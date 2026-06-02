@@ -1,6 +1,6 @@
-from investiq.domain.models import Bar, RawTick
-from investiq.errors import EventOrderingViolation
+from copy import deepcopy
 
+from investiq.domain.models import RawTick
 
 class MarketStore:
     """
@@ -10,6 +10,8 @@ class MarketStore:
         - Key Assumption : RawTicks arrive ordered by timestamp for a given symbol.
         - The current data structure (dict[str, list[RawTick]]) allows
         a future ordering policy without major refactor.
+        - view() returns deep copy to validate the data model and causal flow
+        do not treat this as a hardened ownership boundary.
 
     2026-05-17
         Naive stateful in memory market store.
@@ -23,10 +25,5 @@ class MarketStore:
                 self._history[symbol] = []
             self._history[symbol].extend(payload[symbol])
 
-    def view(self, symbol: str) -> tuple[RawTick, ...]:
-        if symbol not in self._history:
-            raise KeyError(
-                f"symbol={symbol} is not a valid key in MarketStore. "
-                f"Available keys={self._history.keys()}"
-            )
-        return tuple(self._history[symbol])
+    def view(self) -> dict[str, list[RawTick]]:
+        return deepcopy(self._history)
