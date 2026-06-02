@@ -1,7 +1,8 @@
 from ib_insync import IB, Ticker, Stock, Future
 
 from investiq.domain.models import RawTick
-from investiq._archive.raw_tick_buffer import RawTickBuffer
+from investiq.events.canonical_event_factory import CanonicalEventFactory
+from investiq.events.canonical_event_queue import CanonicalEventQueue
 
 class IBLiveMarketDataFeed:
     """
@@ -13,14 +14,16 @@ class IBLiveMarketDataFeed:
     """
     def __init__(
             self,
-            queue: RawTickBuffer,
+            event_factory: CanonicalEventFactory,
+            event_queue: CanonicalEventQueue,
     ):
         self._ib = IB()
         self._ib.pendingTickersEvent += self.on_pending_ticker
         self._tickers: dict[str, Ticker] = {}
 
         self._history: dict[str, list[Ticker]]
-        self._queue = queue
+        self._event_factory = event_factory
+        self._event_queue = event_queue
 
 
     def connect(
@@ -83,10 +86,16 @@ class IBLiveMarketDataFeed:
         """
         raw_ticks: dict[str, list[RawTick]] = {}
         for t in tickers:
+
             _symbol = t.contract.symbol
-            if _symbol not in raw_ticks.keys():
-                raw_ticks[_symbol] = []
             for tick in t.ticks:
+
+                if tick.tickType != 68:
+                    continue
+
+                if _symbol not in raw_ticks:
+                    raw_ticks[_symbol] = []
+
                 raw_tick = RawTick(
                     symbol=_symbol,
                     tick_type=tick.tickType,
@@ -95,4 +104,11 @@ class IBLiveMarketDataFeed:
                     size=tick.size,
                 )
                 raw_ticks[_symbol].append(raw_tick)
-        self._queue.enqueue(raw_ticks)
+
+        if not raw_ticks:
+            return
+
+        event = self._event_factory.create_raw_tick_data_available(
+            payload=raw_ticks
+        )
+        self._event_queue.enqueue(event)
