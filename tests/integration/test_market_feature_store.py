@@ -7,8 +7,7 @@ from investiq.domain.models import RawTick
 
 def test_market_feature_store_one_symbol_valid_update():
     market_store = MarketStore()
-    feature_store = FeatureStore()
-    payload = {
+    feature_store = FeatureStore()payload = {
         "TEST_SYMBOL": [
             RawTick(
                 symbol="TEST_SYMBOL",
@@ -20,9 +19,10 @@ def test_market_feature_store_one_symbol_valid_update():
         ]
     }
     market_store.ingest(payload=payload)
-    print(f"\n{market_store.view()}")
     feature_store.update(market_store.view())
-    print(f"\n{feature_store.view("TEST_SYMBOL")}")
+
+    assert feature_store.view("TEST_SYMBOL") == {}
+
     payload = {
         "TEST_SYMBOL": [
             RawTick(
@@ -35,9 +35,8 @@ def test_market_feature_store_one_symbol_valid_update():
         ]
     }
     market_store.ingest(payload=payload)
-    print(f"\n{market_store.view()}")
     feature_store.update(market_store.view())
-    print(f"\n{feature_store.view("TEST_SYMBOL")}")
+    assert feature_store.view("TEST_SYMBOL", "sma_2") == [106.0]
 
 def test_market_feature_store_two_symbols_valid_updates():
     market_store = MarketStore()
@@ -63,9 +62,9 @@ def test_market_feature_store_two_symbols_valid_updates():
         ]
     }
     market_store.ingest(payload=payload)
-    print(f"\n{market_store.view()}")
     feature_store.update(market_store.view())
-    print(f"\n{feature_store.view()}")
+    assert feature_store.view("SYMBOL_1") == {}
+    assert feature_store.view("SYMBOL_2") == {}
 
     payload = {
         "SYMBOL_1": [
@@ -79,6 +78,6 @@ def test_market_feature_store_two_symbols_valid_updates():
         ],
     }
     market_store.ingest(payload=payload)
-    print(f"\n{market_store.view()}")
     feature_store.update(market_store.view())
-    print(f"\n{feature_store.view()}")
+    assert feature_store.view("SYMBOL_1") == {"sma_2": [112.5]}
+    assert feature_store.view("SYMBOL_2") == {}

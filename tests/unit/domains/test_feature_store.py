@@ -25,7 +25,7 @@ def test_feature_store_ingest_two_valid_ticks():
         ]
     }
     store.update(market_view)
-    print(f"\n{store.view()}")
-    print(f"\n{store.view("TEST_SYMBOL")}")
-    print(f"\n{store.view("TEST_SYMBOL", "sma_2")}")
+    assert store.view() == {'TEST_SYMBOL': {'sma_2': [101.0]}}
+    assert store.view("TEST_SYMBOL") == {'sma_2': [101.0]}
+    assert store.view("TEST_SYMBOL", "sma_2") == [101.0]
 
