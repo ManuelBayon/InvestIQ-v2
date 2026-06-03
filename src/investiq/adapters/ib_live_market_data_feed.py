@@ -2,7 +2,7 @@ from ib_insync import IB, Ticker, Stock, Future
 
 from investiq.domain.models import RawTick
 from investiq.events.canonical_event_factory import CanonicalEventFactory
-from investiq.events.canonical_event_queue import CanonicalEventQueue
+from investiq.runtime.canonical_event_queue import CanonicalEventQueue
 
 class IBLiveMarketDataFeed:
     """
@@ -58,7 +58,7 @@ class IBLiveMarketDataFeed:
             currency: str = "USD",
     ) -> None:
         """
-        Example : reqMktData(Future(symbol="NQ", localSymbol="NQM6",exchange="CME", currency="USD"))
+        Example : reqMktData(Future(symbol="NQ", localSymbol="NQM6"))
         """
         self._tickers[symbol] = self._ib.reqMktData(
             contract=Future(
@@ -108,7 +108,7 @@ class IBLiveMarketDataFeed:
         if not raw_ticks:
             return
 
-        event = self._event_factory.create_raw_tick_data_available(
+        event = self._event_factory.create_tick_data_available(
             payload=raw_ticks
         )
         self._event_queue.enqueue(event)
