@@ -1,195 +1,62 @@
-from typing import Protocol
 from dataclasses import dataclass
+from typing import Protocol
 
-from investiq.domain.order_intents import(
-    MarketOrderIntent,
-    Side,
-    LimitOrderIntent,
-    StopMarketOrderIntent,
-    BracketOrderIntent
-)
-from investiq.domain.models import Bar
-from investiq.events.canonical_events import(
-    IntentGenerated,
-    NoOperation,
-    DecisionContext
-)
+from investiq.domain.models import RawTick
+from investiq.domain.order_intents import OrderSpec
+
 
 @dataclass(frozen=True)
-class DecisionLayerContext:
-    run_id: str
-    next_event_id: str
-    causation_id: str
+class IntentContext:
+    market_view: dict[str, RawTick]
+    feature_view: dict[str, dict[str, float]]
 
+@dataclass(frozen=True)
+class OrderIntent:
+    context: IntentContext
+    order_spec: OrderSpec
+
+@dataclass(frozen=True)
+class NoOperation:
+    context: IntentContext
 
 class DecisionLayer(Protocol):
     def evaluate(
             self,
-            layer_context : DecisionLayerContext,
-            market_view: tuple[Bar,  ...],
-            features_view: tuple[float, ...],
-    ) -> IntentGenerated | NoOperation:
+            market_view: dict[str, list[RawTick]],
+            features_view: dict[str, dict[str, list[float]]],
+    ) -> NoOperation | OrderIntent:
         ...
 
 class NoOperationDecisionLayer:
     """
+    2026-06-02 : Trivial NoOperation DecisionLayer build decision context and returns it to the handler
+    the handler adds meta data event_id, causation_id, run_id etc.
     2026-05-19 : Trivial decision pipeline returning NoOperation used to test complete causal pipeline.
     2026-05-17 : Naive pure decision pipeline. Transforms market and feature into trading decision.
     """
     def evaluate(
             self,
-            layer_context : DecisionLayerContext,
-            market_view: tuple[Bar,  ...],
-            features_view: tuple[float, ...],
-    ) -> IntentGenerated | NoOperation:
-        decision_context = DecisionContext(
-            bar=market_view[-1],
-            features={
-                "sma_2": features_view[-1] if features_view else None
-            },
-        )
+            market_view: dict[str, list[RawTick]],
+            features_view: dict[str, dict[str, list[float]]],
+    ) -> NoOperation:
+        last_tick_view = {}
+        for symbol, ticks in market_view.items():
+            if not ticks:
+                continue
+            last_tick_view[symbol] = ticks[-1]
+
+        last_features = {}
+        for symbol, features in features_view.items():
+            if not features:
+                continue
+            last_features[symbol] = {}
+            for feature_name, values in features.items():
+                if not values:
+                    continue
+                last_features[symbol][feature_name] = values[-1]
         return NoOperation(
-            run_id=layer_context.run_id,
-            event_id=layer_context.next_event_id,
-            causation_id=layer_context.causation_id,
-            meta_data={},
-            context=decision_context,
-        )
-
-class MarketOrderIntentDecisionLayer:
-    """
-    2026-05-19 : Trivial decision pipeline returning MarketOrderIntent used to test complete causal pipeline.
-    """
-    def evaluate(
-            self,
-            layer_context: DecisionLayerContext,
-            market_view: tuple[Bar,  ...],
-            features_view: tuple[float, ...],
-    ) -> IntentGenerated | NoOperation:
-        context = DecisionContext(
-            bar=market_view[-1],
-            features={
-                "sma_2": features_view[-1] if features_view else None
-            },
-        )
-        order_intent = MarketOrderIntent(
-            quantity=1,
-            direction=Side.BUY,
-        )
-        return IntentGenerated(
-            run_id=layer_context.run_id,
-            event_id=layer_context.next_event_id,
-            causation_id=layer_context.causation_id,
-            meta_data={},
-            context=context,
-            intent=order_intent
-        )
-
-class LimitOrderIntentDecisionLayer:
-    """
-    2026-05-19 : Trivial decision pipeline returning LimitOrderIntent used to test complete causal pipeline.
-    """
-    def evaluate(
-            self,
-            layer_context: DecisionLayerContext,
-            market_view: tuple[Bar,  ...],
-            features_view: tuple[float, ...],
-    ) -> IntentGenerated | NoOperation:
-        context = DecisionContext(
-            bar=market_view[-1],
-            features={
-                "sma_2": features_view[-1] if features_view else None
-            },
-        )
-        order_intent = LimitOrderIntent(
-            quantity=1,
-            direction=Side.SELL,
-            price=90.0
-        )
-        return IntentGenerated(
-            run_id=layer_context.run_id,
-            event_id=layer_context.next_event_id,
-            causation_id=layer_context.causation_id,
-            meta_data={},
-            context=context,
-            intent=order_intent
-        )
-
-class StopMarketOrderIntentDecisionLayer:
-    """
-    2026-05-19 : Trivial decision pipeline returning StopMarketOrderIntent used to test complete causal pipeline.
-    """
-    def evaluate(
-            self,
-            layer_context : DecisionLayerContext,
-            market_view: tuple[Bar,  ...],
-            features_view: tuple[float, ...],
-    ) -> IntentGenerated | NoOperation:
-        context = DecisionContext(
-            bar=market_view[-1],
-            features={
-                "sma_2": features_view[-1] if features_view else None
-            },
-        )
-        order_intent = StopMarketOrderIntent(
-            trigger_price=100.0,
-            triggered_order=MarketOrderIntent(
-               quantity=1,
-                direction=Side.BUY,
+            context=IntentContext(
+                market_view=last_tick_view,
+                feature_view=last_features
             )
-        )
-        return IntentGenerated(
-            run_id=layer_context.run_id,
-            event_id=layer_context.next_event_id,
-            causation_id=layer_context.causation_id,
-            meta_data={},
-            context=context,
-            intent=order_intent
-        )
-
-class BracketOrderIntentDecisionLayer:
-    """
-    2026-05-19 : Trivial decision pipeline returning StopMarketOrderIntent used to test complete causal pipeline.
-    """
-    def evaluate(
-            self,
-            layer_context: DecisionLayerContext,
-            market_view: tuple[Bar,  ...],
-            features_view: tuple[float, ...],
-    ) -> IntentGenerated | NoOperation:
-        context = DecisionContext(
-            bar=market_view[-1],
-            features={
-                "sma_2": features_view[-1] if features_view else None
-            },
-        )
-        order_intent = BracketOrderIntent(
-                entry=MarketOrderIntent(
-                   quantity=1,
-                   direction=Side.BUY,
-                ),
-                stop_loss=[
-                    StopMarketOrderIntent(
-                        trigger_price=90.0,
-                        triggered_order=MarketOrderIntent(
-                            quantity=1,
-                            direction=Side.SELL,
-                        )
-                    )
-                ],
-                take_profit=[
-                    LimitOrderIntent(
-                        quantity=1,
-                        direction=Side.SELL,
-                        price=130.0
-                    )
-                ]
-            )
-        return IntentGenerated(
-            run_id=layer_context.run_id,
-            event_id=layer_context.next_event_id,
-            causation_id=layer_context.causation_id,
-            meta_data={},
-            context=context,
-            intent=order_intent
         )
