@@ -16,7 +16,7 @@ def run_bar_available_to_intention_causal_pipeline(
     - different BarAvailable sequences
     - different OrderIntent,
     It returns immuable intents.
-    Decision layers can be found here : sandbox/components/decision_layer.py
+    Decision layers can be found here : sandbox/components/no_op.py
     2026-05-17 : Bar to Intention pipeline
     """
 

@@ -20,6 +20,7 @@ class TestBarPostInitTimestamp:
         ts = make_timestamp(timezone=None)
         with pytest.raises(InvalidBar):
             Bar(
+                symbol="symbol",
                 timestamp_utc=ts,
                 open=100,
                 high=100,
@@ -31,6 +32,7 @@ class TestBarPostInitTimestamp:
         ts = make_timestamp(timezone=datetime.timezone(datetime.timedelta(hours=-1)))
         with pytest.raises(InvalidBar):
             Bar(
+                symbol="symbol",
                 timestamp_utc=ts,
                 open=100,
                 high=100,
@@ -41,6 +43,7 @@ class TestBarPostInitTimestamp:
     def test_init_accepts_utc_timezone(self):
         ts = make_timestamp()
         Bar(
+            symbol="symbol",
             timestamp_utc=ts,
             open=100,
             high=100,
@@ -55,6 +58,7 @@ class TestBarPostInitValues:
         ts = make_timestamp()
         with pytest.raises(InvalidBar):
             Bar(
+                symbol="symbol",
                 timestamp_utc=ts,
                 open=math.inf,
                 high=100,
@@ -66,6 +70,7 @@ class TestBarPostInitValues:
         ts = make_timestamp()
         with pytest.raises(InvalidBar):
             Bar(
+                symbol="symbol",
                 timestamp_utc=ts,
                 open=math.nan,
                 high=100,
@@ -77,6 +82,7 @@ class TestBarPostInitValues:
         ts = make_timestamp()
         with pytest.raises(InvalidBar):
             Bar(
+                symbol="symbol",
                 timestamp_utc=ts,
                 open=-1.0,
                 high=100,
@@ -88,6 +94,7 @@ class TestBarPostInitValues:
         ts = make_timestamp()
         with pytest.raises(InvalidBar):
             Bar(
+                symbol="symbol",
                 timestamp_utc=ts,
                 open=100,
                 high=99,
@@ -99,6 +106,7 @@ class TestBarPostInitValues:
         ts = make_timestamp()
         with pytest.raises(InvalidBar):
             Bar(
+                symbol="symbol",
                 timestamp_utc=ts,
                 open=100,
                 high=100,
@@ -110,6 +118,7 @@ class TestBarPostInitValues:
         ts = make_timestamp()
         with pytest.raises(InvalidBar):
             Bar(
+                symbol="symbol",
                 timestamp_utc=ts,
                 open=100,
                 high=100,
@@ -120,6 +129,7 @@ class TestBarPostInitValues:
     def test_init_accept_valid_case(self):
         ts = make_timestamp()
         bar = Bar(
+            symbol="symbol",
             timestamp_utc=ts,
             open=100.01,
             high=110.02,

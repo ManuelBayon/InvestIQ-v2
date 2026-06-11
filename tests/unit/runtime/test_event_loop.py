@@ -1,20 +1,18 @@
-from investiq.adapters.ib_live_market_data_feed import IBLiveMarketDataFeed
+from datetime import datetime, timezone
+
 from investiq.domain.decision_layer.no_op import NoOperationDecisionLayer
 from investiq.domain.feature_store import FeatureStore
 from investiq.domain.market_store import MarketStore
+from investiq.domain.models import RawTick
 from investiq.events.factory import CanonicalEventFactory
-
 from investiq.runtime.canonical_event_queue import CanonicalEventQueue
 from investiq.runtime.event_loop import EventLoop
 from investiq.runtime.handlers.tick_data_available_handler import TickDataAvailableHandler
 from investiq.runtime.journal import CanonicalJournal
-from investiq.runtime.live_runtime import LiveRuntime
 from investiq.runtime.orchestrator import Orchestrator
 
 
-
-
-def bootstrap_live_runtime() -> LiveRuntime:
+def test_event_loop_run_until_empty():
     journal = CanonicalJournal()
     queue = CanonicalEventQueue()
     market_store = MarketStore()
@@ -30,17 +28,37 @@ def bootstrap_live_runtime() -> LiveRuntime:
     orchestrator = Orchestrator(
         tick_available_handler=tick_data_available_handler,
     )
-    event_loop = EventLoop(
+    loop = EventLoop(
         journal=journal,
         event_queue=queue,
         orchestrator=orchestrator,
     )
-    data_feed = IBLiveMarketDataFeed(
-        event_factory=event_factory,
-        event_queue=queue,
+    event_1 = event_factory.create_tick_data_available(
+        payload={
+            "symbol" : [
+                RawTick(
+                    symbol="symbol",
+                    timestamp_utc=datetime(2026,1,1, tzinfo=timezone.utc),
+                    tick_type=68,
+                    price=100.0,
+                    size=1.0,
+                )
+            ]
+        }
     )
-
-    return LiveRuntime(
-        data_feed=data_feed,
-        event_loop=event_loop
+    queue.enqueue(event_1)
+    event_2 = event_factory.create_tick_data_available(
+        payload={
+            "symbol": [
+                RawTick(
+                    symbol="symbol",
+                    timestamp_utc=datetime(2026, 1, 1, tzinfo=timezone.utc),
+                    tick_type=68,
+                    price=100.0,
+                    size=1.0,
+                )
+            ]
+        }
     )
+    queue.enqueue(event_2)
+    loop.run_until_empty()

@@ -8,11 +8,11 @@ class Side(Enum):
     SELL = auto()
 
 @dataclass(frozen=True)
-class Intent(ABC):
+class OrderSpec(ABC):
     ...
 
 @dataclass(frozen=True)
-class MarketOrderIntent(Intent):
+class MarketOrderSpec(OrderSpec):
     quantity: float
     direction : Side
     def __post_init__(self):
@@ -22,7 +22,7 @@ class MarketOrderIntent(Intent):
             raise ValueError(f"quantity must be positive, got quantity={self.quantity}")
 
 @dataclass(frozen=True)
-class LimitOrderIntent(Intent):
+class LimitOrderSpec(OrderSpec):
     quantity: float
     direction: Side
     price: float
@@ -32,15 +32,15 @@ class LimitOrderIntent(Intent):
         if not self.quantity > 0:
             raise ValueError(f"quantity must be positive, got quantity={self.quantity}")
         if not isfinite(self.price):
-            raise ValueError(f"price must be finite, got price={self.quantity}")
+            raise ValueError(f"price must be finite, got price={self.price}")
         if not self.price > 0:
-            raise ValueError(f"price must be positive, got price={self.quantity}")
+            raise ValueError(f"price must be positive, got price={self.price}")
 
 
 @dataclass(frozen=True)
-class StopMarketOrderIntent(Intent):
+class StopMarketOrderSpec(OrderSpec):
     trigger_price: float
-    triggered_order : MarketOrderIntent
+    triggered_order : MarketOrderSpec
     def __post_init__(self):
         if not isfinite(self.trigger_price):
             raise ValueError(f"trigger_price must be finite, got trigger_price={self.trigger_price}")
@@ -48,10 +48,10 @@ class StopMarketOrderIntent(Intent):
             raise ValueError(f"trigger_price must be positive, got trigger_price={self.trigger_price}")
 
 @dataclass(frozen=True)
-class BracketOrderIntent(Intent):
-    entry: MarketOrderIntent | LimitOrderIntent
-    stop_loss: list[StopMarketOrderIntent] | None
-    take_profit: list[LimitOrderIntent] | None
+class BracketOrderSpec(OrderSpec):
+    entry: MarketOrderSpec | LimitOrderSpec
+    stop_loss: list[StopMarketOrderSpec] | None
+    take_profit: list[LimitOrderSpec] | None
     def __post_init__(self):
 
         if not self.take_profit and not self.stop_loss:

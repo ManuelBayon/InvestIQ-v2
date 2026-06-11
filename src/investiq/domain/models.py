@@ -20,7 +20,7 @@ class Bar:
             raise InvalidBar("timestamp must be in UTC use datetime.timezone.utc")
 
         values = (self.open, self.high, self.low, self.close)
-        if any(v < 0 or isfinite(v) for v in values):
+        if any(v < 0 or not isfinite(v) for v in values):
             raise InvalidBar(
                 f"Values must be finite and non-negative: "
                 f"open={self.open}, high={self.high}, low={self.low}, close={self.close}"
@@ -57,3 +57,13 @@ class RawTick:
             raise InvaliRawTick(f"price must be a finite non-negative float: price={self.price}")
         if self.size < 0:
             raise InvaliRawTick(f"size must be non-negative: size={self.size}")
+
+    def __repr__(self):
+        return (
+            f"RawTick("
+            f"symbol={self.symbol}, "
+            f"timestamp={self.timestamp_utc:%Y-%m-%dT%H:%M:%S.%f}Z, "
+            f"type={self.tick_type}, "
+            f"price={self.price}, "
+            f"size={self.size})"
+        )

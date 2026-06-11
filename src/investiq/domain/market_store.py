@@ -1,23 +1,29 @@
-from investiq.domain.models import Bar
-from investiq.errors import EventOrderingViolation
+from copy import deepcopy
 
+from investiq.domain.models import RawTick
 
 class MarketStore:
     """
-    2026-05-17: Naive stateful in memory market store.
+    2026-06-02
+        - using RawTick.
+        - RawTicks are grouped by symbol.
+        - Key Assumption : RawTicks arrive ordered by timestamp for a given symbol.
+        - The current data structure (dict[str, list[RawTick]]) allows
+        a future ordering policy without major refactor.
+        - view() returns deep copy to validate the data model and causal flow
+        do not treat this as a hardened ownership boundary.
+
+    2026-05-17
+        Naive stateful in memory market store.
     """
     def __init__(self):
-        self._history: list[Bar] = []
+        self._history: dict[str, list[RawTick]] = {}
 
-    def ingest(self, bar: Bar) -> None:
-        if self._history:
-            if bar.timestamp_utc <= self._history[-1].timestamp_utc:
-                raise EventOrderingViolation(
-                    f"bar.timestamp_utc must be strictly greater than last processed"
-                    f"bar.timestamp_utc={bar.timestamp_utc}, "
-                    f"last_processed={self._history[-1].timestamp_utc}"
-                )
-        self._history.append(bar)
+    def ingest(self, payload: dict[str, list[RawTick]]) -> None:
+        for symbol in payload:
+            if symbol not in self._history:
+                self._history[symbol] = []
+            self._history[symbol].extend(payload[symbol])
 
-    def view(self) -> tuple[Bar, ...]:
-        return tuple(self._history)
+    def view(self) -> dict[str, list[RawTick]]:
+        return deepcopy(self._history)
