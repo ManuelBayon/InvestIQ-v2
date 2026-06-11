@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from investiq.domain.models import RawTick
-from investiq.events.canonical_event_factory import CanonicalEventFactory
+from investiq.events.factory import CanonicalEventFactory
 
 
 def test_canonical_event_tick_data_available():

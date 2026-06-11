@@ -1,7 +1,7 @@
 from ib_insync import IB, Ticker, Stock, Future
 
 from investiq.domain.models import RawTick
-from investiq.events.canonical_event_factory import CanonicalEventFactory
+from investiq.events.factory import CanonicalEventFactory
 from investiq.runtime.canonical_event_queue import CanonicalEventQueue
 
 class IBLiveMarketDataFeed:

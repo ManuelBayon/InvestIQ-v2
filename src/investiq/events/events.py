@@ -1,19 +1,20 @@
 from abc import ABC
 from dataclasses import dataclass
 
-from investiq.domain.decision_layer import NoOperation, OrderIntent
+from investiq.domain.decision_layer.base import NoOperation, OrderIntent
 from investiq.domain.models import RawTick
 
 
 @dataclass(frozen=True)
-class BaseEvent(ABC):
+class CanonicalEvent(ABC):
     run_id: str
     event_id: str
     causation_id: str | None
-    meta_data: dict[str, str]
+    meta_data: dict
+    payload: object
 
 @dataclass(frozen=True)
-class TickDataAvailable(BaseEvent):
+class TickDataAvailable(CanonicalEvent):
     payload: dict[str, list[RawTick]]
     def __repr__(self):
         return (
@@ -27,7 +28,7 @@ class TickDataAvailable(BaseEvent):
         )
 
 @dataclass(frozen=True)
-class IntentGenerated(BaseEvent):
+class IntentGenerated(CanonicalEvent):
     payload: NoOperation | OrderIntent
     def __repr__(self):
         return (

@@ -1,10 +1,10 @@
 from datetime import datetime, timezone
 
-from investiq.domain.decision_layer import NoOperationDecisionLayer, NoOperation
+from investiq.domain.decision_layer.no_op import NoOperationDecisionLayer, NoOperation
 from investiq.domain.feature_store import FeatureStore
 from investiq.domain.market_store import MarketStore
 from investiq.domain.models import RawTick
-from investiq.events.canonical_event_factory import CanonicalEventFactory
+from investiq.events.factory import CanonicalEventFactory
 from investiq.runtime.handlers.tick_data_available_handler import TickDataAvailableHandler
 
 def test_nominal_tick_data_available_handler_returns_no_operation():

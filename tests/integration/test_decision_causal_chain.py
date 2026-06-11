@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
 
+from investiq.domain.decision_layer.no_op import NoOperationDecisionLayer
 from investiq.domain.feature_store import FeatureStore
 from investiq.domain.market_store import MarketStore
 from investiq.domain.models import RawTick
-from investiq.domain.decision_layer import NoOperationDecisionLayer
 
 
 def test_market_feature_store_one_symbol_valid_update():

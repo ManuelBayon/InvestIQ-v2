@@ -1,10 +1,10 @@
 from datetime import datetime, timezone
 
-from investiq.domain.decision_layer import NoOperationDecisionLayer
+from investiq.domain.decision_layer.no_op import NoOperationDecisionLayer
 from investiq.domain.feature_store import FeatureStore
 from investiq.domain.market_store import MarketStore
 from investiq.domain.models import RawTick
-from investiq.events.canonical_event_factory import CanonicalEventFactory
+from investiq.events.factory import CanonicalEventFactory
 from investiq.runtime.canonical_event_queue import CanonicalEventQueue
 from investiq.runtime.event_loop import EventLoop
 from investiq.runtime.handlers.tick_data_available_handler import TickDataAvailableHandler

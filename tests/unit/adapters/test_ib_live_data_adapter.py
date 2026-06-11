@@ -1,12 +1,13 @@
 from datetime import datetime, timezone
+from queue import Empty
 
 import pytest
 from ib_insync import Ticker, Stock, TickData
 
 from investiq.adapters.ib_live_market_data_feed import IBLiveMarketDataFeed
-from investiq.events.canonical_event_factory import CanonicalEventFactory
+from investiq.events.factory import CanonicalEventFactory
 from investiq.runtime.canonical_event_queue import CanonicalEventQueue
-from investiq.events.canonical_events import TickDataAvailable
+from investiq.events.events import TickDataAvailable
 
 
 def test_on_pending_ticker_enqueues_tick_data_available_event() -> None:
@@ -23,9 +24,9 @@ def test_on_pending_ticker_enqueues_tick_data_available_event() -> None:
     )
     live_adapter.on_pending_ticker(tickers={ticker})
 
-    available_tick = event_queue.dequeue()
-    with pytest.raises(IndexError):
-        event_queue.dequeue()
+    available_tick = event_queue.dequeue_nowait()
+    with pytest.raises(Empty):
+        event_queue.dequeue_nowait()
 
     assert isinstance(available_tick, TickDataAvailable)
 

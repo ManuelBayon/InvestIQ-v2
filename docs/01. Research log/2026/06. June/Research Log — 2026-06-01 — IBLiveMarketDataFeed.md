@@ -1,0 +1,5 @@
+Faisant suite à ma décision de passer les ticks directement sans aggrégation en bougie. La responsabilité du `IBLiveMarketDataFeed` devient de canoniser les ticks reçus en `RawTick`, les regrouper par instrument (symbol) dans un dictionnaire et pousser l'évènement canonique `TickDataAvailable` sur la file d'attente, puis retourner pour libérer le callback.
+
+Ceci représente une boucle / fonction indépendante du reste du système on pourrait dire que sont rôle est d'alimenter le système en ticks (normalisés) et de produire l'évènement `TickAvailable`.
+
+Les composants en aval notamment la boucle évènementiel selon sa politique (pour l'instant implicite -> FIFO) consomme ces évènements et appelle la chaine causale de décision comprenant la mise à jour du MarketStore, le mise à jour du FeatureStore et enfin le pipeline de décision produit une `IntentGenerated` avec une ordre market, limite, bracket (avec stop loss et/ou take-profit) ou `NoOperation`.

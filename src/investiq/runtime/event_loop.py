@@ -1,5 +1,5 @@
 from investiq.runtime.canonical_event_queue import CanonicalEventQueue
-from investiq.events.canonical_events import BaseEvent
+from investiq.events.events import CanonicalEvent
 from investiq.runtime.journal import CanonicalJournal
 from investiq.runtime.orchestrator import Orchestrator
 
@@ -16,7 +16,7 @@ class EventLoop:
         self._orchestrator = orchestrator
         self._running = False
 
-    def _process(self, event: BaseEvent) -> None:
+    def _process(self, event: CanonicalEvent) -> None:
         self._journal.append(event)
         print(event) # debug
         result_event = self._orchestrator.dispatch(event)

@@ -1,6 +1,6 @@
-from investiq.domain.decision_layer import OrderIntent
+from investiq.domain.decision_layer.base import NoOperation, OrderIntent
 from investiq.domain.models import RawTick
-from investiq.events.canonical_events import TickDataAvailable, NoOperation, IntentGenerated
+from investiq.events.events import TickDataAvailable, IntentGenerated
 
 
 class CanonicalEventFactory:

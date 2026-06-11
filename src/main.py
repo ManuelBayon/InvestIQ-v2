@@ -1,7 +1,6 @@
-
-from investiq.bootstrap.live import LiveRuntime
+from investiq.bootstrap.live import bootstrap_live_runtime
 
 if __name__ == "__main__":
 
-    runtime = LiveRuntime()
-    runtime.run_market_data_feed()
+    live_runtime = bootstrap_live_runtime()
+    live_runtime.run()

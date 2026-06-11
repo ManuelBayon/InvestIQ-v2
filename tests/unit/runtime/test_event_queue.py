@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from investiq.domain.models import RawTick
-from investiq.events.canonical_events import TickDataAvailable
+from investiq.events.events import TickDataAvailable
 from investiq.runtime.canonical_event_queue import CanonicalEventQueue
 
 

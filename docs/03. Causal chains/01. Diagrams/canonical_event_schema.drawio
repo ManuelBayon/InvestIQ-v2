@@ -303,14 +303,14 @@
     </mxGraphModel>
   </diagram>
   <diagram id="u-JYzDH35PlNA-ds-YEf" name="LiveMarketDataFeed">
-    <mxGraphModel dx="673" dy="399" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="783" dy="473" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="I4WkoPDtw0mHYIQZqdtm-28" edge="1" parent="1" source="dDrBZWLs8hcY7cqTl--j-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="I4WkoPDtw0mHYIQZqdtm-27">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="I4WkoPDtw0mHYIQZqdtm-30" connectable="0" parent="I4WkoPDtw0mHYIQZqdtm-28" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="data_queue.push(tickers)" vertex="1">
+        <mxCell id="I4WkoPDtw0mHYIQZqdtm-30" connectable="0" parent="I4WkoPDtw0mHYIQZqdtm-28" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="event_queue.push(TickDataAvailable)" vertex="1">
           <mxGeometry relative="1" x="-0.19" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
@@ -376,7 +376,7 @@
         <mxCell id="I4WkoPDtw0mHYIQZqdtm-29" edge="1" parent="1" source="I4WkoPDtw0mHYIQZqdtm-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="I4WkoPDtw0mHYIQZqdtm-3">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="I4WkoPDtw0mHYIQZqdtm-27" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Tickers" vertex="1">
+        <mxCell id="I4WkoPDtw0mHYIQZqdtm-27" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="TickDataAvailable" vertex="1">
           <mxGeometry height="40" width="140" x="40" y="270" as="geometry" />
         </mxCell>
         <mxCell id="I4WkoPDtw0mHYIQZqdtm-33" edge="1" parent="1" source="I4WkoPDtw0mHYIQZqdtm-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="I4WkoPDtw0mHYIQZqdtm-5">

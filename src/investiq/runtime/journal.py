@@ -1,10 +1,10 @@
-from investiq.events.canonical_events import BaseEvent
+from investiq.events.events import CanonicalEvent
 
 
 class CanonicalJournal:
 
     def __init__(self):
-        self._journal: list[BaseEvent] = []
+        self._journal: list[CanonicalEvent] = []
 
-    def append(self, event: BaseEvent) -> None:
+    def append(self, event: CanonicalEvent) -> None:
         self._journal.append(event)

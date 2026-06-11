@@ -7,7 +7,8 @@ from investiq.domain.models import RawTick
 
 def test_market_feature_store_one_symbol_valid_update():
     market_store = MarketStore()
-    feature_store = FeatureStore()payload = {
+    feature_store = FeatureStore()
+    payload = {
         "TEST_SYMBOL": [
             RawTick(
                 symbol="TEST_SYMBOL",

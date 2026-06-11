@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from investiq.domain.decision_layer import NoOperationDecisionLayer, NoOperation
+from investiq.domain.decision_layer.no_op import NoOperationDecisionLayer, NoOperation
 from investiq.domain.feature_store import FeatureStore
 from investiq.domain.market_store import MarketStore
 from investiq.domain.models import RawTick
@@ -22,7 +22,7 @@ def test_no_op_layer_returns_valid_no_operation():
     payload = {"test_symbol": [tick_1]}
     market_store.ingest(payload=payload)
     feature_store.update(market_store.view())
-    decision_layer.evaluate(market_view=market_store.view(), features_view=feature_store.view())
+    decision_layer.evaluate(market_view=market_store.view(), feature_view=feature_store.view())
 
     tick_2 = RawTick(
         symbol="test_symbol",
@@ -34,7 +34,7 @@ def test_no_op_layer_returns_valid_no_operation():
     payload = {"test_symbol": [tick_2]}
     market_store.ingest(payload=payload)
     feature_store.update(market_store.view())
-    decision_layer.evaluate(market_view=market_store.view(), features_view=feature_store.view())
+    decision_layer.evaluate(market_view=market_store.view(), feature_view=feature_store.view())
 
     tick_3 = RawTick(
         symbol="test_symbol",
@@ -46,8 +46,8 @@ def test_no_op_layer_returns_valid_no_operation():
     payload = {"test_symbol": [tick_3]}
     market_store.ingest(payload=payload)
     feature_store.update(market_store.view())
-    result_3 = decision_layer.evaluate(market_view=market_store.view(), features_view=feature_store.view())
+    result_3 = decision_layer.evaluate(market_view=market_store.view(), feature_view=feature_store.view())
 
     assert isinstance(result_3, NoOperation) 
-    assert result_3.context.market_view == {"test_symbol":tick_3}
-    assert result_3.context.feature_view == {"test_symbol":{"sma_2": 105.5}}
+    assert result_3.context.last_tick == {"test_symbol":tick_3}
+    assert result_3.context.last_features == {"test_symbol":{"sma_2": 105.5}}
