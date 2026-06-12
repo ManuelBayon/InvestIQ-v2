@@ -11,9 +11,6 @@ from investiq.runtime.journal import CanonicalJournal
 from investiq.runtime.live_runtime import LiveRuntime
 from investiq.runtime.orchestrator import Orchestrator
 
-
-
-
 def bootstrap_live_runtime() -> LiveRuntime:
 
     journal = CanonicalJournal()
