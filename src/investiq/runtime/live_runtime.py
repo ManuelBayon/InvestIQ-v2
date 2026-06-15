@@ -17,7 +17,7 @@ class LiveRuntime:
     def run(self) -> None:
 
         self._data_feed.connect()
-        self._data_feed.subscribe_to_cont_fut(symbol="MNQ", local_symbol="MNQM6")
+        self._data_feed.subscribe_to_future(symbol="MNQ", local_symbol="MNQM6")
 
         runtime_thread = Thread(target=self._event_loop.run, daemon=True)
 

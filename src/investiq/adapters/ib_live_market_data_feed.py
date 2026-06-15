@@ -50,7 +50,7 @@ class IBLiveMarketDataFeed:
         """
         self._tickers[symbol] = self._ib.reqMktData(Stock(symbol, exchange, currency))
 
-    def subscribe_to_cont_fut(
+    def subscribe_to_future(
             self,
             symbol: str,
             local_symbol: str,
