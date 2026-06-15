@@ -4,7 +4,7 @@ from investiq.domain.models import RawTick
 
 
 def make_raw_tick(
-        symbol: str,
+        symbol = "symbol",
         timestamp_utc: datetime = datetime(2026,1,1, 12, tzinfo=timezone.utc),
         tick_type: int = 68,
         price: float = 100.0,
