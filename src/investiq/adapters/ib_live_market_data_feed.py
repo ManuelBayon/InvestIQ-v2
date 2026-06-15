@@ -58,7 +58,7 @@ class IBLiveMarketDataFeed:
             currency: str = "USD",
     ) -> None:
         """
-        Example : reqMktData(Future(symbol="NQ", localSymbol="NQM6"))
+        Example : reqMktData(Future(symbol="NQ", localSymbol="NQM6", exchange"CME"))
         """
         self._tickers[symbol] = self._ib.reqMktData(
             contract=Future(
