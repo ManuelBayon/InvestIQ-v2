@@ -1,6 +1,6 @@
 import pytest
 from math import nan
-from investiq.domain.order_intents import (Side, LimitOrderSpec, BracketOrderSpec, StopMarketOrderSpec, MarketOrderSpec)
+from investiq.domain.order_specs import (Side, LimitOrderSpec, BracketOrderSpec, StopMarketOrderSpec, MarketOrderSpec)
 
 class TestMarketOrderIntent:
     def test_market_order_intent_raises_if_quantity_not_finite(self):
