@@ -1,16 +1,14 @@
 from ib_insync import IB, Future, MarketOrder, Trade, LimitOrder, Contract, StopOrder, BracketOrder
 
 
-def format_trade(trade: Trade) -> str:
-    return \
-    f"""
-    contrat:{trade.contract}
-    order:{trade.order}
-    status:{trade.orderStatus.status}
-    filled:{trade.orderStatus.filled}
-    remaining:{trade.orderStatus.remaining}
-    avgFillPrice:{trade.orderStatus.avgFillPrice}
-    """
+def format_trade(trade_: Trade) -> str:
+    return f"""
+    contrat:{trade_.contract}
+    order:{trade_.order}
+    status:{trade_.orderStatus.status}
+    filled:{trade_.orderStatus.filled}
+    remaining:{trade_.orderStatus.remaining}
+    avgFillPrice:{trade_.orderStatus.avgFillPrice}"""
 
 
 class IBLiveMarketDataFeed:
@@ -29,10 +27,8 @@ class IBLiveMarketDataFeed:
             host: str = "127.0.0.1",
             port: int = 4002,
             client_id: int = 1,
-            data_type: int = 3,  # 1 = Live / 3 = Delayed
     ) -> None:
         self.ib.connect(host, port, clientId=client_id)
-        self.ib.reqMarketDataType(data_type)
 
     def disconnect(self):
         self.ib.disconnect()
@@ -127,9 +123,6 @@ def place_bracket_order(
     return bracket_trade
 
 if __name__ == "__main__":
-    """
-    
-    """
     ib_connexion = IBLiveMarketDataFeed()
     ib_connexion.connect()
     contract = Future(symbol="MNQ", localSymbol="MNQU6", exchange="CME")
@@ -139,3 +132,4 @@ if __name__ == "__main__":
             formated = format_trade(t)
             print(formated)
         ib_connexion.ib.sleep(2)
+    ib_connexion.disconnect()
