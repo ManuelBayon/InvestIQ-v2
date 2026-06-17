@@ -1,10 +1,14 @@
-from ib_insync import IB, Ticker, Stock, Future
+import asyncio
 
+from ib_insync import IB, Ticker, Stock, Future, Contract, MarketOrder, Trade
+
+from investiq.domain.instruments import StockSpecs
 from investiq.domain.models import RawTick
+from investiq.domain.order_specs import Side, OrderSpec, MarketOrderSpec
 from investiq.events.factory import CanonicalEventFactory
 from investiq.runtime.canonical_event_queue import CanonicalEventQueue
 
-class IBLiveMarketDataFeed:
+class IBKRGatewayAdapter:
     """
     2026-05-21 :
         MVP limitation:
@@ -29,7 +33,7 @@ class IBLiveMarketDataFeed:
     def connect(
             self,
             host: str = "127.0.0.1",
-            port: int = 7497,
+            port: int = 4002,
             client_id: int = 1,
             data_type: int = 3,  # 1 = Live / 3 = Delayed
     ) -> None:
@@ -58,7 +62,7 @@ class IBLiveMarketDataFeed:
             currency: str = "USD",
     ) -> None:
         """
-        Example : reqMktData(Future(symbol="NQ", localSymbol="NQM6", exchange"CME"))
+        Example : reqMktData(Future(symbol="NQ", local_symbol="NQU6", exchange"CME"))
         """
         self._tickers[symbol] = self._ib.reqMktData(
             contract=Future(
@@ -70,6 +74,7 @@ class IBLiveMarketDataFeed:
         )
 
     def run(self) -> None:
+        self._loop = asyncio.get_event_loop()
         self._ib.run()
 
     def on_pending_ticker(
@@ -112,3 +117,35 @@ class IBLiveMarketDataFeed:
             payload=raw_ticks
         )
         self._event_queue.enqueue(event)
+
+    def place_market_order(
+            self,
+            order_specs: MarketOrderSpec
+    ) -> None:
+        instrument = order_specs.instrument
+        if isinstance(instrument, StockSpecs):
+            contract = Stock(
+                symbol=instrument.symbol,
+                exchange=instrument.exchange,
+                currency=instrument.currency
+            )
+        else:
+            raise NotImplementedError(
+                f"Unsupported instrument for market order:{type(instrument).__name__}"
+            )
+
+        order = MarketOrder(
+            action=order_specs.direction.name,
+            totalQuantity=order_specs.quantity
+        )
+        order.tif = order_specs.tif
+
+        self._loop.call_soon_threadsafe(
+            self._place_market_order_on_ib_loop,
+            contract,
+            order
+        )
+
+    def _place_market_order_on_ib_loop(self, contract: Contract, order: MarketOrder) -> None:
+        trade = self._ib.placeOrder(contract, order)
+        print("[IBKR TRADE CREATED]", trade)
