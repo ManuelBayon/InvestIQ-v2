@@ -18,11 +18,11 @@ class EventLoop:
 
     def _process(self, event: CanonicalEvent) -> None:
         self._journal.append(event)
-        print(event) # debug
-        result_event = self._orchestrator.dispatch(event)
-        if result_event is not None:
-            self._journal.append(result_event)
-            print(result_event) # debug
+        print(event)
+        result = self._orchestrator.dispatch(event)
+        if result is not None:
+            self._journal.append(result)
+            self._event_queue.enqueue(result)
 
     def run_until_empty(self) -> None:
         """
