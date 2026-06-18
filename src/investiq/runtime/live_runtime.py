@@ -1,6 +1,6 @@
 from threading import Thread
 
-from investiq.adapters.ib_live_market_data_feed import IBLiveMarketDataFeed
+from investiq.adapters.ibkr_adapter import IBKRGatewayAdapter
 from investiq.runtime.event_loop import EventLoop
 
 
@@ -8,7 +8,7 @@ class LiveRuntime:
 
     def __init__(
             self,
-            data_feed: IBLiveMarketDataFeed,
+            data_feed: IBKRGatewayAdapter,
             event_loop: EventLoop,
     ):
         self._data_feed = data_feed
@@ -18,6 +18,7 @@ class LiveRuntime:
 
         self._data_feed.connect()
         self._data_feed.subscribe_to_future(symbol="MNQ", local_symbol="MNQM6")
+        self._data_feed.subscribe_to_stock("AMD")
 
         runtime_thread = Thread(target=self._event_loop.run, daemon=True)
 
