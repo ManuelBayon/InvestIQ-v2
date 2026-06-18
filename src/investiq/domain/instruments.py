@@ -3,17 +3,17 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
-class InstrumentSpec(ABC):
+class InstrumentSpecs(ABC):
     ...
 
 @dataclass(frozen=True)
-class StockSpecs(InstrumentSpec):
+class StockSpecs(InstrumentSpecs):
     symbol: str
     exchange: str = "SMART"
     currency: str = "USD"
 
 @dataclass(frozen=True)
-class FutureSpecs(InstrumentSpec):
+class FutureSpecs(InstrumentSpecs):
     symbol: str
     local_symbol: str
     exchange: str = "CME"
