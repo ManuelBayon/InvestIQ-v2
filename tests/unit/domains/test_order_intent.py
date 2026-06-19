@@ -1,28 +1,38 @@
 import pytest
 from math import nan
+
+from investiq.domain.instruments import InstrumentSpecs, StockSpecs
 from investiq.domain.order_specs import (Side, LimitOrderSpec, BracketOrderSpec, StopMarketOrderSpec, MarketOrderSpec)
 
 class TestMarketOrderIntent:
     def test_market_order_intent_raises_if_quantity_not_finite(self):
         with pytest.raises(ValueError):
             MarketOrderSpec(
+                instrument=StockSpecs("AMD"),
+                tif="DAY",
                 quantity=nan,
-                direction=Side.BUY
+                direction=Side.BUY,
             )
     def test_market_order_intent_raises_if_quantity_is_null(self):
         with pytest.raises(ValueError):
             MarketOrderSpec(
+                instrument=StockSpecs("AMD"),
+                tif="DAY",
                 quantity=0,
                 direction=Side.BUY
             )
     def test_market_order_intent_raises_if_quantity_is_negative(self):
         with pytest.raises(ValueError):
             MarketOrderSpec(
+                instrument=StockSpecs("AMD"),
+                tif="DAY",
                 quantity=-1,
                 direction=Side.BUY
             )
     def test_market_order_intent_valid_case(self):
         MarketOrderSpec(
+            instrument=StockSpecs("AMD"),
+            tif="DAY",
             quantity=1,
             direction=Side.BUY
         )
@@ -83,6 +93,8 @@ class TestStopMarketOrderIntent:
             StopMarketOrderSpec(
                 trigger_price=nan,
                 triggered_order= MarketOrderSpec(
+                    instrument=StockSpecs("AMD"),
+                    tif="DAY",
                     quantity=1,
                     direction=Side.BUY
                 )
@@ -92,6 +104,8 @@ class TestStopMarketOrderIntent:
             StopMarketOrderSpec(
                 trigger_price=0,
                 triggered_order= MarketOrderSpec(
+                    instrument=StockSpecs("AMD"),
+                    tif="DAY",
                     quantity=1,
                     direction=Side.BUY
                 )
@@ -101,6 +115,8 @@ class TestStopMarketOrderIntent:
             StopMarketOrderSpec(
                 trigger_price=-1,
                 triggered_order= MarketOrderSpec(
+                    instrument=StockSpecs("AMD"),
+                    tif="DAY",
                     quantity=1,
                     direction=Side.BUY
                 )
@@ -109,6 +125,8 @@ class TestStopMarketOrderIntent:
         StopMarketOrderSpec(
             trigger_price=100.0,
             triggered_order=MarketOrderSpec(
+                instrument=StockSpecs("AMD"),
+                tif="DAY",
                 quantity=1,
                 direction=Side.BUY
             )
@@ -138,6 +156,8 @@ class TestBracketOrderIntent:
                     StopMarketOrderSpec(
                         trigger_price=100.0,
                         triggered_order=MarketOrderSpec(
+                            instrument=StockSpecs("AMD"),
+                            tif="DAY",
                             quantity=1,
                             direction=Side.BUY
                         )
@@ -174,6 +194,8 @@ class TestBracketOrderIntent:
                     StopMarketOrderSpec(
                         trigger_price=100.0,
                         triggered_order=MarketOrderSpec(
+                            instrument=StockSpecs("AMD"),
+                            tif="DAY",
                             quantity=1,
                             direction=Side.SELL
                         )
@@ -181,6 +203,8 @@ class TestBracketOrderIntent:
                     StopMarketOrderSpec(
                         trigger_price=100.0,
                         triggered_order=MarketOrderSpec(
+                            instrument=StockSpecs("AMD"),
+                            tif="DAY",
                             quantity=1,
                             direction=Side.SELL
                         )
@@ -200,6 +224,8 @@ class TestBracketOrderIntent:
                     StopMarketOrderSpec(
                         trigger_price=100.0,
                         triggered_order=MarketOrderSpec(
+                            instrument=StockSpecs("AMD"),
+                            tif="DAY",
                             quantity=2,
                             direction=Side.SELL
                         )
