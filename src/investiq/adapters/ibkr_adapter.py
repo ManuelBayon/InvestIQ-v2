@@ -2,13 +2,13 @@ import asyncio
 
 from ib_insync import IB, Ticker, Stock, Future, Contract, MarketOrder, Trade
 
-from investiq.domain.instruments import StockSpecs
+from investiq.domain.instruments import StockSpecs, FutureSpecs
 from investiq.domain.models import RawTick
 from investiq.domain.order_specs import Side, OrderSpec, MarketOrderSpec
 from investiq.events.factory import CanonicalEventFactory
 from investiq.runtime.canonical_event_queue import CanonicalEventQueue
 
-class IBKRGatewayAdapter:
+class IBKRAdapter:
     """
     2026-05-21 :
         MVP limitation:
@@ -74,7 +74,6 @@ class IBKRGatewayAdapter:
         )
 
     def run(self) -> None:
-        self._loop = asyncio.get_event_loop()
         self._ib.run()
 
     def on_pending_ticker(
@@ -122,12 +121,21 @@ class IBKRGatewayAdapter:
             self,
             order_specs: MarketOrderSpec
     ) -> None:
+
         instrument = order_specs.instrument
+
         if isinstance(instrument, StockSpecs):
             contract = Stock(
                 symbol=instrument.symbol,
                 exchange=instrument.exchange,
                 currency=instrument.currency
+            )
+        elif isinstance(instrument, FutureSpecs):
+            contract = Future(
+                symbol=instrument.symbol,
+                localSymbol=instrument.local_symbol,
+                exchange=instrument.exchange,
+                currency=instrument.currency,
             )
         else:
             raise NotImplementedError(
@@ -139,13 +147,4 @@ class IBKRGatewayAdapter:
             totalQuantity=order_specs.quantity
         )
         order.tif = order_specs.tif
-
-        self._loop.call_soon_threadsafe(
-            self._place_market_order_on_ib_loop,
-            contract,
-            order
-        )
-
-    def _place_market_order_on_ib_loop(self, contract: Contract, order: MarketOrder) -> None:
-        trade = self._ib.placeOrder(contract, order)
-        print("[IBKR TRADE CREATED]", trade)
+        self._ib.placeOrder(contract, order)
