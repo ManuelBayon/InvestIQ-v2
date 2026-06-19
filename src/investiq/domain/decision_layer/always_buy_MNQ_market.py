@@ -1,10 +1,10 @@
 from investiq.domain.decision_layer.base import DecisionLayer, _build_context, OrderIntent
-from investiq.domain.instruments import StockSpecs
+from investiq.domain.instruments import FutureSpecs
 from investiq.domain.models import RawTick
 from investiq.domain.order_specs import MarketOrderSpec, Side
 
 
-class AlwaysBuyAMDMarketDecisionLayer(DecisionLayer):
+class AlwaysBuyMNQMarket(DecisionLayer):
     """
     """
     def evaluate(
@@ -16,9 +16,9 @@ class AlwaysBuyAMDMarketDecisionLayer(DecisionLayer):
         return OrderIntent(
             context=context,
             order_spec=MarketOrderSpec(
-                instrument=StockSpecs(symbol="AMD"),
+                instrument=FutureSpecs("MNQ", "MNQU6"),
                 quantity=1,
                 direction=Side.BUY,
-                tif="DAY"
+                tif="GTC"
             )
         )
