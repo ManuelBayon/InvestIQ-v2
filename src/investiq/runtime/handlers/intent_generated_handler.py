@@ -1,18 +1,27 @@
-from investiq.adapters.ibkr_adapter import IBKRGatewayAdapter
+from investiq.adapters.ibkr_adapter import IBKRAdapter
 from investiq.domain.decision_layer.base import NoOperation
 from investiq.domain.order_specs import MarketOrderSpec
-from investiq.events.events import IntentGenerated
+from investiq.events.events import IntentGenerated, OrderSubmitted
+from investiq.events.factory import CanonicalEventFactory
 
 
 class IntentGeneratedHandler:
 
-    def __init__(self, ibkr_adapter: IBKRGatewayAdapter):
+    def __init__(
+            self,
+            ibkr_adapter: IBKRAdapter,
+            event_factory: CanonicalEventFactory,
+    ):
         self._adapter =ibkr_adapter
+        self._event_factory = event_factory
 
-    def handle(self, event: IntentGenerated) -> None:
+    def handle(self, event: IntentGenerated) -> OrderSubmitted:
 
         if isinstance(event.payload, NoOperation):
-            return None
+            return self._event_factory.create_order_submitted(
+                causation_id=event.causation_id,
+                payload=None
+            )
 
         order_intent = event.payload
         order_specs = order_intent.order_spec
@@ -23,4 +32,8 @@ class IntentGeneratedHandler:
             raise NotImplementedError(
                 f"Unsupported OrderSpec type, got:{type(order_specs).__name__}"
             )
-        return None
+
+        return self._event_factory.create_order_submitted(
+            causation_id=event.causation_id,
+            payload=None
+        )

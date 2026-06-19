@@ -40,3 +40,7 @@ class IntentGenerated(CanonicalEvent):
             f"\tpayload={self.payload}\n"
             f")"
         )
+
+@dataclass(frozen=True)
+class OrderSubmitted(CanonicalEvent):
+    payload : object
