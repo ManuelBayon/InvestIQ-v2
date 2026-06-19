@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from math import isfinite
 
-from investiq.domain.instruments import InstrumentSpec
+from investiq.domain.instruments import InstrumentSpecs
 
 
 class Side(Enum):
@@ -16,11 +16,10 @@ class OrderSpec(ABC):
 
 @dataclass(frozen=True)
 class MarketOrderSpec(OrderSpec):
-    instrument: InstrumentSpec
+    instrument: InstrumentSpecs
     quantity: float
     direction : Side
     tif: str
-
     def __post_init__(self):
         if not isfinite(self.quantity):
             raise ValueError(f"quantity must be finite, got quantity={self.quantity}")
