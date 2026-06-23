@@ -11,11 +11,11 @@ class Side(Enum):
     SELL = auto()
 
 @dataclass(frozen=True)
-class OrderSpec(ABC):
+class OrderSpecs(ABC):
     ...
 
 @dataclass(frozen=True)
-class MarketOrderSpec(OrderSpec):
+class MarketOrderSpecs(OrderSpecs):
     instrument: InstrumentSpecs
     quantity: float
     direction : Side
@@ -27,7 +27,7 @@ class MarketOrderSpec(OrderSpec):
             raise ValueError(f"quantity must be positive, got quantity={self.quantity}")
 
 @dataclass(frozen=True)
-class LimitOrderSpec(OrderSpec):
+class LimitOrderSpecs(OrderSpecs):
     quantity: float
     direction: Side
     price: float
@@ -43,9 +43,9 @@ class LimitOrderSpec(OrderSpec):
 
 
 @dataclass(frozen=True)
-class StopMarketOrderSpec(OrderSpec):
+class StopMarketOrderSpecs(OrderSpecs):
     trigger_price: float
-    triggered_order : MarketOrderSpec
+    triggered_order : MarketOrderSpecs
     def __post_init__(self):
         if not isfinite(self.trigger_price):
             raise ValueError(f"trigger_price must be finite, got trigger_price={self.trigger_price}")
@@ -53,10 +53,10 @@ class StopMarketOrderSpec(OrderSpec):
             raise ValueError(f"trigger_price must be positive, got trigger_price={self.trigger_price}")
 
 @dataclass(frozen=True)
-class BracketOrderSpec(OrderSpec):
-    entry: MarketOrderSpec | LimitOrderSpec
-    stop_loss: list[StopMarketOrderSpec] | None
-    take_profit: list[LimitOrderSpec] | None
+class BracketOrderSpecs(OrderSpecs):
+    entry: MarketOrderSpecs | LimitOrderSpecs
+    stop_loss: list[StopMarketOrderSpecs] | None
+    take_profit: list[LimitOrderSpecs] | None
     def __post_init__(self):
 
         if not self.take_profit and not self.stop_loss:

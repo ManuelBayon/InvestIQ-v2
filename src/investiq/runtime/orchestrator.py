@@ -1,5 +1,6 @@
 from collections.abc import Callable
 
+from investiq.domain.decision_layer.base import NoOperation
 from investiq.events.events import CanonicalEvent, IntentGenerated, TickDataAvailable, OrderSubmitted
 from investiq.runtime.handlers.intent_generated_handler import IntentGeneratedHandler
 from investiq.runtime.handlers.tick_data_available_handler import TickDataAvailableHandler

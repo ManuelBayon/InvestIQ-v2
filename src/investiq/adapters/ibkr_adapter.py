@@ -1,12 +1,14 @@
 import asyncio
+import threading
 
-from ib_insync import IB, Ticker, Stock, Future, Contract, MarketOrder, Trade
+from ib_insync import IB, Ticker, Stock, Future, MarketOrder
 
 from investiq.domain.instruments import StockSpecs, FutureSpecs
 from investiq.domain.models import RawTick
-from investiq.domain.order_specs import Side, OrderSpec, MarketOrderSpec
+from investiq.domain.order_specs import MarketOrderSpecs
 from investiq.events.factory import CanonicalEventFactory
 from investiq.runtime.canonical_event_queue import CanonicalEventQueue
+
 
 class IBKRAdapter:
     """
@@ -22,6 +24,7 @@ class IBKRAdapter:
             event_queue: CanonicalEventQueue,
     ):
         self._ib = IB()
+        self._ib_loop = None
         self._ib.pendingTickersEvent += self.on_pending_ticker
         self._tickers: dict[str, Ticker] = {}
 
@@ -42,6 +45,14 @@ class IBKRAdapter:
 
     def disconnect(self):
         self._ib.disconnect()
+
+    def run(self) -> None:
+        self._ib_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self._ib_loop)
+
+        self.connect()
+        self.subscribe_to_future(symbol="MNQ", local_symbol="MNQU6")
+        self._ib.run()
 
     def subscribe_to_stock(
             self,
@@ -73,13 +84,7 @@ class IBKRAdapter:
             ),
         )
 
-    def run(self) -> None:
-        self._ib.run()
-
-    def on_pending_ticker(
-            self,
-            tickers: set[Ticker]
-    ) -> None:
+    def on_pending_ticker(self, tickers: set[Ticker]) -> None:
         """
         2026-05-28 — Adapter boundary:
         - ib_insync.Ticker and ib_insync.TickData do not cross this method.
@@ -119,7 +124,7 @@ class IBKRAdapter:
 
     def place_market_order(
             self,
-            order_specs: MarketOrderSpec
+            order_specs: MarketOrderSpecs
     ) -> None:
 
         instrument = order_specs.instrument
@@ -148,3 +153,7 @@ class IBKRAdapter:
         )
         order.tif = order_specs.tif
         self._ib.placeOrder(contract, order)
+
+    @property
+    def ib_loop(self):
+        return self._ib_loop

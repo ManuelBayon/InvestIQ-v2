@@ -1,7 +1,7 @@
 from investiq.domain.decision_layer.base import DecisionLayer, _build_context, OrderIntent
 from investiq.domain.instruments import FutureSpecs
 from investiq.domain.models import RawTick
-from investiq.domain.order_specs import MarketOrderSpec, Side
+from investiq.domain.order_specs import MarketOrderSpecs, Side
 
 
 class AlwaysBuyMNQMarket(DecisionLayer):
@@ -15,7 +15,7 @@ class AlwaysBuyMNQMarket(DecisionLayer):
         context = _build_context(market_view, feature_view)
         return OrderIntent(
             context=context,
-            order_spec=MarketOrderSpec(
+            order_specs=MarketOrderSpecs(
                 instrument=FutureSpecs("MNQ", "MNQU6"),
                 quantity=1,
                 direction=Side.BUY,

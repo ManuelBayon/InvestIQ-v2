@@ -1,5 +1,5 @@
 from investiq.runtime.canonical_event_queue import CanonicalEventQueue
-from investiq.events.events import CanonicalEvent, OrderSubmitted
+from investiq.events.events import CanonicalEvent, OrderSubmitted, ExecutionSkipped
 from investiq.runtime.journal import CanonicalJournal
 from investiq.runtime.orchestrator import Orchestrator
 
@@ -17,9 +17,9 @@ class EventLoop:
         self._running = False
 
     def _process(self, event: CanonicalEvent) -> None:
+        print(f"\nProcessed event= {event}")
         self._journal.append(event)
-        print(event)
-        if isinstance(event, OrderSubmitted):
+        if isinstance(event, OrderSubmitted) or isinstance(event, ExecutionSkipped):
             return
         result = self._orchestrator.dispatch(event)
         if result is not None:

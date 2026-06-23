@@ -14,19 +14,10 @@ class LiveRuntime:
         self._ibkr_adapter = ibkr_adapter
         self._event_loop = event_loop
 
-    def run(self) -> None:
-
-        event_loop_thread = Thread(
-            target=self._event_loop.run,
-            name="event_loop_thread",
-        )
-        ibkr_thread = Thread(
-            target=self._ibkr_adapter.run,
-            name="ibkr_thread",
-        )
-
-        self._ibkr_adapter.connect()
-        self._ibkr_adapter.subscribe_to_future(symbol="MNQ", local_symbol="MNQU6")
-
+    def run_process_thread(self) -> None:
+        event_loop_thread = Thread(target=self._event_loop.run, name="process_thread")
         event_loop_thread.start()
+
+    def run_ibkr_thread(self) -> None:
+        ibkr_thread = Thread(target=self._ibkr_adapter.run, name="ibkr_thread")
         ibkr_thread.start()

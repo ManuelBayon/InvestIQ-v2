@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from investiq.domain.models import RawTick
-from investiq.domain.order_specs import OrderSpec
+from investiq.domain.order_specs import OrderSpecs
 
 
 @dataclass(frozen=True)
@@ -13,7 +13,7 @@ class DecisionContext:
 @dataclass(frozen=True)
 class OrderIntent:
     context: DecisionContext
-    order_spec: OrderSpec
+    order_specs: OrderSpecs
 
 @dataclass(frozen=True)
 class NoOperation:

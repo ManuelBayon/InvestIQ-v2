@@ -1,7 +1,6 @@
 from investiq.adapters.ibkr_adapter import IBKRAdapter
-from investiq.domain.decision_layer.base import NoOperation
-from investiq.domain.order_specs import MarketOrderSpec
-from investiq.events.events import IntentGenerated, OrderSubmitted
+from investiq.domain.decision_layer.base import NoOperation, OrderIntent
+from investiq.events.events import IntentGenerated, OrderSubmitted, ExecutionSkipped
 from investiq.events.factory import CanonicalEventFactory
 
 
@@ -15,25 +14,23 @@ class IntentGeneratedHandler:
         self._adapter =ibkr_adapter
         self._event_factory = event_factory
 
-    def handle(self, event: IntentGenerated) -> OrderSubmitted:
+    def handle(self, event: IntentGenerated) -> OrderSubmitted | ExecutionSkipped:
 
         if isinstance(event.payload, NoOperation):
-            return self._event_factory.create_order_submitted(
-                causation_id=event.causation_id,
-                payload=None
+            return self._event_factory.create_no_order_submitted(
+                causation_id=event.event_id,
+                payload={"reason": "NoOperation"}
             )
-
-        order_intent = event.payload
-        order_specs = order_intent.order_spec
-
-        if isinstance(order_specs, MarketOrderSpec):
-            self._adapter.place_market_order(order_specs)
+        elif isinstance(event.payload, OrderIntent):
+            self._adapter.ib_loop.call_soon_threadsafe(
+                self._adapter.place_market_order,
+                event.payload.order_specs,
+            )
+            return self._event_factory.create_order_submitted(
+                causation_id=event.event_id,
+                payload=event.payload.order_specs
+            )
         else:
             raise NotImplementedError(
-                f"Unsupported OrderSpec type, got:{type(order_specs).__name__}"
+                f"Unsupported event.payload, got:{type(event.payload).__name__}"
             )
-
-        return self._event_factory.create_order_submitted(
-            causation_id=event.causation_id,
-            payload=None
-        )
