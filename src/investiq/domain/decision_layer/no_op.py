@@ -1,4 +1,4 @@
-from investiq.domain.decision_layer.base import DecisionLayer, NoOperation
+from investiq.domain.decision_layer.base import DecisionLayer, NoOperation, _build_context
 from investiq.domain.models import RawTick
 
 class NoOperationDecisionLayer(DecisionLayer):
@@ -13,5 +13,5 @@ class NoOperationDecisionLayer(DecisionLayer):
             market_view: dict[str, list[RawTick]],
             feature_view: dict[str, dict[str, list[float]]],
     ) -> NoOperation:
-        context = self._build_context(market_view, feature_view)
+        context = _build_context(market_view, feature_view)
         return NoOperation(context=context)

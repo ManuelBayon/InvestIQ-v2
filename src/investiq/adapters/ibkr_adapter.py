@@ -1,10 +1,16 @@
-from ib_insync import IB, Ticker, Stock, Future
+import asyncio
+import threading
 
+from ib_insync import IB, Ticker, Stock, Future, MarketOrder
+
+from investiq.domain.instruments import StockSpecs, FutureSpecs
 from investiq.domain.models import RawTick
+from investiq.domain.order_specs import MarketOrderSpecs
 from investiq.events.factory import CanonicalEventFactory
 from investiq.runtime.canonical_event_queue import CanonicalEventQueue
 
-class IBLiveMarketDataFeed:
+
+class IBKRAdapter:
     """
     2026-05-21 :
         MVP limitation:
@@ -18,6 +24,7 @@ class IBLiveMarketDataFeed:
             event_queue: CanonicalEventQueue,
     ):
         self._ib = IB()
+        self._ib_loop = None
         self._ib.pendingTickersEvent += self.on_pending_ticker
         self._tickers: dict[str, Ticker] = {}
 
@@ -29,7 +36,7 @@ class IBLiveMarketDataFeed:
     def connect(
             self,
             host: str = "127.0.0.1",
-            port: int = 7497,
+            port: int = 4002,
             client_id: int = 1,
             data_type: int = 3,  # 1 = Live / 3 = Delayed
     ) -> None:
@@ -38,6 +45,14 @@ class IBLiveMarketDataFeed:
 
     def disconnect(self):
         self._ib.disconnect()
+
+    def run(self) -> None:
+        self._ib_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self._ib_loop)
+
+        self.connect()
+        self.subscribe_to_future(symbol="MNQ", local_symbol="MNQU6")
+        self._ib.run()
 
     def subscribe_to_stock(
             self,
@@ -50,7 +65,7 @@ class IBLiveMarketDataFeed:
         """
         self._tickers[symbol] = self._ib.reqMktData(Stock(symbol, exchange, currency))
 
-    def subscribe_to_cont_fut(
+    def subscribe_to_future(
             self,
             symbol: str,
             local_symbol: str,
@@ -58,7 +73,7 @@ class IBLiveMarketDataFeed:
             currency: str = "USD",
     ) -> None:
         """
-        Example : reqMktData(Future(symbol="NQ", localSymbol="NQM6"))
+        Example : reqMktData(Future(symbol="NQ", local_symbol="NQU6", exchange"CME"))
         """
         self._tickers[symbol] = self._ib.reqMktData(
             contract=Future(
@@ -69,13 +84,7 @@ class IBLiveMarketDataFeed:
             ),
         )
 
-    def run(self) -> None:
-        self._ib.run()
-
-    def on_pending_ticker(
-            self,
-            tickers: set[Ticker]
-    ) -> None:
+    def on_pending_ticker(self, tickers: set[Ticker]) -> None:
         """
         2026-05-28 — Adapter boundary:
         - ib_insync.Ticker and ib_insync.TickData do not cross this method.
@@ -112,3 +121,39 @@ class IBLiveMarketDataFeed:
             payload=raw_ticks
         )
         self._event_queue.enqueue(event)
+
+    def place_market_order(
+            self,
+            order_specs: MarketOrderSpecs
+    ) -> None:
+
+        instrument = order_specs.instrument
+
+        if isinstance(instrument, StockSpecs):
+            contract = Stock(
+                symbol=instrument.symbol,
+                exchange=instrument.exchange,
+                currency=instrument.currency
+            )
+        elif isinstance(instrument, FutureSpecs):
+            contract = Future(
+                symbol=instrument.symbol,
+                localSymbol=instrument.local_symbol,
+                exchange=instrument.exchange,
+                currency=instrument.currency,
+            )
+        else:
+            raise NotImplementedError(
+                f"Unsupported instrument for market order:{type(instrument).__name__}"
+            )
+
+        order = MarketOrder(
+            action=order_specs.direction.name,
+            totalQuantity=order_specs.quantity
+        )
+        order.tif = order_specs.tif
+        self._ib.placeOrder(contract, order)
+
+    @property
+    def ib_loop(self):
+        return self._ib_loop

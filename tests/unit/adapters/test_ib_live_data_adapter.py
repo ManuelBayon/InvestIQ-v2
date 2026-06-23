@@ -4,7 +4,7 @@ from queue import Empty
 import pytest
 from ib_insync import Ticker, Stock, TickData
 
-from investiq.adapters.ib_live_market_data_feed import IBLiveMarketDataFeed
+from investiq.adapters.ibkr_adapter import IBKRAdapter
 from investiq.events.factory import CanonicalEventFactory
 from investiq.runtime.canonical_event_queue import CanonicalEventQueue
 from investiq.events.events import TickDataAvailable
@@ -13,7 +13,7 @@ from investiq.events.events import TickDataAvailable
 def test_on_pending_ticker_enqueues_tick_data_available_event() -> None:
     event_factory = CanonicalEventFactory(run_id="test_run_id")
     event_queue = CanonicalEventQueue()
-    live_adapter = IBLiveMarketDataFeed(
+    live_adapter = IBKRAdapter(
         event_factory=event_factory,
         event_queue=event_queue,
     )
