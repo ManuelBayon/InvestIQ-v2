@@ -79,25 +79,44 @@ class FakeIBKRAdapter:
     def ib(self):
         return self._ib
 
+def _format_trade(trade: Trade) -> str:
+    return \
+    f"""contrat: {trade.contract}
+    order: {trade.order}
+    fills: {trade.fills}
+    log: {trade.log}
+    """
+
+def _format_fill(fill: Fill) -> str:
+    return \
+        f"""contract: {fill.contract}
+        execution: {fill.execution}
+        commission report: {fill.commissionReport}
+        time: {fill.time}
+        """
 
 def on_fill(trade: Trade, fill: Fill):
-    print(f"On_fill: trade={trade} fill={fill}")
+    print("On Fill: ")
+    print(_format_trade(trade))
+    print(_format_fill(fill))
 
 def on_filled(trade: Trade):
-    print(f"On_filled: trade={trade}")
+    print("On Filled")
+    print(_format_trade(trade))
 
 def on_status_update(trade: Trade):
-    print(f"On status update: trade={trade}")
+    print("On status update: ")
+    print(_format_trade(trade))
 
 def on_commission_report(
         trade: Trade,
         fill: Fill,
         report: CommissionReport
 ) -> None:
-    print(f"""On commission report: 
-        trade={trade}
-        fill: {fill}
-        report: {report}""")
+    print("On commission report: ")
+    print(_format_trade(trade))
+    print(_format_fill(fill))
+    print(f"{report}")
 
 if __name__ == "__main__":
 
