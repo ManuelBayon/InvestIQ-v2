@@ -68,7 +68,22 @@ class ExecutionSkipped(CanonicalEvent):
 
 @dataclass(frozen=True)
 class OrderStatusUpdated(CanonicalEvent):
-    pass
+    order_id: int
+    parent_id: int
+    status: str
+    client_id: int
+    broker_perm_id: int
+    def __repr__(self):
+        return (
+            f"OrderStatusUpdated(\n"
+            f"\trun_id={self.run_id},\n"
+            f"\tevent_id={self.event_id},\n"
+            f"\tcausation_id={self.causation_id},\n"
+            f"\torder_id={self.order_id},\n"
+            f"\tparent_id={self.parent_id},\n"
+            f"\tstatus={self.status},\n"
+            f"\tclient_id={self.client_id},\n"
+            f"\tbroker_perm_id={self.broker_perm_id},\n")
 
 @dataclass(frozen=True)
 class FillReceived(CanonicalEvent):
