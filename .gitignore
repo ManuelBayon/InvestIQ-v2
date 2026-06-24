@@ -1,8 +1,6 @@
 .pytest_cache/
 .idea/
 .venv/
-docs/
-sandbox/
 __pycache__/
 __init__.py
 *.pyc
