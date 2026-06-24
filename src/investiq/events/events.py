@@ -65,3 +65,21 @@ class ExecutionSkipped(CanonicalEvent):
             f"\treason={self.payload["reason"]}\n"
             f")"
         )
+
+@dataclass(frozen=True)
+class OrderStatusUpdated(CanonicalEvent):
+    pass
+
+@dataclass(frozen=True)
+class FillReceived(CanonicalEvent):
+    """Atomic Fill doesnt signify order filled"""
+    pass
+
+@dataclass(frozen=True)
+class OrderFilled(CanonicalEvent):
+    """Order completely filled"""
+    pass
+
+@dataclass(frozen=True)
+class CommissionReportReceived(CanonicalEvent):
+    pass
