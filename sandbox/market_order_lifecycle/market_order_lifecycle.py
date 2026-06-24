@@ -1,0 +1,121 @@
+import asyncio
+
+from ib_insync import IB, Stock, Future, MarketOrder, Trade, Fill, CommissionReport
+
+from investiq.domain.instruments import StockSpecs, FutureSpecs
+from investiq.domain.order_specs import MarketOrderSpecs, Side
+
+
+class FakeIBKRAdapter:
+    """
+    2026-05-21 :
+        MVP limitation:
+            IB reqMktData delayed ticks are used as proxy ticks.
+            TickData.time is treated as tick timestamp for aggregation,
+            but this is not guaranteed to be exchange trade-time.
+    """
+    def __init__(
+            self,
+    ):
+        self._ib = IB()
+        self._ib_loop = None
+
+    def connect(
+            self,
+            host: str = "127.0.0.1",
+            port: int = 4002,
+            client_id: int = 1,
+    ) -> None:
+        self._ib.connect(host, port, clientId=client_id)
+
+    def disconnect(self):
+        self._ib.disconnect()
+
+    def run(self) -> None:
+        self._ib_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self._ib_loop)
+
+        self.connect()
+        self._ib.run()
+
+    def place_market_order(
+            self,
+            order_specs: MarketOrderSpecs
+    ) -> Trade:
+
+        instrument = order_specs.instrument
+
+        if isinstance(instrument, StockSpecs):
+            contract = Stock(
+                symbol=instrument.symbol,
+                exchange=instrument.exchange,
+                currency=instrument.currency
+            )
+        elif isinstance(instrument, FutureSpecs):
+            contract = Future(
+                symbol=instrument.symbol,
+                localSymbol=instrument.local_symbol,
+                exchange=instrument.exchange,
+                currency=instrument.currency,
+            )
+        else:
+            raise NotImplementedError(
+                f"Unsupported instrument for market order:{type(instrument).__name__}"
+            )
+
+        order = MarketOrder(
+            action=order_specs.direction.name,
+            totalQuantity=order_specs.quantity
+        )
+        order.tif = order_specs.tif
+        trade = self._ib.placeOrder(contract, order)
+        return trade
+
+    @property
+    def ib_loop(self):
+        return self._ib_loop
+
+    @property
+    def ib(self):
+        return self._ib
+
+
+def on_fill(trade: Trade, fill: Fill):
+    print(f"On_fill: trade={trade} fill={fill}")
+
+def on_filled(trade: Trade):
+    print(f"On_filled: trade={trade}")
+
+def on_status_update(trade: Trade):
+    print(f"On status update: trade={trade}")
+
+def on_commission_report(
+        trade: Trade,
+        fill: Fill,
+        report: CommissionReport
+) -> None:
+    print(f"""On commission report: 
+        trade={trade}
+        fill: {fill}
+        report: {report}""")
+
+if __name__ == "__main__":
+
+    adapter = FakeIBKRAdapter()
+    adapter.connect()
+
+    _order_specs = MarketOrderSpecs(
+        instrument=FutureSpecs(symbol="MNQ", local_symbol="MNQU6"),
+        quantity=1, direction=Side.BUY, tif="DAY",
+    )
+
+    _trade = adapter.place_market_order(order_specs=_order_specs)
+
+    _trade.statusEvent += on_status_update
+    _trade.commissionReportEvent += on_commission_report
+    _trade.fillEvent += on_fill
+    _trade.filledEvent += on_filled
+
+    adapter.ib.sleep(2)
+
+
