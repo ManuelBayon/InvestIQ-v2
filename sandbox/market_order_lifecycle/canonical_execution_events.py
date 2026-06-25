@@ -7,9 +7,7 @@ from sandbox.market_order_lifecycle.market_order_lifecycle import FakeIBKRAdapte
 
 
 
-def on_status_update(trade: Trade) -> None:
-    event = map_ibkr_order_status(status=trade.orderStatus)
-    print(event)
+
 
 
 if __name__ =="__main__":

@@ -39,7 +39,7 @@ class FakeIBKRAdapter:
         self.connect()
         self._ib.run()
 
-    def map_ibkr_order_status(status: OrderStatus) -> OrderStatusUpdated:
+    def map_ibkr_order_status(self, status: OrderStatus) -> OrderStatusUpdated:
         return OrderStatusUpdated(
             run_id="test",
             event_id="EVT_00002",
@@ -50,6 +50,10 @@ class FakeIBKRAdapter:
             status=status.status,
             broker_perm_id=status.permId,
         )
+
+    def on_status_update(self, trade: Trade) -> None:
+        event = self.map_ibkr_order_status(status=trade.orderStatus)
+        print(event)
 
     def place_market_order(
             self,
