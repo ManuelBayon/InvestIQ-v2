@@ -12,7 +12,6 @@ class CanonicalEvent(ABC):
     event_id: str
     causation_id: str | None
     meta_data: dict
-    payload: object
 
 @dataclass(frozen=True)
 class TickDataAvailable(CanonicalEvent):

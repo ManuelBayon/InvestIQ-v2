@@ -11,7 +11,6 @@ def map_ibkr_order_status(status: OrderStatus) -> OrderStatusUpdated:
         event_id="EVT_00002",
         causation_id="EVT_00001",
         meta_data={},
-        payload={},
         order_id =status.orderId,
         parent_id =status.parentId,
         status= status.status,

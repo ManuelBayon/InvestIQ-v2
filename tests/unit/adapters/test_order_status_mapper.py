@@ -12,7 +12,6 @@ def test_map_presubmitted_order_to_canonical_event():
     assert event.event_id == "EVT_00002"
     assert event.causation_id == "EVT_00001"
     assert event.meta_data == {}
-    assert event.payload == {}
     assert event.order_id == 277
     assert event.parent_id == 0
     assert event.status == OrderStatus.PreSubmitted
