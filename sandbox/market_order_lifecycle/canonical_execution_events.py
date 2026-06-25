@@ -1,12 +1,11 @@
-from ib_insync import Trade
+from ib_insync import Trade, OrderStatus
 
 from investiq.domain.instruments import FutureSpecs
 from investiq.domain.order_specs import MarketOrderSpecs, Side
 from investiq.events.events import OrderStatusUpdated
 from sandbox.market_order_lifecycle.market_order_lifecycle import FakeIBKRAdapter
 
-def _map_ibkr_order_status(trade: Trade) -> OrderStatusUpdated:
-    status = trade.orderStatus
+def _map_ibkr_order_status(status: OrderStatus) -> OrderStatusUpdated:
     return OrderStatusUpdated(
         run_id="test",
         event_id="EVT_00002",
@@ -21,7 +20,7 @@ def _map_ibkr_order_status(trade: Trade) -> OrderStatusUpdated:
     )
 
 def on_status_update(trade: Trade) -> None:
-    event = _map_ibkr_order_status(trade=trade)
+    event = _map_ibkr_order_status(status=trade.orderStatus)
     print(event)
 
 
