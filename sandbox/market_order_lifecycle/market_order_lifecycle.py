@@ -83,6 +83,7 @@ def _format_trade(trade: Trade) -> str:
     return \
     f"""contrat: {trade.contract}
     order: {trade.order}
+    status: {trade.orderStatus}
     fills: {trade.fills}
     log: {trade.log}
     """
@@ -97,8 +98,8 @@ def _format_fill(fill: Fill) -> str:
 
 def on_fill(trade: Trade, fill: Fill):
     print("On Fill: ")
-    print(_format_trade(trade))
-    print(_format_fill(fill))
+    print(f"trade: {_format_trade(trade)}")
+    print(f"fill: {_format_fill(fill)}")
 
 def on_filled(trade: Trade):
     print("On Filled")
