@@ -5,17 +5,7 @@ from investiq.domain.order_specs import MarketOrderSpecs, Side
 from investiq.events.events import OrderStatusUpdated
 from sandbox.market_order_lifecycle.market_order_lifecycle import FakeIBKRAdapter
 
-def map_ibkr_order_status(status: OrderStatus) -> OrderStatusUpdated:
-    return OrderStatusUpdated(
-        run_id="test",
-        event_id="EVT_00002",
-        causation_id="EVT_00001",
-        meta_data={},
-        order_id =status.orderId,
-        parent_id =status.parentId,
-        status= status.status,
-        broker_perm_id= status.permId,
-    )
+
 
 def on_status_update(trade: Trade) -> None:
     event = map_ibkr_order_status(status=trade.orderStatus)

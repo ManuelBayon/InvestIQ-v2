@@ -1,9 +1,10 @@
 import asyncio
 
-from ib_insync import IB, Stock, Future, MarketOrder, Trade, Fill, CommissionReport
+from ib_insync import IB, Stock, Future, MarketOrder, Trade, Fill, CommissionReport, OrderStatus
 
 from investiq.domain.instruments import StockSpecs, FutureSpecs
 from investiq.domain.order_specs import MarketOrderSpecs, Side
+from investiq.events.events import OrderStatusUpdated
 
 
 class FakeIBKRAdapter:
@@ -37,6 +38,18 @@ class FakeIBKRAdapter:
 
         self.connect()
         self._ib.run()
+
+    def map_ibkr_order_status(status: OrderStatus) -> OrderStatusUpdated:
+        return OrderStatusUpdated(
+            run_id="test",
+            event_id="EVT_00002",
+            causation_id="EVT_00001",
+            meta_data={},
+            order_id=status.orderId,
+            parent_id=status.parentId,
+            status=status.status,
+            broker_perm_id=status.permId,
+        )
 
     def place_market_order(
             self,
