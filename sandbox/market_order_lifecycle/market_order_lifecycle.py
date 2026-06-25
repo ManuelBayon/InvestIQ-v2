@@ -51,7 +51,7 @@ class FakeIBKRAdapter:
             broker_perm_id=status.permId,
         )
 
-    def on_status_update(self, trade: Trade) -> None:
+    def _on_status_update(self, trade: Trade) -> None:
         event = self.map_ibkr_order_status(status=trade.orderStatus)
         print(event)
 
@@ -86,6 +86,7 @@ class FakeIBKRAdapter:
         )
         order.tif = order_specs.tif
         trade = self._ib.placeOrder(contract, order)
+        trade.statusEvent += self._on_status_update
         return trade
 
     @property
@@ -148,7 +149,6 @@ if __name__ == "__main__":
 
     _trade = adapter.place_market_order(order_specs=_order_specs)
 
-    _trade.statusEvent += on_status_update
     _trade.fillEvent += on_fill
     _trade.commissionReportEvent += on_commission_report
 
