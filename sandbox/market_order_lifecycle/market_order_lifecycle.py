@@ -132,9 +132,8 @@ if __name__ == "__main__":
     _trade = adapter.place_market_order(order_specs=_order_specs)
 
     _trade.statusEvent += on_status_update
-    _trade.commissionReportEvent += on_commission_report
     _trade.fillEvent += on_fill
-    _trade.filledEvent += on_filled
+    _trade.commissionReportEvent += on_commission_report
 
     adapter.ib.sleep(2)
 

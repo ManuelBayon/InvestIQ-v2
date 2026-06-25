@@ -99,6 +99,32 @@ commissionReportEvent(trade, fill, report) : Filled
 ```
 
 ---
+2026-06-25
+
+J'ai pu observer avec l'envoie de 1 ordre au marché l'éxécution des callback StatusEvent.
+
+- statusEvent: PendingSubmit -> PreSubmitted 
+- fillEvent 
+- statusEvent: PreSubmitted -> Filled
+- filledEvent
+- commissionReportEvent
+
+`filledEvent` est donc un événement dérivé de la transition de statut vers `Filled`, et non une mise à jour d’état indépendante.
+
+**PendingSubmit** - indique que l'ordre a été envoyé depuis TWS, mais qu'aucune confirmation de réception n'a été reçue de la part de la destination. Cela est le plus souvent dû à la fermeture de la bourse.
+
+**PreSubmitted** - indique qu'un ordre de type simulé a été accepté par le système IB et que cet ordre n'a pas encore été sélectionné. L'ordre est conservé dans le système IB jusqu'à ce que les critères de sélection soient remplis. À ce moment-là, l'ordre est transmis à la destination spécifiée.
+
+**Filled** - indique que l'ordre a été entièrement exécuté.
+
+## Décision architecturale — Ne pas utiliser filledEvent
+
+Je décide donc de mapper les évènements suivants :
+- statusEvent
+- fillEvent
+- commissionReportEvent
+
+et ne pas utiliser filledEvent.
 
 
 
