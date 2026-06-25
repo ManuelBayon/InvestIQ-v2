@@ -71,8 +71,8 @@ class OrderStatusUpdated(CanonicalEvent):
     order_id: int
     parent_id: int
     status: str
-    client_id: int
     broker_perm_id: int
+    client_id: int = 1
     def __repr__(self):
         return (
             f"OrderStatusUpdated(\n"
