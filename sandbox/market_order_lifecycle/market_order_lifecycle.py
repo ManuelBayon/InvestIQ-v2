@@ -5,6 +5,7 @@ from ib_insync import IB, Stock, Future, MarketOrder, Trade, Fill, CommissionRep
 from investiq.domain.instruments import StockSpecs, FutureSpecs
 from investiq.domain.order_specs import MarketOrderSpecs, Side
 from investiq.events.events import OrderStatusUpdated
+from investiq.events.factory import CanonicalEventFactory
 
 
 class FakeIBKRAdapter:
@@ -20,6 +21,7 @@ class FakeIBKRAdapter:
     ):
         self._ib = IB()
         self._ib_loop = None
+        self._event_factory = CanonicalEventFactory("TEST_RUN")
 
     def connect(
             self,
@@ -39,15 +41,15 @@ class FakeIBKRAdapter:
         self.connect()
         self._ib.run()
 
-    def map_ibkr_order_status(self, status: OrderStatus) -> OrderStatusUpdated:
-        return OrderStatusUpdated(
-            run_id="test",
-            event_id="EVT_00002",
-            causation_id="EVT_00001",
-            meta_data={},
+    def map_ibkr_order_status(
+            self,
+            status: OrderStatus
+    ) -> OrderStatusUpdated:
+        return self._event_factory.create_order_status_updated(
             order_id=status.orderId,
             parent_id=status.parentId,
             status=status.status,
+            client_id=status.clientId,
             broker_perm_id=status.permId,
         )
 
@@ -153,5 +155,3 @@ if __name__ == "__main__":
     _trade.commissionReportEvent += on_commission_report
 
     adapter.ib.sleep(2)
-
-
