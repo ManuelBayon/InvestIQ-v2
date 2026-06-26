@@ -127,7 +127,7 @@ class IBKRAdapter:
             status=trade.orderStatus,
             event_factory=self._event_factory
         )
-        print(event)
+        self._event_queue.enqueue(event)
 
     def _on_fill(self, trade: Trade, fill: Fill) -> None:
         status = trade.orderStatus
@@ -145,7 +145,7 @@ class IBKRAdapter:
             price=execution.price,
             cumul_qty=execution.cumQty,
         )
-        print(event)
+        self._event_queue.enqueue(event)
 
     def _on_commission_report(
             self,
@@ -165,7 +165,7 @@ class IBKRAdapter:
             currency=report.currency,
             realized_pnl=report.realizedPNL,
         )
-        print(event)
+        self._event_queue.enqueue(event)
 
     def place_market_order(
             self,
