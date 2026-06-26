@@ -1,5 +1,6 @@
 from abc import ABC
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from datetime import datetime
 
 from investiq.domain.decision_layer.base import NoOperation, OrderIntent
 from investiq.domain.models import RawTick
@@ -86,8 +87,14 @@ class OrderStatusUpdated(CanonicalEvent):
 
 @dataclass(frozen=True)
 class FillReceived(CanonicalEvent):
-    """Atomic Fill doesnt signify order filled"""
-    pass
+    order_id: int
+    parent_id: int
+    client_id: int
+    broker_perm_id: int
+    timestamp_utc: datetime
+    account_num: str
+    shares: float
+    avg_price: float
 
 @dataclass(frozen=True)
 class CommissionReportReceived(CanonicalEvent):
