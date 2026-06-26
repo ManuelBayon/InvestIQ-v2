@@ -121,8 +121,10 @@ class CanonicalEventFactory:
             broker_perm_id: int,
             timestamp_utc: datetime,
             account_num: str,
-            shares: float,
-            avg_price: float,
+            qty_executed: float,
+            side: str,
+            price: float,
+            cumul_qty: float,
             meta_data: dict | None = None
     ) -> FillReceived:
 
@@ -140,6 +142,8 @@ class CanonicalEventFactory:
             broker_perm_id=broker_perm_id,
             timestamp_utc=timestamp_utc,
             account_num=account_num,
-            shares=shares,
-            avg_price=avg_price,
+            qty_executed=qty_executed,
+            side=side,
+            price=price,
+            cumul_qty=cumul_qty,
         )

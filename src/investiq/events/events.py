@@ -4,7 +4,7 @@ from datetime import datetime
 
 from investiq.domain.decision_layer.base import NoOperation, OrderIntent
 from investiq.domain.models import RawTick
-from investiq.domain.order_specs import OrderSpecs
+from investiq.domain.order_specs import OrderSpecs, Side
 
 
 @dataclass(frozen=True)
@@ -93,8 +93,28 @@ class FillReceived(CanonicalEvent):
     broker_perm_id: int
     timestamp_utc: datetime
     account_num: str
-    shares: float
-    avg_price: float
+    qty_executed: float
+    side: str
+    price: float
+    cumul_qty: float
+    def __repr__(self):
+        return (
+            f"FillReceived(\n"
+            f"\trun_id={self.run_id},\n"
+            f"\tevent_id={self.event_id},\n"
+            f"\tcausation_id={self.causation_id},\n"
+            f"\torder_id={self.order_id},\n"
+            f"\tparent_id={self.parent_id},\n"
+            f"\tclient_id={self.client_id},\n"
+            f"\tbroker_perm_id={self.broker_perm_id},\n"
+            f"\ttimestamp_utc={self.timestamp_utc},\n"
+            f"\taccount_num={self.account_num},\n"
+            f"\tqty_executed={self.qty_executed},\n"
+            f"\tside={self.side},\n"
+            f"\tprice={self.price}\n"
+            f"\tcumul_qty={self.cumul_qty}\n"
+            f")"
+        )
 
 @dataclass(frozen=True)
 class CommissionReportReceived(CanonicalEvent):
