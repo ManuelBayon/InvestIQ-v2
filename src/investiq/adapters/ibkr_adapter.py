@@ -137,6 +137,7 @@ class IBKRAdapter:
             parent_id=status.parentId,
             client_id=status.clientId,
             broker_perm_id=status.permId,
+            exec_id=execution.execId,
             timestamp_utc=execution.time,
             account_num=execution.acctNumber,
             qty_executed=execution.shares,

@@ -1,10 +1,10 @@
 from abc import ABC
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 
 from investiq.domain.decision_layer.base import NoOperation, OrderIntent
 from investiq.domain.models import RawTick
-from investiq.domain.order_specs import OrderSpecs, Side
+from investiq.domain.order_specs import OrderSpecs
 
 
 @dataclass(frozen=True)
@@ -91,6 +91,7 @@ class FillReceived(CanonicalEvent):
     parent_id: int
     client_id: int
     broker_perm_id: int
+    exec_id: str
     timestamp_utc: datetime
     account_num: str
     qty_executed: float
@@ -107,6 +108,7 @@ class FillReceived(CanonicalEvent):
             f"\tparent_id={self.parent_id},\n"
             f"\tclient_id={self.client_id},\n"
             f"\tbroker_perm_id={self.broker_perm_id},\n"
+            f"\texec_id={self.exec_id},\n"
             f"\ttimestamp_utc={self.timestamp_utc},\n"
             f"\taccount_num={self.account_num},\n"
             f"\tqty_executed={self.qty_executed},\n"
