@@ -1,8 +1,10 @@
+from datetime import datetime
+
 from investiq.domain.decision_layer.base import NoOperation, OrderIntent
 from investiq.domain.models import RawTick
 from investiq.domain.order_specs import OrderSpecs
 from investiq.events.events import TickDataAvailable, IntentGenerated, OrderSubmitted, ExecutionSkipped, \
-    OrderStatusUpdated
+    OrderStatusUpdated, FillReceived
 
 
 class CanonicalEventFactory:
@@ -110,3 +112,34 @@ class CanonicalEventFactory:
             status=status,
             client_id=client_id,
             broker_perm_id=broker_perm_id)
+
+    def create_fill_received(
+            self,
+            order_id: int,
+            parent_id: int,
+            client_id: int,
+            broker_perm_id: int,
+            timestamp_utc: datetime,
+            account_num: str,
+            shares: float,
+            avg_price: float,
+            meta_data: dict | None = None
+    ) -> FillReceived:
+
+        if meta_data is None:
+            meta_data = {}
+
+        return FillReceived(
+            run_id=self._run_id,
+            event_id=self._make_next_event_id(),
+            causation_id=None,
+            meta_data=meta_data,
+            order_id=order_id,
+            parent_id=parent_id,
+            client_id=client_id,
+            broker_perm_id=broker_perm_id,
+            timestamp_utc=timestamp_utc,
+            account_num=account_num,
+            shares=shares,
+            avg_price=avg_price,
+        )
