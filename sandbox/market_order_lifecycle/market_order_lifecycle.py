@@ -41,18 +41,6 @@ class FakeIBKRAdapter:
         self.connect()
         self._ib.run()
 
-    def map_ibkr_order_status(
-            self,
-            status: OrderStatus
-    ) -> OrderStatusUpdated:
-        return self._event_factory.create_order_status_updated(
-            order_id=status.orderId,
-            parent_id=status.parentId,
-            status=status.status,
-            client_id=status.clientId,
-            broker_perm_id=status.permId,
-        )
-
     def _on_status_update(self, trade: Trade) -> None:
         event = self.map_ibkr_order_status(status=trade.orderStatus)
         print(event)
