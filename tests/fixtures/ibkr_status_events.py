@@ -1,8 +1,5 @@
 from ib_insync import OrderStatus
 
-from sandbox.market_order_lifecycle.canonical_execution_events import map_ibkr_order_status
-
-
 def _make_ibkr_order_status_fixture(
         order_id: int,
         status: str,
@@ -48,8 +45,3 @@ def make_presubmitted_order_status(
         why_held='',
         mkt_cap_price=0.0,
     )
-
-if __name__ == "__main__":
-    order_status = make_presubmitted_order_status()
-    event = map_ibkr_order_status(order_status)
-    print(event)
