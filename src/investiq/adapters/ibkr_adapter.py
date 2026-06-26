@@ -36,7 +36,7 @@ class IBKRAdapter:
     def connect(
             self,
             host: str = "127.0.0.1",
-            port: int = 4002,
+            port: int = 7497,
             client_id: int = 1,
             data_type: int = 3,  # 1 = Live / 3 = Delayed
     ) -> None:
