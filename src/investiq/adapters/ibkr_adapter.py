@@ -1,6 +1,6 @@
 import asyncio
 
-from ib_insync import IB, Ticker, Stock, Future, MarketOrder, Trade, OrderStatus
+from ib_insync import IB, Ticker, Stock, Future, MarketOrder, Trade, OrderStatus, Fill
 
 from investiq.adapters.mappers import map_ibkr_order_status_to_canonical_event
 from investiq.domain.instruments import StockSpecs, FutureSpecs
@@ -129,6 +129,23 @@ class IBKRAdapter:
         )
         print(event)
 
+    def _on_fill(self, trade: Trade, fill: Fill) -> None:
+        status = trade.orderStatus
+        execution = fill.execution
+        event = self._event_factory.create_fill_received(
+            order_id=status.orderId,
+            parent_id=status.parentId,
+            client_id=status.clientId,
+            broker_perm_id=status.permId,
+            timestamp_utc=execution.time,
+            account_num=execution.acctNumber,
+            qty_executed=execution.shares,
+            side=execution.side,
+            price=execution.price,
+            cumul_qty=execution.cumQty,
+        )
+        print(event)
+
     def place_market_order(
             self,
             order_specs: MarketOrderSpecs
@@ -161,6 +178,7 @@ class IBKRAdapter:
         order.tif = order_specs.tif
         trade = self._ib.placeOrder(contract, order)
         trade.statusEvent += self._on_status_update
+        trade.fillEvent += self._on_fill
 
     @property
     def ib_loop(self):
