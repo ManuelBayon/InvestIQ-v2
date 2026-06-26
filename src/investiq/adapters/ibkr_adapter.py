@@ -1,6 +1,6 @@
 import asyncio
 
-from ib_insync import IB, Ticker, Stock, Future, MarketOrder, Trade, OrderStatus, Fill
+from ib_insync import IB, Ticker, Stock, Future, MarketOrder, Trade, OrderStatus, Fill, CommissionReport
 
 from investiq.adapters.mappers import map_ibkr_order_status_to_canonical_event
 from investiq.domain.instruments import StockSpecs, FutureSpecs
@@ -147,6 +147,26 @@ class IBKRAdapter:
         )
         print(event)
 
+    def _on_commission_report(
+            self,
+            trade: Trade,
+            fill: Fill,
+            report: CommissionReport
+    ) -> None:
+        status = trade.orderStatus
+        execution = fill.execution
+        event = self._event_factory.create_commission_report_received(
+            order_id=status.orderId,
+            parent_id=status.parentId,
+            client_id=status.clientId,
+            broker_perm_id=status.permId,
+            exec_id=execution.execId,
+            commission=report.commission,
+            currency=report.currency,
+            realized_pnl=report.realizedPNL,
+        )
+        print(event)
+
     def place_market_order(
             self,
             order_specs: MarketOrderSpecs
@@ -180,6 +200,7 @@ class IBKRAdapter:
         trade = self._ib.placeOrder(contract, order)
         trade.statusEvent += self._on_status_update
         trade.fillEvent += self._on_fill
+        trade.commissionReportEvent += self._on_commission_report
 
     @property
     def ib_loop(self):
