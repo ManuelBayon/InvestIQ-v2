@@ -1,8 +1,8 @@
 import asyncio
-import threading
 
-from ib_insync import IB, Ticker, Stock, Future, MarketOrder
+from ib_insync import IB, Ticker, Stock, Future, MarketOrder, Trade, OrderStatus
 
+from investiq.adapters.mappers import map_ibkr_order_status_to_canonical_event
 from investiq.domain.instruments import StockSpecs, FutureSpecs
 from investiq.domain.models import RawTick
 from investiq.domain.order_specs import MarketOrderSpecs
@@ -122,6 +122,13 @@ class IBKRAdapter:
         )
         self._event_queue.enqueue(event)
 
+    def _on_status_update(self, trade: Trade) -> None:
+        event = map_ibkr_order_status_to_canonical_event(
+            status=trade.orderStatus,
+            event_factory=self._event_factory
+        )
+        print(event)
+
     def place_market_order(
             self,
             order_specs: MarketOrderSpecs
@@ -152,7 +159,8 @@ class IBKRAdapter:
             totalQuantity=order_specs.quantity
         )
         order.tif = order_specs.tif
-        self._ib.placeOrder(contract, order)
+        trade = self._ib.placeOrder(contract, order)
+        trade.statusEvent += self._on_status_update
 
     @property
     def ib_loop(self):

@@ -1,7 +1,7 @@
 import asyncio
 
 from ib_insync import IB, Stock, Future, MarketOrder, Trade, Fill, CommissionReport, OrderStatus
-
+from investiq.adapters.mappers import map_ibkr_order_status_to_canonical_event
 from investiq.domain.instruments import StockSpecs, FutureSpecs
 from investiq.domain.order_specs import MarketOrderSpecs, Side
 from investiq.events.events import OrderStatusUpdated
@@ -41,10 +41,6 @@ class FakeIBKRAdapter:
         self.connect()
         self._ib.run()
 
-    def _on_status_update(self, trade: Trade) -> None:
-        event = self.map_ibkr_order_status(status=trade.orderStatus)
-        print(event)
-
     def place_market_order(
             self,
             order_specs: MarketOrderSpecs
@@ -76,8 +72,6 @@ class FakeIBKRAdapter:
         )
         order.tif = order_specs.tif
         trade = self._ib.placeOrder(contract, order)
-        trade.statusEvent += self._on_status_update
-        return trade
 
     @property
     def ib_loop(self):
