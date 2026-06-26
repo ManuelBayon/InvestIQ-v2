@@ -120,4 +120,27 @@ class FillReceived(CanonicalEvent):
 
 @dataclass(frozen=True)
 class CommissionReportReceived(CanonicalEvent):
-    pass
+    order_id: int
+    parent_id: int
+    client_id: int
+    broker_perm_id: int
+    exec_id: str
+    commission: float
+    currency: str
+    realized_pnl: float
+    def __repr__(self):
+        return (
+            f"CommissionReportReceived(\n"
+            f"\trun_id={self.run_id},\n"
+            f"\tevent_id={self.event_id},\n"
+            f"\tcausation_id={self.causation_id},\n"
+            f"\torder_id={self.order_id},\n"
+            f"\tparent_id={self.parent_id},\n"
+            f"\tclient_id={self.client_id},\n"
+            f"\tbroker_perm_id={self.broker_perm_id},\n"
+            f"\texec_id={self.exec_id},\n"
+            f"\tcommission={self.commission},\n"
+            f"\tcurrency={self.currency},\n"
+            f"\trealized_pnl={self.realized_pnl},\n"
+            f")"
+        )
