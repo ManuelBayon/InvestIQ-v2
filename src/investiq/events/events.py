@@ -90,10 +90,5 @@ class FillReceived(CanonicalEvent):
     pass
 
 @dataclass(frozen=True)
-class OrderFilled(CanonicalEvent):
-    """Order completely filled"""
-    pass
-
-@dataclass(frozen=True)
 class CommissionReportReceived(CanonicalEvent):
     pass
