@@ -1,6 +1,7 @@
 from investiq.adapters.ibkr_adapter import IBKRAdapter
+from investiq.adapters.ibkr_client import IBKRClient
+from investiq.adapters.ibkr_market_data_adapter import IBKRMarketDataAdapter
 
-from investiq.domain.decision_layer.always_buy_MNQ_market import AlwaysBuyMNQMarket
 from investiq.domain.decision_layer.no_op import NoOperationDecisionLayer
 from investiq.domain.feature_store import FeatureStore
 from investiq.domain.market_store import MarketStore
@@ -18,9 +19,18 @@ from investiq.runtime.orchestrator import Orchestrator
 def bootstrap_live_runtime() -> LiveRuntime:
 
     journal = CanonicalJournal()
-    queue = CanonicalEventQueue()
+    event_queue = CanonicalEventQueue()
     event_factory = CanonicalEventFactory("test_run")
-    ibkr_adapter = IBKRAdapter(event_factory=event_factory, event_queue=queue)
+    ibkr_client = IBKRClient()
+    ibkr_market_data_adapter = IBKRMarketDataAdapter(
+        ibkr_client=ibkr_client,
+        event_factory=event_factory,
+        event_queue=event_queue
+    )
+    ibkr_adapter = IBKRAdapter(
+        ibkr_client=ibkr_client,
+        ibkr_market_data_adapter=ibkr_market_data_adapter,
+    )
     market_store = MarketStore()
     feature_store = FeatureStore()
     decision_layer = NoOperationDecisionLayer()#AlwaysBuyMNQMarket()
@@ -38,5 +48,12 @@ def bootstrap_live_runtime() -> LiveRuntime:
         tick_available_handler=tick_data_available_handler,
         intent_generated_handler=intent_generated_handler,
     )
-    event_loop = EventLoop(journal=journal, event_queue=queue, orchestrator=orchestrator)
-    return LiveRuntime(ibkr_adapter=ibkr_adapter, event_loop=event_loop)
+    event_loop = EventLoop(
+        journal=journal,
+        event_queue=event_queue,
+        orchestrator=orchestrator
+    )
+    return LiveRuntime(
+        ibkr_adapter=ibkr_adapter,
+        event_loop=event_loop
+    )
