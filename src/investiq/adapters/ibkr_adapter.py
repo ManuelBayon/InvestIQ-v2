@@ -1,7 +1,8 @@
 import asyncio
 
-from ib_insync import IB, Ticker, Stock, Future, MarketOrder, Trade, OrderStatus, Fill, CommissionReport
+from ib_insync import Ticker, Stock, Future, MarketOrder, Trade, Fill, CommissionReport
 
+from investiq.adapters.ibkr_client import IBKRClient
 from investiq.adapters.mappers import map_ibkr_order_status_to_canonical_event
 from investiq.domain.instruments import StockSpecs, FutureSpecs
 from investiq.domain.models import RawTick
@@ -20,39 +21,26 @@ class IBKRAdapter:
     """
     def __init__(
             self,
+            ibkr_client: IBKRClient,
             event_factory: CanonicalEventFactory,
             event_queue: CanonicalEventQueue,
     ):
-        self._ib = IB()
+        self._ibkr_client = ibkr_client
         self._ib_loop = None
-        self._ib.pendingTickersEvent += self.on_pending_ticker
+        self._ibkr_client.ib_client.pendingTickersEvent += self.on_pending_ticker
         self._tickers: dict[str, Ticker] = {}
 
         self._history: dict[str, list[Ticker]]
         self._event_factory = event_factory
         self._event_queue = event_queue
 
-
-    def connect(
-            self,
-            host: str = "127.0.0.1",
-            port: int = 7497,
-            client_id: int = 1,
-            data_type: int = 3,  # 1 = Live / 3 = Delayed
-    ) -> None:
-        self._ib.connect(host, port, clientId=client_id)
-        self._ib.reqMarketDataType(data_type)
-
-    def disconnect(self):
-        self._ib.disconnect()
-
     def run(self) -> None:
         self._ib_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self._ib_loop)
 
-        self.connect()
+        self._ibkr_client.ib_client.connect()
         self.subscribe_to_future(symbol="MNQ", local_symbol="MNQU6")
-        self._ib.run()
+        self._ibkr_client.ib_client.run()
 
     def subscribe_to_stock(
             self,
@@ -63,7 +51,7 @@ class IBKRAdapter:
         """
         Example : reqMktData(symbol="AMD", exchange= "SMART", currency= "USD")
         """
-        self._tickers[symbol] = self._ib.reqMktData(Stock(symbol, exchange, currency))
+        self._tickers[symbol] = self._ibkr_client.ib_client.reqMktData(Stock(symbol, exchange, currency))
 
     def subscribe_to_future(
             self,
@@ -75,7 +63,7 @@ class IBKRAdapter:
         """
         Example : reqMktData(Future(symbol="NQ", local_symbol="NQU6", exchange"CME"))
         """
-        self._tickers[symbol] = self._ib.reqMktData(
+        self._tickers[symbol] = self._ibkr_client.ib_client.reqMktData(
             contract=Future(
                 symbol=symbol,
                 localSymbol=local_symbol,
@@ -197,7 +185,7 @@ class IBKRAdapter:
             totalQuantity=order_specs.quantity
         )
         order.tif = order_specs.tif
-        trade = self._ib.placeOrder(contract, order)
+        trade = self._ibkr_client.ib_client.placeOrder(contract, order)
         trade.statusEvent += self._on_status_update
         trade.fillEvent += self._on_fill
         trade.commissionReportEvent += self._on_commission_report
