@@ -27,7 +27,9 @@ class IBKRAdapter:
     ):
         self._ibkr_client = ibkr_client
         self._ib_loop = None
-        self._ibkr_client.ib_client.pendingTickersEvent += self.on_pending_ticker
+        self._ibkr_client.subscribe_pending_tickers(
+            handler=self.on_pending_ticker
+        )
         self._tickers: dict[str, Ticker] = {}
 
         self._history: dict[str, list[Ticker]]
@@ -39,6 +41,7 @@ class IBKRAdapter:
         asyncio.set_event_loop(self._ib_loop)
 
         self._ibkr_client.ib_client.connect()
+        self._ibkr_client.set_market_data_type()
         self.subscribe_to_future(symbol="MNQ", local_symbol="MNQU6")
         self._ibkr_client.ib_client.run()
 
