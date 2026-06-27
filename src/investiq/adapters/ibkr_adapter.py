@@ -1,16 +1,7 @@
 import asyncio
 
-from ib_insync import Stock, Future, MarketOrder, Trade, Fill, CommissionReport
-
 from investiq.adapters.ibkr_client import IBKRClient
 from investiq.adapters.ibkr_market_data_adapter import IBKRMarketDataAdapter
-from investiq.adapters.mappers import map_ibkr_order_status_to_canonical_event
-
-from investiq.domain.instruments import StockSpecs, FutureSpecs
-from investiq.domain.order_specs import MarketOrderSpecs
-from investiq.events.factory import CanonicalEventFactory
-from investiq.runtime.canonical_event_queue import CanonicalEventQueue
-
 
 class IBKRAdapter:
     """

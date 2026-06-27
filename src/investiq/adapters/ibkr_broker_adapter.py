@@ -1,6 +1,7 @@
 from ib_insync import Trade, Fill, CommissionReport, Stock, Future, MarketOrder
 
 from investiq.adapters.ibkr_client import IBKRClient
+from investiq.adapters.ibkr_contract_mappers import map_stock_specs_to_ib_contract, map_future_specs_to_ib_contract
 from investiq.domain.instruments import StockSpecs, FutureSpecs
 from investiq.domain.order_specs import MarketOrderSpecs
 from investiq.events.factory import CanonicalEventFactory
@@ -70,32 +71,27 @@ class IBKRBrokerAdapter:
 
     def place_market_order(self, specs: MarketOrderSpecs) -> None:
 
-        instrument = specs.instrument
+        instrument_specs = specs.instrument
 
-        if isinstance(instrument, StockSpecs):
-            contract = Stock(
-                symbol=instrument.symbol,
-                exchange=instrument.exchange,
-                currency=instrument.currency
-            )
-        elif isinstance(instrument, FutureSpecs):
-            contract = Future(
-                symbol=instrument.symbol,
-                localSymbol=instrument.local_symbol,
-                exchange=instrument.exchange,
-                currency=instrument.currency,
-            )
+        if isinstance(instrument_specs, StockSpecs):
+            contract = map_stock_specs_to_ib_contract(instrument_specs)
+
+        elif isinstance(instrument_specs, FutureSpecs):
+            contract = map_future_specs_to_ib_contract(instrument_specs)
+
         else:
             raise NotImplementedError(
-                f"Unsupported instrument for market order:{type(instrument).__name__}"
+                f"Unsupported instrument type: {type(instrument_specs).__name__}"
             )
 
-        order = MarketOrder(
-            action=specs.direction.name,
-            totalQuantity=specs.quantity
-        )
+        # Build market order
+        order = MarketOrder(action=specs.direction.name, totalQuantity=specs.quantity)
         order.tif = specs.tif
-        trade = self._ibkr_client.place_order(contract, order)
+
+        # Place market order
+        trade = self._ibkr_client.place_order(contract=contract, order=order)
+
+        # Subscribe to broker events
         trade.statusEvent += self._on_status_update
         trade.fillEvent += self._on_fill
         trade.commissionReportEvent += self._on_commission_report
