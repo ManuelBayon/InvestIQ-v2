@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from investiq.domain.decision_layer.base import NoOperation, OrderIntent
 from investiq.domain.models import RawTick
 from investiq.domain.order_specs import OrderSpecs
-from investiq.events.events import TickDataAvailable, IntentGenerated, OrderSubmitted, ExecutionSkipped
+from investiq.events.events import TickDataAvailable, IntentGenerated, OrderSubmitted, ExecutionSkipped, \
+    OrderStatusUpdated, FillReceived, CommissionReportReceived
 
 
 class CanonicalEventFactory:
@@ -84,4 +87,96 @@ class CanonicalEventFactory:
             causation_id=causation_id,
             meta_data=meta_data,
             payload=payload,
+        )
+
+    def create_order_status_updated(
+            self,
+            order_id: int,
+            parent_id: int,
+            status: str,
+            client_id: int,
+            broker_perm_id: int,
+            meta_data: dict | None = None
+    ) -> OrderStatusUpdated:
+
+        if meta_data is None:
+            meta_data = {}
+
+        return OrderStatusUpdated(
+            run_id=self._run_id,
+            event_id=self._make_next_event_id(),
+            causation_id=None,
+            meta_data=meta_data,
+            order_id=order_id,
+            parent_id=parent_id,
+            status=status,
+            client_id=client_id,
+            broker_perm_id=broker_perm_id)
+
+    def create_fill_received(
+            self,
+            order_id: int,
+            parent_id: int,
+            client_id: int,
+            broker_perm_id: int,
+            exec_id: str,
+            timestamp_utc: datetime,
+            account_num: str,
+            qty_executed: float,
+            side: str,
+            price: float,
+            cumul_qty: float,
+            meta_data: dict | None = None
+    ) -> FillReceived:
+
+        if meta_data is None:
+            meta_data = {}
+
+        return FillReceived(
+            run_id=self._run_id,
+            event_id=self._make_next_event_id(),
+            causation_id=None,
+            meta_data=meta_data,
+            order_id=order_id,
+            parent_id=parent_id,
+            client_id=client_id,
+            broker_perm_id=broker_perm_id,
+            exec_id=exec_id,
+            timestamp_utc=timestamp_utc,
+            account_num=account_num,
+            qty_executed=qty_executed,
+            side=side,
+            price=price,
+            cumul_qty=cumul_qty,
+        )
+
+    def create_commission_report_received(
+            self,
+            order_id: int,
+            parent_id: int,
+            client_id: int,
+            broker_perm_id: int,
+            exec_id: str,
+            commission: float,
+            currency: str,
+            realized_pnl: float,
+            meta_data: dict | None = None
+    ) -> CommissionReportReceived:
+
+        if meta_data is None:
+            meta_data = {}
+
+        return CommissionReportReceived(
+            run_id=self._run_id,
+            event_id=self._make_next_event_id(),
+            causation_id=None,
+            meta_data=meta_data,
+            order_id=order_id,
+            parent_id=parent_id,
+            client_id=client_id,
+            broker_perm_id=broker_perm_id,
+            exec_id=exec_id,
+            commission=commission,
+            currency=currency,
+            realized_pnl=realized_pnl,
         )

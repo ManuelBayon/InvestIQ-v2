@@ -1,8 +1,10 @@
 .pytest_cache/
 .idea/
 .venv/
-docs/
-sandbox/
+.obsidian/
+docs/01. Research log/2026/06. June/01. python/
+docs/01. Research log/2026/06. June/02. R&D workflow/
 __pycache__/
 __init__.py
 *.pyc
+src/investiq/bootstrap/
