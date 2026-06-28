@@ -1,14 +1,16 @@
-from investiq.runtime.canonical_event_queue import CanonicalEventQueue
-from investiq.events.events import CanonicalEvent, OrderSubmitted, ExecutionSkipped, FillReceived, OrderStatusUpdated, \
+from investiq.events.intents import IntentGenerated
+from investiq.runtime.event_queue import CanonicalEventQueue
+from investiq.events.base import CanonicalEvent
+from investiq.events.orders import OrderSubmitted, ExecutionSkipped, FillReceived, OrderStatusUpdated, \
     CommissionReportReceived
-from investiq.runtime.journal import CanonicalJournal
-from investiq.runtime.orchestrator import Orchestrator
+from investiq.runtime.event_journal import CanonicalEventJournal
+from investiq.runtime.event_dispatcher import Orchestrator
 
-class EventLoop:
+class CanonicalEventLoop:
 
     def __init__(
             self,
-            journal: CanonicalJournal,
+            journal: CanonicalEventJournal,
             event_queue: CanonicalEventQueue,
             orchestrator: Orchestrator,
     ):
@@ -21,7 +23,8 @@ class EventLoop:
         print(f"\nProcessed event= {event}")
         self._journal.append(event)
         if (
-                isinstance(event, OrderSubmitted)
+                isinstance(event, IntentGenerated)
+                or isinstance(event, OrderSubmitted)
                 or isinstance(event, ExecutionSkipped)
                 or isinstance(event, OrderStatusUpdated)
                 or isinstance(event, FillReceived)

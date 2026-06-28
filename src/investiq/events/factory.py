@@ -1,9 +1,11 @@
 from datetime import datetime
 
-from investiq.domain.decision_layer.base import NoOperation, OrderIntent
-from investiq.domain.models import RawTick
+from investiq.domain.decision.base import NoOperation, OrderIntent
 from investiq.domain.order_specs import OrderSpecs
-from investiq.events.events import TickDataAvailable, IntentGenerated, OrderSubmitted, ExecutionSkipped, \
+
+from investiq.events.intents import IntentGenerated
+from investiq.events.market_data import TradeReceived
+from investiq.events.orders import OrderSubmitted, ExecutionSkipped, \
     OrderStatusUpdated, FillReceived, CommissionReportReceived
 
 
@@ -18,75 +20,81 @@ class CanonicalEventFactory:
         self._next_event_id += 1
         return event_id
 
-    def create_tick_data_available(
+    def create_trade_received(
             self,
-            payload: dict[str, list[RawTick]],
-            meta_data : dict | None = None,
-    ) -> TickDataAvailable:
+            symbol: str,
+            timestamp_utc: datetime,
+            price: float,
+            size: float,
+            metadata : dict | None = None,
+    ) -> TradeReceived:
 
-        if meta_data is None:
-            meta_data = {}
+        if metadata is None:
+            metadata = {}
 
-        return TickDataAvailable(
+        return TradeReceived(
             run_id=self._run_id,
             event_id=self._make_next_event_id(),
             causation_id=None,
-            meta_data=meta_data,
-            payload=payload
+            metadata=metadata,
+            symbol=symbol,
+            timestamp_utc=timestamp_utc,
+            price=price,
+            size=size,
         )
 
     def create_intent_generated(
             self,
             causation_id: str,
-            payload: NoOperation | OrderIntent,
-            meta_data: dict | None = None
+            intent: NoOperation | OrderIntent,
+            metadata: dict | None = None
     ) -> IntentGenerated:
 
-        if meta_data is None:
-            meta_data = {}
+        if metadata is None:
+            metadata = {}
 
         return IntentGenerated(
             run_id=self._run_id,
             event_id=self._make_next_event_id(),
             causation_id=causation_id,
-            meta_data=meta_data,
-            payload=payload
+            metadata=metadata,
+            intent=intent
         )
 
     def create_order_submitted(
             self,
             causation_id: str,
-            payload: OrderSpecs,
-            meta_data: dict | None = None
+            order: OrderSpecs,
+            metadata: dict | None = None
     ) -> OrderSubmitted:
 
-        if meta_data is None:
-            meta_data = {}
+        if metadata is None:
+            metadata = {}
 
         return OrderSubmitted(
             run_id=self._run_id,
             event_id=self._make_next_event_id(),
             causation_id=causation_id,
-            meta_data=meta_data,
-            payload=payload,
+            metadata=metadata,
+            order=order,
         )
 
     def create_no_order_submitted(
             self,
             causation_id: str,
-            payload: dict,
-            meta_data: dict | None = None
+            reason: str,
+            metadata: dict | None = None
     ) -> ExecutionSkipped:
 
-        if meta_data is None:
-            meta_data = {}
+        if metadata is None:
+            metadata = {}
 
         return ExecutionSkipped(
             run_id=self._run_id,
             event_id=self._make_next_event_id(),
             causation_id=causation_id,
-            meta_data=meta_data,
-            payload=payload,
+            metadata=metadata,
+            reason=reason,
         )
 
     def create_order_status_updated(
@@ -96,22 +104,22 @@ class CanonicalEventFactory:
             status: str,
             client_id: int,
             broker_perm_id: int,
-            meta_data: dict | None = None
+            metadata: dict | None = None
     ) -> OrderStatusUpdated:
 
-        if meta_data is None:
-            meta_data = {}
+        if metadata is None:
+            metadata = {}
 
         return OrderStatusUpdated(
             run_id=self._run_id,
             event_id=self._make_next_event_id(),
             causation_id=None,
-            meta_data=meta_data,
+            metadata=metadata,
             order_id=order_id,
             parent_id=parent_id,
             status=status,
             client_id=client_id,
-            broker_perm_id=broker_perm_id)
+            perm_id=broker_perm_id)
 
     def create_fill_received(
             self,
@@ -126,28 +134,28 @@ class CanonicalEventFactory:
             side: str,
             price: float,
             cumul_qty: float,
-            meta_data: dict | None = None
+            metadata: dict | None = None
     ) -> FillReceived:
 
-        if meta_data is None:
-            meta_data = {}
+        if metadata is None:
+            metadata = {}
 
         return FillReceived(
             run_id=self._run_id,
             event_id=self._make_next_event_id(),
             causation_id=None,
-            meta_data=meta_data,
+            metadata=metadata,
             order_id=order_id,
             parent_id=parent_id,
             client_id=client_id,
-            broker_perm_id=broker_perm_id,
+            perm_id=broker_perm_id,
             exec_id=exec_id,
             timestamp_utc=timestamp_utc,
             account_num=account_num,
             qty_executed=qty_executed,
             side=side,
             price=price,
-            cumul_qty=cumul_qty,
+            qty_cumul=cumul_qty,
         )
 
     def create_commission_report_received(
@@ -160,21 +168,21 @@ class CanonicalEventFactory:
             commission: float,
             currency: str,
             realized_pnl: float,
-            meta_data: dict | None = None
+            metadata: dict | None = None
     ) -> CommissionReportReceived:
 
-        if meta_data is None:
-            meta_data = {}
+        if metadata is None:
+            metadata = {}
 
         return CommissionReportReceived(
             run_id=self._run_id,
             event_id=self._make_next_event_id(),
             causation_id=None,
-            meta_data=meta_data,
+            metadata=metadata,
             order_id=order_id,
             parent_id=parent_id,
             client_id=client_id,
-            broker_perm_id=broker_perm_id,
+            perm_id=broker_perm_id,
             exec_id=exec_id,
             commission=commission,
             currency=currency,

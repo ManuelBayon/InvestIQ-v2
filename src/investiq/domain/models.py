@@ -2,7 +2,7 @@ from math import isfinite
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
-from investiq.errors import InvalidBar, InvaliRawTick
+from investiq.errors import InvalidBar, InvalidTrade
 
 
 @dataclass(frozen=True)
@@ -50,13 +50,13 @@ class RawTick:
 
     def __post_init__(self):
         if self.timestamp_utc.tzinfo is not timezone.utc:
-            raise InvaliRawTick("timestamp must be in UTC use datetime.timezone.utc")
+            raise InvalidTrade("timestamp must be in UTC use datetime.timezone.utc")
         if self.tick_type < 0:
-            raise InvaliRawTick(f"tick_type must a non-negative integer, got tick_type={self.tick_type}")
+            raise InvalidTrade(f"tick_type must a non-negative integer, got tick_type={self.tick_type}")
         if self.price < 0 or not isfinite(self.price):
-            raise InvaliRawTick(f"price must be a finite non-negative float: price={self.price}")
+            raise InvalidTrade(f"price must be a finite non-negative float: price={self.price}")
         if self.size < 0:
-            raise InvaliRawTick(f"size must be non-negative: size={self.size}")
+            raise InvalidTrade(f"size must be non-negative: size={self.size}")
 
     def __repr__(self):
         return (
