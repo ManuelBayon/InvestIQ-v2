@@ -1,5 +1,5 @@
 from investiq.adapters.ibkr.ib_adapter import IBKRAdapter
-from investiq.adapters.ibkr.ib_broker_adapter import IBKRBrokerAdapter
+from investiq.broker.ib_broker_adapter import IBKRBrokerAdapter
 from investiq.domain.decision.base import NoOperation, OrderIntent
 from investiq.events.intents import IntentGenerated
 from investiq.events.orders import OrderSubmitted, ExecutionSkipped

@@ -1,13 +1,15 @@
+import asyncio
+
 from ib_insync import Ticker, Future, Stock
 
 from investiq.adapters.ibkr.ib_client import IBKRClient
 from investiq.adapters.ibkr.ib_contants import TRADE_TICK_TYPES
 
 from investiq.events.factory import CanonicalEventFactory
-from investiq.runtime.event_queue import CanonicalEventQueue
+from investiq.process.event_queue import CanonicalEventQueue
 
 
-class IBKRMarketDataAdapter:
+class IBKRLiveIngress:
 
     def __init__(
             self,
@@ -24,6 +26,7 @@ class IBKRMarketDataAdapter:
         self._ibkr_client.subscribe_pending_tickers(
             handler=self.on_pending_ticker
         )
+        self._ib_loop = None
 
     def subscribe_to_stock(
             self,
@@ -76,3 +79,13 @@ class IBKRMarketDataAdapter:
                     self._event_queue.enqueue(event)
                 else:
                     continue
+
+
+    def start(self) -> None:
+        self._ib_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self._ib_loop)
+
+        self._ibkr_client.connect()
+        self._ibkr_client.set_market_data_type()
+        self.subscribe_to_future(symbol="MNQ", local_symbol="MNQU6")
+        self._ibkr_client.run()

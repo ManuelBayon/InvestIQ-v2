@@ -1,10 +1,10 @@
 from investiq.events.intents import IntentGenerated
-from investiq.runtime.event_queue import CanonicalEventQueue
+from investiq.process.event_queue import CanonicalEventQueue
 from investiq.events.base import CanonicalEvent
 from investiq.events.orders import OrderSubmitted, ExecutionSkipped, FillReceived, OrderStatusUpdated, \
     CommissionReportReceived
-from investiq.runtime.event_journal import CanonicalEventJournal
-from investiq.runtime.event_dispatcher import Orchestrator
+from investiq.process.event_journal import CanonicalEventJournal
+from investiq.process.event_dispatcher import Orchestrator
 
 class CanonicalEventLoop:
 
@@ -17,7 +17,7 @@ class CanonicalEventLoop:
         self._journal = journal
         self._event_queue = event_queue
         self._orchestrator = orchestrator
-        self._running = False
+        self.running = False
 
     def _process(self, event: CanonicalEvent) -> None:
         print(f"\nProcessed event= {event}")
@@ -47,13 +47,13 @@ class CanonicalEventLoop:
             event = self._event_queue.dequeue_nowait()
             self._process(event)
 
-    def run(self) -> None:
+    def run_forever(self) -> None:
         """
         Blocking method, awaits elements
         To stop the loop, set self._running = False.
         :return:
         """
-        self._running = True
-        while self._running:
+        self.running = True
+        while self.running:
             event = self._event_queue.dequeue_blocking()
             self._process(event)

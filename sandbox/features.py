@@ -1,24 +1,10 @@
-import random
-
-from investiq.domain.features.caculators.SMA import SMA
-from investiq.domain.market_data.reader import InMemoryMarketDataReader
-from investiq.domain.market_data.stores.trade_store import TradeStore
-
-from tests.fixtures.trade_received import make_trade_stream
+from investiq.bootstrap.live import bootstrap_live_runtime
+from investiq.bootstrap.synthetic import bootstrap_synthetical_runtime
 
 if __name__ == "__main__":
 
+    synthetical_runtime = bootstrap_synthetical_runtime("TEST_RUN")
+    live_runtime = bootstrap_live_runtime("TEST_RUN")
 
-
-    store = TradeStore()
-    store_reader = InMemoryMarketDataReader(trade_store=store)
-    sma_3 = SMA(window=3)
-
-    for trade in trades:
-        store.ingest(trade=trade)
-
-        if store_reader.has_at_least_n_trades(symbol="AMD", n=sma_3.window):
-            result = sma_3.calculate(events=store_reader.trades(symbol="AMD", n=3))
-            print(result)
-        else:
-            print("warmup")
+    #synthetical_runtime.run()
+    live_runtime.run()

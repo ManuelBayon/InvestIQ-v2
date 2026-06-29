@@ -5,7 +5,7 @@ from investiq.adapters.ibkr.ib_contract_mappers import map_stock_specs_to_ib_con
 from investiq.domain.instruments import StockSpecs, FutureSpecs
 from investiq.domain.order_specs import MarketOrderSpecs
 from investiq.events.factory import CanonicalEventFactory
-from investiq.runtime.event_queue import CanonicalEventQueue
+from investiq.process.event_queue import CanonicalEventQueue
 
 
 class IBKRBrokerAdapter:

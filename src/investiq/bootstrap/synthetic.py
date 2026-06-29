@@ -1,43 +1,37 @@
-from investiq.applications.synthetic_runtime import SyntheticRuntime
-
+from investiq.runtime.sequential import SequentialRuntime
 from investiq.domain.market_data.stores.trade_store import TradeStore
 from investiq.events.factory import CanonicalEventFactory
-from investiq.ingress.synthetic_ingress import SyntheticIngress
+from investiq.ingress.synthetic import SyntheticIngress
+from investiq.process.event_dispatcher import Orchestrator
+from investiq.process.event_journal import CanonicalEventJournal
+from investiq.process.event_loop import CanonicalEventLoop
+from investiq.process.event_queue import CanonicalEventQueue
+from investiq.process.handlers.trade_received_handler import TradeReceivedHandler
 
-from investiq.runtime.event_queue import CanonicalEventQueue
-from investiq.runtime.event_loop import CanonicalEventLoop
-from investiq.runtime.handlers.trade_received_handler import TradeReceivedHandler
-from investiq.runtime.event_journal import CanonicalEventJournal
-from investiq.runtime.event_dispatcher import Orchestrator
 
-def bootstrap_synthetic_runtime() -> SyntheticRuntime:
-
+def bootstrap_synthetical_runtime(
+        run_id: str,
+) -> SequentialRuntime:
     event_queue = CanonicalEventQueue()
-    event_factory = CanonicalEventFactory("SYNTHETIC_RUN")
-    journal = CanonicalEventJournal()
-
-    trade_store = TradeStore()
-
-    trade_received_handler = TradeReceivedHandler(
-        trade_store=trade_store,
-        event_factory=event_factory
-    )
-
-    orchestrator = Orchestrator(
-        trade_received_handler=trade_received_handler,
+    event_factory = CanonicalEventFactory(run_id=run_id)
+    ingress = SyntheticIngress(
+        event_factory=event_factory,
+        event_queue=event_queue,
+        n=10,
+        delay_seconds=None,
     )
     event_loop = CanonicalEventLoop(
-        journal=journal,
         event_queue=event_queue,
-        orchestrator=orchestrator
+        journal=CanonicalEventJournal(),
+        orchestrator=Orchestrator(
+            trade_received_handler=TradeReceivedHandler(
+                trade_store=TradeStore(),
+                event_factory=event_factory
+            )
+        )
     )
-
-    ingress = SyntheticIngress(
-        event_queue=event_queue,
-        event_factory=event_factory
-    )
-
-    return SyntheticRuntime(
+    return SequentialRuntime(
+        run_id=run_id,
+        ingress=ingress,
         event_loop=event_loop,
-        ingress=ingress
     )

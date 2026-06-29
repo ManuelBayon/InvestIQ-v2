@@ -3,7 +3,7 @@ from collections.abc import Callable
 from investiq.events.base import CanonicalEvent
 from investiq.events.intents import IntentGenerated
 from investiq.events.market_data import TradeReceived
-from investiq.runtime.handlers.trade_received_handler import TradeReceivedHandler
+from investiq.process.handlers.trade_received_handler import TradeReceivedHandler
 
 
 class Orchestrator:
