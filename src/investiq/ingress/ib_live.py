@@ -6,7 +6,7 @@ from investiq.adapters.ibkr.ib_client import IBKRClient
 from investiq.adapters.ibkr.ib_contants import TRADE_TICK_TYPES
 
 from investiq.events.factory import CanonicalEventFactory
-from investiq.process.event_queue import CanonicalEventQueue
+from investiq.core.event_queue import CanonicalEventQueue
 
 
 class IBKRLiveIngress:
@@ -20,8 +20,6 @@ class IBKRLiveIngress:
         self._ibkr_client = ibkr_client
         self._event_factory = event_factory
         self._event_queue = event_queue
-
-        self._tickers: dict[str, Ticker] = {}
 
         self._ibkr_client.subscribe_pending_tickers(
             handler=self.on_pending_ticker
@@ -37,7 +35,7 @@ class IBKRLiveIngress:
         """
         Example : reqMktData(symbol="AMD", exchange= "SMART", currency= "USD")
         """
-        self._tickers[symbol] = self._ibkr_client.request_market_data(
+        self._ibkr_client.request_market_data(
             contract=Stock(
                 symbol=symbol,
                 exchange=exchange,
@@ -55,7 +53,7 @@ class IBKRLiveIngress:
         """
         Example : reqMktData(Future(symbol="NQ", local_symbol="NQU6", exchange"CME"))
         """
-        self._tickers[symbol] = self._ibkr_client.request_market_data(
+        self._ibkr_client.request_market_data(
             contract=Future(
                 symbol=symbol,
                 localSymbol=local_symbol,
@@ -76,6 +74,7 @@ class IBKRLiveIngress:
                         price=tick.price,
                         size=tick.size,
                     )
+                    print(event) # debug
                     self._event_queue.enqueue(event)
                 else:
                     continue

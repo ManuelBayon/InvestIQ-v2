@@ -1,10 +1,8 @@
-from investiq.events.intents import IntentGenerated
-from investiq.process.event_queue import CanonicalEventQueue
-from investiq.events.base import CanonicalEvent
-from investiq.events.orders import OrderSubmitted, ExecutionSkipped, FillReceived, OrderStatusUpdated, \
-    CommissionReportReceived
-from investiq.process.event_journal import CanonicalEventJournal
-from investiq.process.event_dispatcher import Orchestrator
+from investiq.core.contracts.events import CanonicalEvent
+from investiq.core.event_queue import CanonicalEventQueue
+
+from investiq.core.event_journal import CanonicalEventJournal
+from investiq.process.dispatcher import Dispatcher
 
 class CanonicalEventLoop:
 
@@ -12,27 +10,17 @@ class CanonicalEventLoop:
             self,
             journal: CanonicalEventJournal,
             event_queue: CanonicalEventQueue,
-            orchestrator: Orchestrator,
+            dispatcher: Dispatcher,
     ):
         self._journal = journal
         self._event_queue = event_queue
-        self._orchestrator = orchestrator
+        self._dispatcher = dispatcher
         self.running = False
 
     def _process(self, event: CanonicalEvent) -> None:
-        print(f"\nProcessed event= {event}")
         self._journal.append(event)
-        if (
-                isinstance(event, IntentGenerated)
-                or isinstance(event, OrderSubmitted)
-                or isinstance(event, ExecutionSkipped)
-                or isinstance(event, OrderStatusUpdated)
-                or isinstance(event, FillReceived)
-                or isinstance(event, CommissionReportReceived)
-        ):
-            return
-
-        result = self._orchestrator.dispatch(event)
+        print(f"[EVENT LOOP] Processed event= {event}")
+        result = self._dispatcher.dispatch(event)
         if result is not None:
             self._journal.append(result)
             self._event_queue.enqueue(result)

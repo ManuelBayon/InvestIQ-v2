@@ -1,24 +1,21 @@
 from datetime import datetime
 
-from investiq.domain.decision.base import NoOperation, OrderIntent
-from investiq.domain.order_specs import OrderSpecs
-
-from investiq.events.intents import IntentGenerated
 from investiq.events.market_data import TradeReceived
-from investiq.events.orders import OrderSubmitted, ExecutionSkipped, \
-    OrderStatusUpdated, FillReceived, CommissionReportReceived
-
 
 class CanonicalEventFactory:
 
     def __init__(self, run_id: str):
         self._run_id = run_id
         self._next_event_id: int = 1
+        self._causal_group_id: int = 1
 
     def _make_next_event_id(self) -> str:
         event_id =  f"EVT_{self._next_event_id:05d}"
         self._next_event_id += 1
         return event_id
+
+    def _make_causal_group_id(self) -> str:
+        return f"G_{self._causal_group_id:03d}"
 
     def create_trade_received(
             self,
@@ -26,24 +23,22 @@ class CanonicalEventFactory:
             timestamp_utc: datetime,
             price: float,
             size: float,
-            metadata : dict | None = None,
     ) -> TradeReceived:
 
-        if metadata is None:
-            metadata = {}
-
-        return TradeReceived(
+        event = TradeReceived(
             run_id=self._run_id,
             event_id=self._make_next_event_id(),
-            causation_id=None,
-            metadata=metadata,
             symbol=symbol,
             timestamp_utc=timestamp_utc,
             price=price,
             size=size,
         )
 
-    def create_intent_generated(
+        self._causal_group_id += 1
+        return event
+
+
+    """def create_intent_generated(
             self,
             causation_id: str,
             intent: NoOperation | OrderIntent,
@@ -57,6 +52,7 @@ class CanonicalEventFactory:
             run_id=self._run_id,
             event_id=self._make_next_event_id(),
             causation_id=causation_id,
+            causal_group_id=self._make_causal_group_id(),
             metadata=metadata,
             intent=intent
         )
@@ -119,7 +115,8 @@ class CanonicalEventFactory:
             parent_id=parent_id,
             status=status,
             client_id=client_id,
-            perm_id=broker_perm_id)
+            perm_id=broker_perm_id
+        )
 
     def create_fill_received(
             self,
@@ -187,4 +184,4 @@ class CanonicalEventFactory:
             commission=commission,
             currency=currency,
             realized_pnl=realized_pnl,
-        )
+        )"""

@@ -2,39 +2,39 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from investiq.domain.order_specs import OrderSpecs
-from investiq.events.base import CanonicalEvent
+from investiq.core.contracts.commands import BrokerCommand
 
 
 @dataclass(frozen=True)
-class OrderSubmitted(CanonicalEvent):
-    order : OrderSpecs
+class SubmitOrderCommand(BrokerCommand):
+    specs : OrderSpecs
     def __repr__(self):
         return (
             f"OrderSubmitted(\n"
             f"\trun_id={self.run_id},\n"
-            f"\tevent_id={self.event_id},\n"
-            f"\tcausation_id={self.causation_id},\n"
-            f"\torder={self.order}\n"
+            f"\tcommand_id={self.command_id},\n"
+            f"\tcausation_order_id={self.causation_order_id},\n"
+            f"\tspecs={self.specs}\n"
             f")"
         )
 
 
 @dataclass(frozen=True)
-class ExecutionSkipped(CanonicalEvent):
+class ExecutionSkipped(BrokerCommand):
     reason: str
     def __repr__(self):
         return (
             f"ExecutionSkipped(\n"
             f"\trun_id={self.run_id},\n"
-            f"\tevent_id={self.event_id},\n"
-            f"\tcausation_id={self.causation_id},\n"
+            f"\tcommand_id={self.command_id},\n"
+            f"\tcausation_order_id={self.causation_order_id},\n"
             f"\treason={self.reason}\n"
             f")"
         )
 
 
 @dataclass(frozen=True)
-class OrderStatusUpdated(CanonicalEvent):
+class OrderStatusUpdated(BrokerEvent):
     order_id: int
     parent_id: int
     status: str
@@ -59,7 +59,7 @@ class OrderStatusUpdated(CanonicalEvent):
 
 
 @dataclass(frozen=True)
-class FillReceived(CanonicalEvent):
+class FillReceived(BrokerEvent):
     order_id: int
     parent_id: int
     client_id: int
@@ -93,7 +93,7 @@ class FillReceived(CanonicalEvent):
 
 
 @dataclass(frozen=True)
-class CommissionReportReceived(CanonicalEvent):
+class CommissionReportReceived(BrokerEvent):
     order_id: int
     parent_id: int
     client_id: int

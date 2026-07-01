@@ -1,5 +1,6 @@
+
+from investiq.core.event_loop import CanonicalEventLoop
 from investiq.ingress.base import Ingress
-from investiq.process.event_loop import CanonicalEventLoop
 
 
 class SequentialRuntime:

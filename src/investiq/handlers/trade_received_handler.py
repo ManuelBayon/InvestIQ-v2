@@ -1,8 +1,9 @@
-from investiq.domain.decision.base import NoOperation
 from investiq.domain.market_data.stores.trade_store import TradeStore
+
 from investiq.events.factory import CanonicalEventFactory
-from investiq.events.intents import IntentGenerated
 from investiq.events.market_data import TradeReceived
+
+from investiq.handlers.base import HandlerResult
 
 
 class TradeReceivedHandler:
@@ -18,11 +19,6 @@ class TradeReceivedHandler:
     def handle(
             self,
             event: TradeReceived
-    ) -> IntentGenerated:
-
+    ) -> HandlerResult:
         self._trade_store.ingest(event)
-
-        return self._event_factory.create_intent_generated(
-            causation_id=event.event_id,
-            intent=NoOperation(),
-        )
+        return HandlerResult()

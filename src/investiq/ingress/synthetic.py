@@ -2,7 +2,7 @@ import random
 from time import sleep
 
 from investiq.events.factory import CanonicalEventFactory
-from investiq.process.event_queue import CanonicalEventQueue
+from investiq.core.event_queue import CanonicalEventQueue
 
 from tests.fixtures.trade_received import make_trade_received
 

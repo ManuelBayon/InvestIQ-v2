@@ -1,10 +1,10 @@
 from threading import Thread
-
+from investiq.core.event_loop import CanonicalEventLoop
 from investiq.ingress.base import Ingress
-from investiq.process.event_loop import CanonicalEventLoop
 
 
 class LiveRuntime:
+
 
     def __init__(
             self,
@@ -20,5 +20,4 @@ class LiveRuntime:
     def run(self) -> None:
         thread = Thread(target=self._event_loop.run_forever)
         thread.start()
-
         self._ingress.start()

@@ -1,4 +1,4 @@
-from investiq.events.base import CanonicalEvent
+from investiq.core.contracts.events import CanonicalEvent
 
 
 class CanonicalEventJournal:

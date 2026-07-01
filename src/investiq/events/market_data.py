@@ -3,12 +3,7 @@ from datetime import datetime, timezone
 from math import isfinite
 
 from investiq.errors import InvalidTrade
-from investiq.events.base import CanonicalEvent
-
-
-@dataclass(frozen=True)
-class MarketDataEvent(CanonicalEvent):
-    pass
+from investiq.events.events import MarketDataEvent
 
 
 @dataclass(frozen=True)
@@ -29,7 +24,6 @@ class TradeReceived(MarketDataEvent):
             f"\nTradeReceived(\n"
             f"\trun_id={self.run_id},\n"
             f"\tevent_id={self.event_id},\n"
-            f"\tcausation_id={self.causation_id},\n"
             f"\tsymbol={self.symbol},\n"
             f"\ttimestamp={self.timestamp_utc:%Y-%m-%dT%H:%M:%S.%f}Z,\n"
             f"\tprice={self.price},\n"

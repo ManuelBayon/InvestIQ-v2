@@ -1,13 +1,13 @@
 from investiq.adapters.ibkr.ib_client import IBKRClient
+from investiq.ingress.ib_live import IBKRLiveIngress
 from investiq.runtime.live import LiveRuntime
 from investiq.domain.market_data.stores.trade_store import TradeStore
 from investiq.events.factory import CanonicalEventFactory
-from investiq.ingress.ib_live import IBKRLiveIngress
-from investiq.process.event_dispatcher import Orchestrator
-from investiq.process.event_journal import CanonicalEventJournal
-from investiq.process.event_loop import CanonicalEventLoop
-from investiq.process.event_queue import CanonicalEventQueue
-from investiq.process.handlers.trade_received_handler import TradeReceivedHandler
+from investiq.process.dispatcher import Dispatcher
+from investiq.core.event_journal import CanonicalEventJournal
+from investiq.core.event_loop import CanonicalEventLoop
+from investiq.core.event_queue import CanonicalEventQueue
+from investiq.handlers.trade_received_handler import TradeReceivedHandler
 
 
 def bootstrap_live_runtime(
@@ -24,7 +24,7 @@ def bootstrap_live_runtime(
     event_loop = CanonicalEventLoop(
         event_queue=event_queue,
         journal=CanonicalEventJournal(),
-        orchestrator=Orchestrator(
+        dispatcher=Dispatcher(
             trade_received_handler=TradeReceivedHandler(
                 trade_store=TradeStore(),
                 event_factory=event_factory
