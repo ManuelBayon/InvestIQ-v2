@@ -1,10 +1,16 @@
+from dataclasses import dataclass
 from investiq.core.contracts.events import CanonicalEvent
 
+@dataclass(frozen=True, slots=True)
+class EventTransition:
+    input_event: CanonicalEvent
+    emitted_events: tuple[CanonicalEvent, ...]
 
-class CanonicalEventJournal:
+
+class EventTransitionJournal:
 
     def __init__(self):
-        self._journal: list[CanonicalEvent] = []
+        self._journal: list[EventTransition] = []
 
-    def append(self, event: CanonicalEvent) -> None:
-        self._journal.append(event)
+    def append(self, transition: EventTransition) -> None:
+        self._journal.append(transition)

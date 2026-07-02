@@ -1,36 +1,29 @@
-from abc import ABC
 from dataclasses import dataclass
-from enum import Enum, auto
+from decimal import Decimal
 from math import isfinite
 
-from investiq.domain.instruments import InstrumentSpecs
+from investiq.domain.orders.base import Order
+from investiq.domain.orders.side import Side
 
-
-class Side(Enum):
-    BUY = auto()
-    SELL = auto()
 
 @dataclass(frozen=True)
-class OrderSpecs(ABC):
-    ...
-
-@dataclass(frozen=True)
-class MarketOrderSpecs(OrderSpecs):
-    instrument: InstrumentSpecs
-    quantity: float
+class MarketOrder(Order):
+    quantity: Decimal
     direction : Side
-    tif: str
+
     def __post_init__(self):
         if not isfinite(self.quantity):
             raise ValueError(f"quantity must be finite, got quantity={self.quantity}")
         if not self.quantity > 0:
             raise ValueError(f"quantity must be positive, got quantity={self.quantity}")
 
+
 @dataclass(frozen=True)
-class LimitOrderSpecs(OrderSpecs):
-    quantity: float
+class LimitOrder(Order):
+    quantity: Decimal
     direction: Side
-    price: float
+    price: Decimal
+
     def __post_init__(self):
         if not isfinite(self.quantity):
             raise ValueError(f"quantity must be finite, got quantity={self.quantity}")
@@ -43,22 +36,24 @@ class LimitOrderSpecs(OrderSpecs):
 
 
 @dataclass(frozen=True)
-class StopMarketOrderSpecs(OrderSpecs):
-    trigger_price: float
-    triggered_order : MarketOrderSpecs
+class StopMarketOrder(Order):
+    trigger_price: Decimal
+    triggered_order : MarketOrder
+
     def __post_init__(self):
         if not isfinite(self.trigger_price):
             raise ValueError(f"trigger_price must be finite, got trigger_price={self.trigger_price}")
         if not self.trigger_price > 0:
             raise ValueError(f"trigger_price must be positive, got trigger_price={self.trigger_price}")
 
-@dataclass(frozen=True)
-class BracketOrderSpecs(OrderSpecs):
-    entry: MarketOrderSpecs | LimitOrderSpecs
-    stop_loss: list[StopMarketOrderSpecs] | None
-    take_profit: list[LimitOrderSpecs] | None
-    def __post_init__(self):
 
+@dataclass(frozen=True)
+class BracketOrder(Order):
+    entry: MarketOrder | LimitOrder
+    stop_loss: list[StopMarketOrder] | None
+    take_profit: list[LimitOrder] | None
+
+    def __post_init__(self):
         if not self.take_profit and not self.stop_loss:
             raise ValueError("Must have at leat one stop_loss or one take_profit otherwise don't use brackets.")
 

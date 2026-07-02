@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
-from investiq.domain.order_specs import OrderSpecs
+from investiq.domain.orders.orders import OrderSpecs
 from investiq.core.contracts.commands import BrokerCommand
 
 

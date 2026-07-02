@@ -1,4 +1,4 @@
-from investiq.domain.market_data.stores.trade_store import TradeStore
+from investiq.domain.market_data.stores.in_memory_trade_store import MarketStore
 
 from investiq.events.factory import CanonicalEventFactory
 from investiq.events.market_data import TradeReceived
@@ -10,7 +10,7 @@ class TradeReceivedHandler:
 
     def __init__(
             self,
-            trade_store: TradeStore,
+            trade_store: MarketStore,
             event_factory: CanonicalEventFactory,
     ):
         self._trade_store = trade_store
@@ -20,5 +20,5 @@ class TradeReceivedHandler:
             self,
             event: TradeReceived
     ) -> HandlerResult:
-        self._trade_store.ingest(event)
+        self._trade_store.append(event)
         return HandlerResult()

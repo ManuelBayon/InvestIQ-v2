@@ -14,8 +14,8 @@ class CanonicalEventQueue:
         """
         Remove and return an item from the queue without blocking.
 
-        Only get an item if one is immediately available. Otherwise
-        raise the Empty exception.
+        Only get an item if one is immediately available.
+        Otherwise, raise the Empty exception.
         :return: CanonicalEvent
         """
         return self._queue.get_nowait()
@@ -44,5 +44,9 @@ class CanonicalEventQueue:
         """
         return self._queue.get(block=block, timeout=timeout)
 
+    @property
     def is_empty(self) -> bool:
         return self._queue.empty()
+
+    def __len__(self) -> int:
+        return self._queue.qsize()

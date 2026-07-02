@@ -1,14 +1,14 @@
 from investiq.core.contracts.events import CanonicalEvent
 from investiq.core.event_queue import CanonicalEventQueue
 
-from investiq.core.event_journal import CanonicalEventJournal
+from investiq.core.event_journal import EventTransitionJournal, EventTransition
 from investiq.process.dispatcher import Dispatcher
 
 class CanonicalEventLoop:
 
     def __init__(
             self,
-            journal: CanonicalEventJournal,
+            journal: EventTransitionJournal,
             event_queue: CanonicalEventQueue,
             dispatcher: Dispatcher,
     ):
@@ -18,12 +18,19 @@ class CanonicalEventLoop:
         self.running = False
 
     def _process(self, event: CanonicalEvent) -> None:
-        self._journal.append(event)
-        print(f"[EVENT LOOP] Processed event= {event}")
+        print(f"[DISPATCH]: {event}")
+
         result = self._dispatcher.dispatch(event)
-        if result is not None:
-            self._journal.append(result)
-            self._event_queue.enqueue(result)
+
+        for emitted in result.emitted_events:
+            self._event_queue.enqueue(emitted)
+
+        self._journal.append(
+            EventTransition(
+                input_event=event,
+                emitted_events=result.emitted_events,
+            )
+        )
 
     def run_until_empty(self) -> None:
         """

@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from decimal import Decimal
 
 from investiq.events.factory import CanonicalEventFactory
 from investiq.events.market_data import TradeReceived
@@ -6,7 +7,8 @@ from investiq.events.market_data import TradeReceived
 def make_trade_received(
         event_factory: CanonicalEventFactory,
         symbol: str,
-        price: float,
+        price: Decimal,
+        size: Decimal,
         _day: int = 1,
         _hour: int = 12,
         _min: int = 0,
@@ -19,7 +21,7 @@ def make_trade_received(
             tzinfo=timezone.utc
         ),
         price=price,
-        size=1.0,
+        size=size,
     )
 
 

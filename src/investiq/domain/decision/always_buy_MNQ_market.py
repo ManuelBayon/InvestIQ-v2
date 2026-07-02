@@ -1,7 +1,7 @@
 from investiq.domain.decision.base import DecisionLayer, _build_context, OrderIntent
 from investiq.domain.instruments import FutureSpecs
 from investiq.domain.models import RawTick
-from investiq.domain.order_specs import MarketOrderSpecs, Side
+from investiq.domain.orders.orders import MarketOrderSpecs, Side
 
 
 class AlwaysBuyMNQMarket(DecisionLayer):

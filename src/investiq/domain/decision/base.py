@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from investiq.domain.models import RawTick
-from investiq.domain.order_specs import OrderSpecs
+from investiq.domain.orders.orders import OrderSpecs
 
 
 @dataclass(frozen=True)

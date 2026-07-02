@@ -26,7 +26,7 @@ class IBKRClient:
     def set_market_data_type(self, data_type: int = 3) -> None:
         """
         data_type = 1 for real-time
-        data_type = 3 for delayed data (by default)
+        data_type = 3 for delayed market_data (by default)
         """
         self._ib.reqMarketDataType(marketDataType=data_type)
 
