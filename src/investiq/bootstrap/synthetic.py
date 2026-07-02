@@ -2,14 +2,14 @@ from decimal import Decimal
 
 from investiq.ingress.synthetic import SyntheticIngress, SyntheticStream
 from investiq.runtime.sequential import SequentialRuntime
-from investiq.domain.market_data.stores.in_memory_trade_store import MarketStore, InMemoryTradeStore
+from investiq.domain.market_data.stores.in_memory.trade_store import InMemoryTradeStore
 from investiq.events.factory import CanonicalEventFactory
 
 from investiq.process.dispatcher import Dispatcher
 from investiq.core.event_journal import EventTransitionJournal
 from investiq.core.event_loop import CanonicalEventLoop
 from investiq.core.event_queue import CanonicalEventQueue
-from investiq.handlers.trade_received_handler import TradeReceivedHandler
+from investiq.handlers.market_data_handler import TradeReceivedHandler
 
 
 def bootstrap_synthetical_runtime(run_id: str) -> SequentialRuntime:

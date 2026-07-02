@@ -4,6 +4,8 @@ from decimal import Decimal
 
 from investiq.events.factory import CanonicalEventFactory
 from investiq.core.event_queue import CanonicalEventQueue
+from investiq.events.market_data import TradeReceived
+
 
 @dataclass(frozen=True, slots=True)
 class SyntheticTrade:
@@ -21,6 +23,7 @@ class SyntheticStream:
     max_price: Decimal
     min_size: Decimal
     max_size: Decimal
+    ordered_by_ts: bool = True
 
     def __post_init__(self):
         one = Decimal("1")
@@ -69,8 +72,8 @@ class SyntheticIngress:
         self._event_queue = event_queue
         self._event_factory = event_factory
 
-    def start(self) -> None:
-
+    def _make_ordered_trades(self) -> list[TradeReceived]:
+        trades = []
         for i in range(max(s.n for s in self._streams)):
             for stream in self._streams:
                 if i >= stream.n:
@@ -97,4 +100,10 @@ class SyntheticIngress:
                     price=price,
                     size=size,
                 )
-                self._event_queue.enqueue(trade)
+                trades.append(trade)
+        return trades
+
+    def start(self) -> None:
+        trades = self._make_ordered_trades()
+        for t in trades:
+            self._event_queue.enqueue(t)

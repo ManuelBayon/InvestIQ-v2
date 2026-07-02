@@ -1,64 +1,66 @@
 from decimal import Decimal
 
-from investiq.bootstrap.live import bootstrap_live_runtime
-from investiq.bootstrap.synthetic import bootstrap_synthetical_runtime
+from investiq.core.event_journal import EventTransitionJournal
+from investiq.core.event_loop import CanonicalEventLoop
 from investiq.core.event_queue import CanonicalEventQueue
 from investiq.domain.market_data.readers.in_memory_market_data_reader import InMemoryMarketDataReader
-from investiq.domain.market_data.stores.in_memory_trade_store import InMemoryTradeStore
+from investiq.domain.market_data.stores.in_memory.trade_store import InMemoryTradeStore
 from investiq.events.factory import CanonicalEventFactory
-from investiq.events.market_data import TradeReceived
+
+from investiq.handlers.market_data_handler import MarketDataHandler
 from investiq.ingress.synthetic import SyntheticIngress, SyntheticStream
+from investiq.process.dispatcher import Dispatcher
 
 if __name__ == "__main__":
 
-    synthetical_runtime = bootstrap_synthetical_runtime("TEST_RUN")
-    live_runtime = bootstrap_live_runtime("TEST_RUN")
+    run_id = "TEST_RUN"
 
-    #synthetical_runtime.run()
-    #live_runtime.run()
+    symbol_1 = "TEST_SYMBOL_1"
+    num_trades_1 = 1
 
-    #################################################################
+    symbol_2 = "TEST_SYMBOL_2"
+    num_trades_2 = 1
+
+    trade_store = InMemoryTradeStore()
+    reader = InMemoryMarketDataReader(store=trade_store)
+
+    market_data_handler = MarketDataHandler(trade_store=trade_store)
+
+    dispatcher = Dispatcher(market_data_handler=market_data_handler)
 
     event_queue = CanonicalEventQueue()
-    event_factory = CanonicalEventFactory(run_id="TEST_RUN_ID")
+    journal = EventTransitionJournal()
+    event_factory = CanonicalEventFactory(run_id=run_id)
 
-    store = InMemoryTradeStore()
-    reader = InMemoryMarketDataReader(store=store)
+    event_loop = CanonicalEventLoop(
+        event_queue=event_queue,
+        dispatcher=dispatcher,
+        transition_journal=journal
+    )
 
-    s1 = SyntheticStream(
-        symbol="TEST_SYMBOL_1",
-        n=20,
-        min_price=Decimal(100),
-        max_price=Decimal(110),
-        min_size=Decimal(1),
-        max_size=Decimal(5),
-    )
-    s2 = SyntheticStream(
-        symbol="TEST_SYMBOL_2",
-        n=25,
-        min_price=Decimal(200),
-        max_price=Decimal(220),
-        min_size=Decimal(1),
-        max_size=Decimal(10),
-    )
     ingress = SyntheticIngress(
         event_queue=event_queue,
         event_factory=event_factory,
-        streams=[s1, s2],
+        streams=[
+            SyntheticStream(
+                symbol=symbol_1,
+                n=num_trades_1,
+                min_price=Decimal(100),
+                max_price=Decimal(110),
+                min_size=Decimal(1),
+                max_size=Decimal(5),
+            ),
+            SyntheticStream(
+                symbol=symbol_2,
+                n=num_trades_2,
+                min_price=Decimal(100),
+                max_price=Decimal(110),
+                min_size=Decimal(1),
+                max_size=Decimal(5),
+            )
+        ],
     )
 
     ingress.start()
+    event_loop.run_until_empty()
 
-    while not event_queue.is_empty:
-        event = event_queue.dequeue_nowait()
-        assert isinstance(event, TradeReceived)
-        store.append(event)
-
-    trades_1 = reader.window(s1.symbol, s1.n)
-    trades_2 = reader.window(s2.symbol, s2.n)
-
-    trades = list(trades_1 + trades_2)
-    trades.sort(key=lambda trade: trade.event_id)
-
-    for t in trades:
-        print(t)

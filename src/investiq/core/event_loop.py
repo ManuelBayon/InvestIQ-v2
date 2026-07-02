@@ -6,20 +6,20 @@ from investiq.process.dispatcher import Dispatcher
 
 class CanonicalEventLoop:
 
+
     def __init__(
             self,
-            journal: EventTransitionJournal,
+            transition_journal: EventTransitionJournal,
             event_queue: CanonicalEventQueue,
             dispatcher: Dispatcher,
     ):
-        self._journal = journal
+        self._journal = transition_journal
         self._event_queue = event_queue
         self._dispatcher = dispatcher
         self.running = False
 
-    def _process(self, event: CanonicalEvent) -> None:
-        print(f"[DISPATCH]: {event}")
 
+    def _process(self, event: CanonicalEvent) -> None:
         result = self._dispatcher.dispatch(event)
 
         for emitted in result.emitted_events:
@@ -32,15 +32,17 @@ class CanonicalEventLoop:
             )
         )
 
+
     def run_until_empty(self) -> None:
         """
         Non-blocking, used for backtest or replay,
         While there are elements returns the elements then ends.
         :return:
         """
-        while not self._event_queue.is_empty():
+        while not self._event_queue.is_empty:
             event = self._event_queue.dequeue_nowait()
             self._process(event)
+
 
     def run_forever(self) -> None:
         """
