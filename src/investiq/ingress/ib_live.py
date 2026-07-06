@@ -1,4 +1,5 @@
 import asyncio
+from decimal import Decimal
 
 from ib_insync import Ticker, Future, Stock
 
@@ -71,8 +72,8 @@ class IBKRLiveIngress:
                     event = self._event_factory.create_trade_received(
                         symbol=symbol,
                         timestamp_utc=tick.time,
-                        price=tick.price,
-                        size=tick.size,
+                        price=Decimal(tick.price),
+                        size=Decimal(tick.size),
                     )
                     print(event) # debug
                     self._event_queue.enqueue(event)

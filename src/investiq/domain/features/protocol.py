@@ -1,0 +1,9 @@
+from typing import Protocol
+
+
+class Feature[E, V](Protocol):
+    def compute(self, event: E) -> None:...
+    @property
+    def is_ready(self) -> bool:...
+    @property
+    def value(self) -> V:...

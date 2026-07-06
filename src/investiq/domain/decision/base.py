@@ -48,9 +48,5 @@ def _build_context(
     )
 
 class DecisionLayer(Protocol):
-    def evaluate(
-            self,
-            market_view: dict[str, list[RawTick]],
-            feature_view: dict[str, dict[str, list[float]]],
-    ) -> NoOperation | OrderIntent:
+    def evaluate(self) -> NoOperation | OrderIntent:
         ...

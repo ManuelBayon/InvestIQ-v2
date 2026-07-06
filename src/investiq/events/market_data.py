@@ -26,7 +26,7 @@ class TradeReceived(MarketDataEvent):
             f"\trun_id={self.run_id},\n"
             f"\tevent_id={self.event_id},\n"
             f"\tsymbol={self.symbol},\n"
-            f"\ttimestamp={self.timestamp_utc:%Y-%m-%dT%H:%M:%S.%f}Z,\n"
+            f"\ttimestamp_utc={self.timestamp_utc:%Y-%m-%dT%H:%M:%S.%f}Z,\n"
             f"\tprice={self.price},\n"
             f"\tsize={self.size}\n"
             f")"

@@ -9,19 +9,19 @@ class CanonicalEventLoop:
 
     def __init__(
             self,
-            transition_journal: EventTransitionJournal,
+            journal: EventTransitionJournal,
             event_queue: CanonicalEventQueue,
             dispatcher: Dispatcher,
     ):
-        self._journal = transition_journal
+        self._journal = journal
         self._event_queue = event_queue
         self._dispatcher = dispatcher
         self.running = False
 
 
     def _process(self, event: CanonicalEvent) -> None:
+        print(f"[EVENT LOOP — PROCESS] : {event}")
         result = self._dispatcher.dispatch(event)
-
         for emitted in result.emitted_events:
             self._event_queue.enqueue(emitted)
 
