@@ -1,4 +1,13 @@
-from investiq.events.market_data import TradeReceived
+from collections.abc import Mapping
+from dataclasses import dataclass
+from decimal import Decimal
+
+from investiq.events.trade_received import TradeReceived
+
+@dataclass(frozen=True)
+class LatestTradeSnapshot:
+    latest: Mapping[str, Decimal]
+
 
 class InMemoryTradeStore:
     """
@@ -50,3 +59,12 @@ class InMemoryTradeStore:
     @property
     def symbols(self) -> tuple[str, ...]:
         return tuple(self._trades_by_symbol)
+
+
+    @property
+    def snapshot(self) -> LatestTradeSnapshot:
+        latest_by_symbol = {
+            symbol: events[-1].price
+            for symbol, events in self._trades_by_symbol.items()
+        }
+        return LatestTradeSnapshot(latest=latest_by_symbol)

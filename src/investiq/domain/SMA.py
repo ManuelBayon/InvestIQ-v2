@@ -1,7 +1,7 @@
 from collections import deque
 from decimal import Decimal
 
-from investiq.events.market_data import TradeReceived
+from investiq.events.trade_received import TradeReceived
 
 
 class SMA:

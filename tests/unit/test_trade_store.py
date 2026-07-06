@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from decimal import Decimal
 
 from investiq.domain.trade_store import InMemoryTradeStore
-from investiq.events.market_data import TradeReceived
+from investiq.events.trade_received import TradeReceived
 
 
 def test_ingest_first_trade_received_event():

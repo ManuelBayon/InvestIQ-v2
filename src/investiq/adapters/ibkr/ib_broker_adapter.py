@@ -3,7 +3,7 @@ from ib_insync import Trade, Fill, CommissionReport, MarketOrder
 from investiq.adapters.ibkr.ib_client import IBKRClient
 from investiq.adapters.ibkr.ib_contract_mappers import map_stock_specs_to_ib_contract, map_future_specs_to_ib_contract
 from investiq.domain.instruments import StockSpecs, FutureSpecs
-from investiq.domain.orders.orders import MarketOrderSpecs
+from investiq.domain.orders import MarketOrderSpecs
 from investiq.events.factory import CanonicalEventFactory
 from investiq.core.event_queue import CanonicalEventQueue
 

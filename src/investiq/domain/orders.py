@@ -1,11 +1,26 @@
+from abc import ABC
 from dataclasses import dataclass
 from decimal import Decimal
+from enum import StrEnum
 from math import isfinite
 
-from investiq.domain.orders.base import Order
-from investiq.domain.orders.side import Side
+from investiq.domain.instrument_specs import InstrumentSpec
 
+class Side(StrEnum):
+    BUY = "BUY"
+    SELL = "SELL"
 
+class TimeInForce(StrEnum):
+    DAY = "DAY"
+    GTC = "GTC"
+    IOC = "IOC"
+    FOK = "FOK"
+
+@dataclass(frozen=True, slots=True)
+class Order(ABC):
+    instrument: InstrumentSpec
+    tif: str
+    
 @dataclass(frozen=True)
 class MarketOrder(Order):
     quantity: Decimal
