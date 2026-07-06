@@ -1,7 +1,7 @@
 from abc import ABC
 from dataclasses import dataclass
 
-from investiq.domain.instruments.specs import InstrumentSpecs
+from investiq.domain.instrument_specs import InstrumentSpecs
 
 
 @dataclass(frozen=True, slots=True)

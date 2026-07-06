@@ -8,37 +8,43 @@ from investiq.events.market_data import TradeReceived
 
 class FeatureEngine:
 
-    def __init__(self, feature_set: list[FeatureSet]):
-        self._registry = MappingProxyType({
-            f.symbol: f for f in feature_set
-        })
+    def __init__(self, feature_sets: list[FeatureSet]):
+        _registry = {}
+        for fs in feature_sets:
+            if fs.symbol in _registry:
+                raise ValueError(
+                    f"Duplicate FeatureSet for symbol={fs.symbol}."
+                )
+            _registry[fs.symbol] = fs
+        self._registry = MappingProxyType(_registry)
 
 
     def update(self, event: TradeReceived) -> None:
-        symbol = event.symbol
-        if symbol not in self._registry:
+        fs = self._registry.get(event.symbol)
+
+        if fs is None:
             raise KeyError(
-                f"symbol={symbol} is not recognized. "
+                f"symbol={event.symbol} is not recognized. "
                 f"Available symbols={self._registry}"
             )
 
-        for feature in self._registry[symbol].features.values():
+        for feature in fs.features.values():
             feature.compute(event)
 
 
     def _get_feature(self, symbol: str, feature_name: str) -> Feature:
-        feature_set = self._registry.get(symbol)
-        if feature_set is None:
+        fs = self._registry.get(symbol)
+        if fs is None:
             raise KeyError(
                 f"symbol={symbol} is not recognized. "
-                f"Available symbols={self._registry}"
+                f"Available symbols={self._registry.keys()}"
             )
 
-        feature = feature_set.features.get(feature_name)
+        feature = fs.features.get(feature_name)
         if feature is None:
             raise KeyError(
                 f"feature={feature_name} is not recognized in FeatureSet for symbol={symbol}. "
-                f"Available features={[f for f in feature_set.features]}"
+                f"Available features={[f for f in fs.features]}"
             )
         return feature
 

@@ -17,7 +17,7 @@ def test_ingest_first_trade_received_event():
         price=Decimal(100),
         size=Decimal(1),
     )
-    store.ingest(event)
+    store.append(event)
 
     assert symbol in store.symbols
     assert store.has_at_least(symbol, 1)
@@ -39,7 +39,7 @@ def test_ingest_two_trade_received_events():
         price=Decimal(100),
         size=Decimal(1),
     )
-    store.ingest(event_1)
+    store.append(event_1)
     event_2 = TradeReceived(
         run_id="TEST_RUN",
         event_id="EVT_00002",
@@ -52,7 +52,7 @@ def test_ingest_two_trade_received_events():
         price=Decimal(102),
         size=Decimal(1),
     )
-    store.ingest(event_2)
+    store.append(event_2)
 
     assert symbol in store.symbols
     assert store.has_at_least(symbol, 2)
@@ -75,7 +75,7 @@ def test_ingest_two_trade_received_events_with_different_symbols():
         price=Decimal(100),
         size=Decimal(1),
     )
-    store.ingest(event_1)
+    store.append(event_1)
     event_2 = TradeReceived(
         run_id="TEST_RUN",
         event_id="EVT_00002",
@@ -88,7 +88,7 @@ def test_ingest_two_trade_received_events_with_different_symbols():
         price=Decimal(102),
         size=Decimal(1),
     )
-    store.ingest(event_2)
+    store.append(event_2)
 
     assert symbol_1 in store.symbols
     assert symbol_2 in store.symbols
@@ -113,7 +113,7 @@ def test_ingest_rejects_decreasing_timestamps_utc():
         price=Decimal(100),
         size=Decimal(1),
     )
-    store.ingest(event_1)
+    store.append(event_1)
     event_2 = TradeReceived(
         run_id="TEST_RUN",
         event_id="EVT_00002",
@@ -128,7 +128,7 @@ def test_ingest_rejects_decreasing_timestamps_utc():
     )
 
     with pytest.raises(ValueError):
-        store.ingest(event_2)
+        store.append(event_2)
 
 
 def test_has_at_least_zero_raises():
@@ -146,7 +146,7 @@ def test_has_at_least_zero_raises():
         price=Decimal(100),
         size=Decimal(1),
     )
-    store.ingest(event_1)
+    store.append(event_1)
 
     with pytest.raises(ValueError):
         store.has_at_least(symbol, 0)
@@ -167,7 +167,7 @@ def test_window_zero_raises():
         price=Decimal(100),
         size=Decimal(1),
     )
-    store.ingest(event_1)
+    store.append(event_1)
 
     with pytest.raises(ValueError):
         store.window(symbol, 0)
@@ -188,7 +188,7 @@ def test_window_unknown_symbol_raises():
         price=Decimal(100),
         size=Decimal(1),
     )
-    store.ingest(event_1)
+    store.append(event_1)
 
     with pytest.raises(KeyError):
         store.window("unknown", 1)
@@ -209,7 +209,7 @@ def test_window_insufficient_data_raises():
         price=Decimal(100),
         size=Decimal(1),
     )
-    store.ingest(event_1)
+    store.append(event_1)
 
     with pytest.raises(ValueError):
         store.window(symbol, 2)
