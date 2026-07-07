@@ -1,4 +1,3 @@
-from collections.abc import Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Protocol, runtime_checkable, TypeVar
@@ -24,14 +23,6 @@ class FeatureSet:
     """
     symbol: str
     features: dict[str, Feature]
-
-
-@dataclass(frozen=True)
-class FeatureSnapshot:
-    """
-
-    """
-    data: Mapping[str, Mapping[str, object]]
 
 
 class FeatureEngine:
@@ -60,7 +51,7 @@ class FeatureEngine:
             feature.compute(event)
 
 
-    def _get_feature(self, symbol: str, feature_name: str) -> Feature:
+    def get_feature(self, symbol: str, feature_name: str) -> Feature:
         fs = self._registry.get(symbol)
         if fs is None:
             raise KeyError(
@@ -71,22 +62,6 @@ class FeatureEngine:
         if feature is None:
             raise KeyError(
                 f"feature={feature_name} is not recognized in FeatureSet for symbol={symbol}. "
-                f"Available features={[f for f in fs.features]}"
+                f"Available features={[fs.features.keys()]}"
             )
         return feature
-
-
-    @property
-    def snapshot(self) -> FeatureSnapshot:
-        data = {}
-
-        for symbol, feature_set in self._registry.items():
-            values = {
-                name: feature.value
-                for name, feature in feature_set.features.items()
-            }
-            data[symbol] = MappingProxyType(values)
-
-        return FeatureSnapshot(
-            data=MappingProxyType(data)
-        )

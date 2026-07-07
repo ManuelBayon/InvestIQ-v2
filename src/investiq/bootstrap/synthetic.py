@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from investiq.ingress.synthetic import SyntheticIngress, TradeFixture
 from investiq.runtime.sequential import SequentialRuntime
-from investiq.domain.trade_store import InMemoryTradeStore
+from investiq.domain.market_store import InMemoryTradeStore
 from investiq.events.factory import CanonicalEventFactory
 
 from investiq.process.dispatcher import Dispatcher

@@ -1,5 +1,5 @@
-from investiq.domain.feature_engine import FeatureEngine
-from investiq.domain.trade_store import InMemoryTradeStore
+from investiq.features.feature_engine import FeatureEngine
+from investiq.domain.market_store import InMemoryTradeStore
 from investiq.events.trade_received import TradeReceived
 
 from investiq.handlers.base import HandlerResult

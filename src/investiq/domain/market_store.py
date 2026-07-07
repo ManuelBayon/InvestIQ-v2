@@ -9,7 +9,7 @@ class LatestTradeSnapshot:
     latest: Mapping[str, Decimal]
 
 
-class InMemoryTradeStore:
+class InMemoryMarketStore:
     """
     In memory trade store.
 
@@ -20,7 +20,7 @@ class InMemoryTradeStore:
         self._trades_by_symbol: dict[str, list[TradeReceived]] = {}
 
 
-    def append(self, event: TradeReceived) -> None:
+    def on_trade_received(self, event: TradeReceived) -> None:
         symbol = event.symbol
 
         if symbol in self._trades_by_symbol:
@@ -56,15 +56,10 @@ class InMemoryTradeStore:
         return tuple(events[-n:])
 
 
+    def latest(self, symbol: str) -> Decimal:
+        return self.window(symbol, 1)[0].price
+
+
     @property
     def symbols(self) -> tuple[str, ...]:
         return tuple(self._trades_by_symbol)
-
-
-    @property
-    def snapshot(self) -> LatestTradeSnapshot:
-        latest_by_symbol = {
-            symbol: events[-1].price
-            for symbol, events in self._trades_by_symbol.items()
-        }
-        return LatestTradeSnapshot(latest=latest_by_symbol)

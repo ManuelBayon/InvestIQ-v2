@@ -2,7 +2,7 @@ import pytest
 from datetime import datetime, timezone
 from decimal import Decimal
 
-from investiq.domain.trade_store import InMemoryTradeStore
+from investiq.domain.market_store import InMemoryTradeStore
 from investiq.events.trade_received import TradeReceived
 
 

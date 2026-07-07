@@ -3,8 +3,8 @@ from decimal import Decimal
 
 import pytest
 
-from investiq.domain.SMA import SMA
-from investiq.domain.feature_engine import FeatureEngine
+from investiq.features.SMA import SMA
+from investiq.features.feature_engine import FeatureEngine
 from investiq.domain.features.feature_set import FeatureSet
 from investiq.events.trade_received import TradeReceived
 

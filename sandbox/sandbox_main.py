@@ -2,9 +2,9 @@ from investiq.core.event_journal import EventTransitionJournal
 from investiq.core.event_loop import CanonicalEventLoop
 from investiq.core.event_queue import CanonicalEventQueue
 
-from investiq.domain.SMA import SMA
-from investiq.domain.feature_engine import FeatureEngine, FeatureSet
-from investiq.domain.trade_store import InMemoryTradeStore
+from investiq.features.SMA import SMA
+from investiq.features.feature_engine import FeatureEngine, FeatureSet
+from investiq.domain.market_store import InMemoryMarketStore
 
 from investiq.events.factory import CanonicalEventFactory
 
