@@ -49,3 +49,25 @@ volatility_20
 signal
 ```
 
+---
+# Modèles existants
+
+## Orchestrateur de workflow
+
+- Apache Airflow
+- Prefect
+- Dagster
+
+## Feature pipelines
+
+- Feast
+
+## Quant / Data science
+
+- Zipline reloaded
+- Backtrader
+
+## Build systems
+
+- Bazel
+- Buck2
