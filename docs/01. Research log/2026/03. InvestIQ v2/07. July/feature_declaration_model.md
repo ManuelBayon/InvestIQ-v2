@@ -71,3 +71,21 @@ signal
 
 - Bazel
 - Buck2
+
+---
+Question de recherche 
+
+Comment un chercheur déclare-t-il explicitement une chaîne de dépendances entre données marché et features avant l'exécution ?
+
+Exemple : 
+```
+Market Input
+    close(AAPL)
+          ↓
+Feature
+    returns_1
+          ↓
+Feature
+    volatility_20
+```
+
