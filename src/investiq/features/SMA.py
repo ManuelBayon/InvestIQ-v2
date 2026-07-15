@@ -1,6 +1,7 @@
 from collections import deque
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class SMAFeature:
     symbol: str

@@ -1,19 +1,8 @@
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import Protocol, runtime_checkable, TypeVar
 
 from investiq.events.trade_received import TradeReceived
-
-E = TypeVar("E")
-V = TypeVar("V")
-
-@runtime_checkable
-class Feature(Protocol[E, V]):
-    def compute(self, event: E) -> None:...
-    @property
-    def is_ready(self) -> bool:...
-    @property
-    def value(self) -> V:...
+from investiq.features.protocol import Feature
 
 
 @dataclass(frozen=True)
@@ -48,7 +37,7 @@ class FeatureEngine:
                 f"Available symbols={self._registry}"
             )
         for feature in fs.features.values():
-            feature.compute(event)
+            feature.compute(float(event.price))
 
 
     def get_feature(self, symbol: str, feature_name: str) -> Feature:

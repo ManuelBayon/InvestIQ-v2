@@ -1,0 +1,12 @@
+[tool.pyright]
+typeCheckingMode = "strict"
+
+pythonVersion = "3.13.0"
+
+include = ["sandbox", "src"]
+
+exclude = [
+    "**/__pycache__",
+    ".venv/",
+    "docs/",
+]
