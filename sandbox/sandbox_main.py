@@ -2,8 +2,6 @@ from investiq.core.event_journal import EventTransitionJournal
 from investiq.core.event_loop import CanonicalEventLoop
 from investiq.core.event_queue import CanonicalEventQueue
 
-from investiq.features.SMA import SMA
-from investiq.features.feature_engine import FeatureEngine, FeatureSet
 from investiq.domain.market_store import InMemoryMarketStore
 
 from investiq.events.factory import CanonicalEventFactory
@@ -19,15 +17,10 @@ if __name__ == "__main__":
     run_id = "TEST_RUN"
     symbol = "TEST_SYMBOL"
 
-    trade_store = InMemoryTradeStore()
-    feature_sets = [
-        FeatureSet(symbol=symbol, features={"sma_2": SMA(2), "sma_3": SMA(3)})
-    ]
-    feature_engine = FeatureEngine(feature_sets=feature_sets)
+    trade_store = InMemoryMarketStore()
 
     trade_received_handler = TradeReceivedHandler(
         trade_store=trade_store,
-        feature_engine=feature_engine
     )
 
     dispatcher = Dispatcher(
@@ -53,5 +46,3 @@ if __name__ == "__main__":
 
     ingress.start()
     event_loop.run_until_empty()
-
-    print(f"{feature_engine.features(symbol)}")

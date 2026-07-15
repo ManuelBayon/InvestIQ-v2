@@ -10,7 +10,6 @@ class TradingIntent:
     target: Decimal
 
 
-SnapshotT = TypeVar("SnapshotT")
-class Strategy[SnapshotT](Protocol):
-    def decide(self, snapshot: SnapshotT) -> list[TradingIntent]:
+class Strategy(Protocol):
+    def decide(self, *args, **kwargs) -> list[TradingIntent]:
         ...
