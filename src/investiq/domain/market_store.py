@@ -14,20 +14,21 @@ class InMemoryMarketStore:
     In memory trade store.
 
     TradeReceived events are supposed to be ordered by timestamp for each symbol.
+    TradeReceived are stored by symbol.
     """
 
     def __init__(self):
-        self._trades_by_symbol: dict[str, list[TradeReceived]] = {}
+        self._trades: dict[str, list[TradeReceived]] = {}
 
 
     def on_trade_received(self, event: TradeReceived) -> None:
         symbol = event.symbol
-        if symbol in self._trades_by_symbol:
-            last = self._trades_by_symbol[event.symbol][-1]
+        if symbol in self._trades:
+            last = self._trades[event.symbol][-1]
 
             if event.timestamp_utc < last.timestamp_utc:
                 raise ValueError(
-                    f"timestamp_utc for symbol={event.symbol}, is decreasing."
+                    f"event.timestamp_utc={event.timestamp_utc} < last.timestamp_utc={last.timestamp_utc}"
                 )
 
-        self._trades_by_symbol.setdefault(symbol, []).append(event)
+        self._trades.setdefault(symbol, []).append(event)
