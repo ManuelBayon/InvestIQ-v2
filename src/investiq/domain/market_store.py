@@ -3,10 +3,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from investiq.events.trade_received import TradeReceived
-
-@dataclass(frozen=True)
-class LatestTradeSnapshot:
-    latest: Mapping[str, Decimal]
+from tests.fixtures.market.simple import SIMPLE_TRADES
 
 
 class InMemoryMarketStore:
@@ -32,3 +29,25 @@ class InMemoryMarketStore:
                 )
 
         self._trades.setdefault(symbol, []).append(event)
+
+    def window(self, symbol: str, size: int) -> tuple[float, ...]:
+        window = self._trades[symbol][-size:]
+        return tuple(float(p.price) for p in window)
+
+    def has_at_least(self, symbol: str, size: int) -> bool:
+        if size <= 0:
+            raise ValueError(f"size must be positive, got size={size}.")
+        if symbol not in self._trades:
+            raise KeyError(f"symbol={symbol} not found in self._trades")
+        if len(self._trades[symbol]) >= size:
+            return True
+        else:
+            return False
+
+
+if __name__ == "__main__":
+    store = InMemoryMarketStore()
+    trade_0 = SIMPLE_TRADES[0]
+
+    store.on_trade_received(trade_0)
+    print(store.has_at_least(symbol="TEST_SYMBOL", size=2))

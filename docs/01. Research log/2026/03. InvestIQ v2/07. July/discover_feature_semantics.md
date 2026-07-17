@@ -139,3 +139,81 @@ volatility_3 : window: liste des 3 derniers returns_1
 z_score_3 : window: liste des 3 derniers volatility_3
 
 Le modèle liste de callables recevant tous un `TradeReceived` ne possède pas assez d'information pour satisfaire les besoins d'entrée des features.
+
+## Hypothèse 2
+
+Est-ce qu’un besoin de fenêtre et un symbole commun suffit à rendre les features orchestrables ?
+
+``` python
+class InMemoryMarketStore:  
+
+    def __init__(self):  
+        self._trades: dict[str, list[TradeReceived]] = {}    
+  
+    def on_trade_received(self, event: TradeReceived) -> None:  
+        symbol = event.symbol  
+        if symbol in self._trades:  
+            last = self._trades[event.symbol][-1]  
+  
+            if event.timestamp_utc < last.timestamp_utc:  
+                raise ValueError(...)  
+  
+        self._trades.setdefault(symbol, []).append(event)  
+  
+	def window(self, symbol: str, size) -> tuple[float, ...]:  
+	    window = self._trades[symbol][-size:]  
+	    return tuple(float(p.price) for p in window)
+```
+
+```python
+from math import log  
+from typing import Protocol  
+  
+from investiq.domain.market_store import InMemoryMarketStore  
+  
+from tests.fixtures.market.simple import SIMPLE_TRADES  
+  
+class Feature(Protocol):  
+    window_size: int  
+    def compute(self, window: tuple[float, ...]) -> float:  
+        ...  
+  
+class Returns1:  
+    window_size: int = 2  
+    def compute(self, window: tuple[float, ...]) -> float:  
+        price = window[-1]  
+        last_price = window[-2]  
+        return log(price / last_price)  
+  
+  
+class FeatureEngine:  
+    def __init__(  
+            self,  
+            pipelines: list[Feature],  
+            store: InMemoryMarketStore,  
+    ):  
+        self._pipelines = pipelines  
+        self._market_store = store  
+        self._features: dict[str, float] = {}  
+  
+    def update(self):  
+        for p in self._pipelines:  
+            if self._market_store.has_at_least("TEST_SYMBOL", p.window_size):  
+                view = self._market_store.window("TEST_SYMBOL", p.window_size)  
+                r = p.compute(window=view)  
+                self._features["TEST_SYMBOL"] = r  
+  
+    def get(self, symbol: str) -> float:  
+        if symbol not in self._features:  
+            raise KeyError(f"unknown symbol={symbol}")  
+        return self._features["TEST_SYMBOL"]
+```
+
+Ce modèle fonctionne uniquement pour les features dérivées du marché comme returns_1 mais il échoue dès que la source n'est plus le marché (vol_3, zscore, etc.).
+
+Une feature a un besoin d'entrée caractérisé à la fois par une provenance et une profondeur d'historique.
+
+---
+
+
+
