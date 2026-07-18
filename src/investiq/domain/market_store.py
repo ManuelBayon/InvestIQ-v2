@@ -30,9 +30,9 @@ class InMemoryMarketStore:
 
         self._trades.setdefault(symbol, []).append(event)
 
-    def window(self, symbol: str, size: int) -> tuple[float, ...]:
+    def price_window(self, symbol: str, size: int) -> list[float]:
         window = self._trades[symbol][-size:]
-        return tuple(float(p.price) for p in window)
+        return [float(p.price) for p in window]
 
     def has_at_least(self, symbol: str, size: int) -> bool:
         if size <= 0:
