@@ -1,6 +1,6 @@
-from investiq.errors import InsufficientHistoryError
+from investiq.errors import InsufficientHistoryError, UnknownSymbolError
 from investiq.events.trade_received import TradeReceived
-from tests.fixtures.market.simple import SIMPLE_TRADES
+from tests.fixtures.market.simple import MONO_SYMBOL_SIMPLE_TRADES
 
 
 class InMemoryMarketStore:
@@ -11,21 +11,27 @@ class InMemoryMarketStore:
     TradeReceived are stored by symbol.
     """
 
-    def __init__(self):
-        self._trades: dict[str, list[TradeReceived]] = {}
+    def __init__(self, symbols: tuple[str, ...]):
+        if not symbols:
+            raise ValueError("symbols must not be empty.")
+
+        if len(symbols) != len(set(symbols)):
+            raise ValueError(f"duplicate symbols: {symbols}")
+
+        self._trades: dict[str, list[TradeReceived]] = {
+            symbol : []
+            for symbol in symbols
+        }
 
 
-    def on_trade_received(self, event: TradeReceived) -> None:
-        symbol = event.symbol
-        if symbol in self._trades:
-            last = self._trades[event.symbol][-1]
-
-            if event.timestamp_utc < last.timestamp_utc:
-                raise ValueError(
-                    f"event.timestamp_utc={event.timestamp_utc} < last.timestamp_utc={last.timestamp_utc}"
-                )
-
-        self._trades.setdefault(symbol, []).append(event)
+    def on_trade_received(self, trade: TradeReceived) -> None:
+        try:
+            history = self._trades[trade.symbol]
+        except KeyError as exc:
+            raise UnknownSymbolError(
+                f"symbol={trade.symbol} is outside the configured universe"
+            ) from exc
+        history.append(trade)
 
 
     def price_window(self, symbol: str, n: int) -> list[float]:
@@ -50,7 +56,7 @@ class InMemoryMarketStore:
 
 if __name__ == "__main__":
     store = InMemoryMarketStore()
-    trade_0 = SIMPLE_TRADES[0]
+    trade_0 = MONO_SYMBOL_SIMPLE_TRADES[0]
 
     store.on_trade_received(trade_0)
     result = store.price_window("TEST_SYMBOL", 1)
