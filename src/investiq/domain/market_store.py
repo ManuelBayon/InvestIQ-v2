@@ -1,7 +1,4 @@
-from collections.abc import Mapping
-from dataclasses import dataclass
-from decimal import Decimal
-
+from investiq.errors import InsufficientHistoryError
 from investiq.events.trade_received import TradeReceived
 from tests.fixtures.market.simple import SIMPLE_TRADES
 
@@ -30,19 +27,25 @@ class InMemoryMarketStore:
 
         self._trades.setdefault(symbol, []).append(event)
 
-    def price_window(self, symbol: str, size: int) -> list[float]:
-        window = self._trades[symbol][-size:]
-        return [float(p.price) for p in window]
 
-    def has_at_least(self, symbol: str, size: int) -> bool:
-        if size <= 0:
-            raise ValueError(f"size must be positive, got size={size}.")
+    def price_window(self, symbol: str, n: int) -> list[float]:
+        if n < 1:
+            raise ValueError(f"n must be positive, got n={n}")
+
         if symbol not in self._trades:
-            raise KeyError(f"symbol={symbol} not found in self._trades")
-        if len(self._trades[symbol]) >= size:
-            return True
-        else:
-            return False
+            raise KeyError(
+                f"Unknown symbol={symbol}, registered symbols={[s for s in self._trades]}"
+            )
+
+        available_size  = len(self._trades[symbol])
+        if available_size < n:
+            raise InsufficientHistoryError(f"asked={n}, available={available_size}")
+
+        return [float(trade.price) for trade in self._trades[symbol][-n:]]
+
+
+    def size(self, symbol) -> int:
+        return len(self._trades[symbol])
 
 
 if __name__ == "__main__":
@@ -50,4 +53,5 @@ if __name__ == "__main__":
     trade_0 = SIMPLE_TRADES[0]
 
     store.on_trade_received(trade_0)
-    print(store.has_at_least(symbol="TEST_SYMBOL", size=2))
+    result = store.price_window("TEST_SYMBOL", 1)
+    print(result)
