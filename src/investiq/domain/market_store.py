@@ -1,6 +1,6 @@
 from investiq.errors import InsufficientHistoryError, UnknownSymbolError
 from investiq.events.trade_received import TradeReceived
-from tests.fixtures.market.simple import MONO_SYMBOL_SIMPLE_TRADES
+from tests.fixtures.market.simple import MONO_SYMBOL_SIMPLE_TRADES, MULTI_SYMBOLS_SIMPLE_TRADES
 
 
 class InMemoryMarketStore:
@@ -23,13 +23,12 @@ class InMemoryMarketStore:
             for symbol in symbols
         }
 
-
     def on_trade_received(self, trade: TradeReceived) -> None:
         try:
             history = self._trades[trade.symbol]
         except KeyError as exc:
             raise UnknownSymbolError(
-                f"symbol={trade.symbol} is outside the configured universe"
+                f"symbol={trade.symbol} is outside the configured universe."
             ) from exc
         history.append(trade)
 
@@ -55,9 +54,9 @@ class InMemoryMarketStore:
 
 
 if __name__ == "__main__":
-    store = InMemoryMarketStore()
-    trade_0 = MONO_SYMBOL_SIMPLE_TRADES[0]
+    store = InMemoryMarketStore(("SYMBOL_1", "SYMBOL_2"))
+    trade_0 = MULTI_SYMBOLS_SIMPLE_TRADES[0]
 
     store.on_trade_received(trade_0)
-    result = store.price_window("TEST_SYMBOL", 1)
+    result = store.price_window("SYMBOL_1", 1)
     print(result)
