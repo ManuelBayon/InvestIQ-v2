@@ -257,7 +257,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="3XyJ5PZLhHcTAgS3xihK" name="Types de graphe">
-    <mxGraphModel dx="541" dy="1496" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1136" dy="1855" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -359,6 +359,63 @@
         </mxCell>
         <mxCell id="a_-5Aua2IE8lXq1_rv5o-32" parent="1" style="html=1;whiteSpace=wrap;" value="Mean_3(MNQ)" vertex="1">
           <mxGeometry height="50" width="110" x="670" y="-840" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-1" parent="1" style="text;align=center;fontStyle=1;verticalAlign=middle;spacingLeft=3;spacingRight=3;strokeColor=none;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;" value="Multi-Symbol&lt;br&gt;Non-Linear" vertex="1">
+          <mxGeometry height="26" width="80" x="270" y="-597" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-2" edge="1" parent="1" source="Ln3K_gNusWoWhBvN6Yd2-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="Ln3K_gNusWoWhBvN6Yd2-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-3" parent="1" style="html=1;whiteSpace=wrap;" value="Trade(MNQ)" vertex="1">
+          <mxGeometry height="50" width="110" x="70" y="-560" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-4" edge="1" parent="1" source="Ln3K_gNusWoWhBvN6Yd2-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="Ln3K_gNusWoWhBvN6Yd2-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-5" edge="1" parent="1" source="Ln3K_gNusWoWhBvN6Yd2-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="Ln3K_gNusWoWhBvN6Yd2-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-6" parent="1" style="html=1;whiteSpace=wrap;" value="Returns1(MNQ)" vertex="1">
+          <mxGeometry height="50" width="110" x="70" y="-480" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-7" edge="1" parent="1" source="Ln3K_gNusWoWhBvN6Yd2-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="Ln3K_gNusWoWhBvN6Yd2-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-8" parent="1" style="html=1;whiteSpace=wrap;" value="Volatility_5(MNQ)" vertex="1">
+          <mxGeometry height="50" width="110" x="70" y="-400" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-9" parent="1" style="html=1;whiteSpace=wrap;" value="ZScore_3(MNQ)" vertex="1">
+          <mxGeometry height="50" width="110" x="70" y="-320" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-10" parent="1" style="html=1;whiteSpace=wrap;" value="Mean_3(MNQ)" vertex="1">
+          <mxGeometry height="50" width="110" x="210" y="-400" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-11" edge="1" parent="1" source="Ln3K_gNusWoWhBvN6Yd2-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="Ln3K_gNusWoWhBvN6Yd2-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-12" parent="1" style="html=1;whiteSpace=wrap;" value="Trade(AMD)" vertex="1">
+          <mxGeometry height="50" width="110" x="380" y="-560" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-13" edge="1" parent="1" source="Ln3K_gNusWoWhBvN6Yd2-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="Ln3K_gNusWoWhBvN6Yd2-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-14" edge="1" parent="1" source="Ln3K_gNusWoWhBvN6Yd2-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="Ln3K_gNusWoWhBvN6Yd2-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-15" parent="1" style="html=1;whiteSpace=wrap;" value="Returns1(MNQ)" vertex="1">
+          <mxGeometry height="50" width="110" x="380" y="-480" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-16" edge="1" parent="1" source="Ln3K_gNusWoWhBvN6Yd2-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="Ln3K_gNusWoWhBvN6Yd2-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-17" parent="1" style="html=1;whiteSpace=wrap;" value="Volatility_5(MNQ)" vertex="1">
+          <mxGeometry height="50" width="110" x="380" y="-400" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-18" parent="1" style="html=1;whiteSpace=wrap;" value="ZScore_3(MNQ)" vertex="1">
+          <mxGeometry height="50" width="110" x="380" y="-320" as="geometry" />
+        </mxCell>
+        <mxCell id="Ln3K_gNusWoWhBvN6Yd2-19" parent="1" style="html=1;whiteSpace=wrap;" value="Mean_3(MNQ)" vertex="1">
+          <mxGeometry height="50" width="110" x="520" y="-400" as="geometry" />
         </mxCell>
         <mxCell id="a_-5Aua2IE8lXq1_rv5o-35" parent="0" value="test" />
       </root>

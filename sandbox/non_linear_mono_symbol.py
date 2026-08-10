@@ -12,7 +12,7 @@ def print_feature_status():
 
 
 def on_trade(trade: TradeReceived) -> None:
-    print("\n New step: ")
+    print("\nNew step: ")
     eligible: list[Feature] = [returns]
 
     store.on_trade_received(trade)
@@ -55,9 +55,3 @@ if __name__ == "__main__":
     on_trade(trade_4)
     on_trade(trade_5)
     on_trade(trade_6)
-
-
-
-
-
-
