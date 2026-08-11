@@ -1,4 +1,4 @@
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 from collections.abc import Sequence
 from math import log
 from statistics import stdev, mean
@@ -25,7 +25,7 @@ class PriceSource:
     def load(self, window: int) -> Sequence[float]:
         return self._source.price_window(self._symbol, window)
 
-
+@runtime_checkable
 class Feature(Protocol):
     def compute(self) -> bool:
         """
@@ -36,8 +36,9 @@ class Feature(Protocol):
 
     def load(self, window: int) -> Sequence[float]:
         ...
+
     @property
-    def successor(self) -> list["Feature"]:...
+    def successors(self) -> list["Feature"]:...
 
 
 class Returns1:
@@ -70,7 +71,7 @@ class Returns1:
         return self._history[-window:]
 
     @property
-    def successor(self) -> list["Feature"]:
+    def successors(self) -> list["Feature"]:
         return self.successors
 
 
@@ -106,7 +107,7 @@ class Volatility:
         return self._history[-window:]
 
     @property
-    def successor(self) -> list["Feature"]:
+    def successors(self) -> list["Feature"]:
         return self.successors
 
 
@@ -150,7 +151,7 @@ class ZScore:
         return self._history[-window:]
 
     @property
-    def successor(self) -> list["Feature"]:
+    def successors(self) -> list["Feature"]:
         return self.successors
 
 
@@ -187,5 +188,5 @@ class Mean:
         return self._history[-window:]
 
     @property
-    def successor(self) -> list["Feature"]:
+    def successors(self) -> list["Feature"]:
         return self.successors
