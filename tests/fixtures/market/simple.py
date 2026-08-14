@@ -11,9 +11,9 @@ MONO_SYMBOL_SIMPLE_TRADES = [
     TradeFixture(symbol=symbol_1, timestamp_utc=datetime(2026, 1, 1,12, 1, 0, tzinfo=timezone.utc), price=Decimal(110.0), size=Decimal(2.0)),
     TradeFixture(symbol=symbol_1, timestamp_utc=datetime(2026, 1, 1,12, 2, 0, tzinfo=timezone.utc), price=Decimal(103.0), size=Decimal(1.0)),
     TradeFixture(symbol=symbol_1, timestamp_utc=datetime(2026, 1, 1,12, 3, 0, tzinfo=timezone.utc), price=Decimal(107.5), size=Decimal(3.0)),
-    TradeFixture(symbol=symbol_1, timestamp_utc=datetime(2026, 1, 1,12, 3, 0, tzinfo=timezone.utc), price=Decimal(101.0), size=Decimal(1.0)),
-    TradeFixture(symbol=symbol_1, timestamp_utc=datetime(2026, 1, 1,12, 3, 0, tzinfo=timezone.utc), price=Decimal(99.5), size=Decimal(1.0)),
-    TradeFixture(symbol=symbol_1, timestamp_utc=datetime(2026, 1, 1,12, 3, 0, tzinfo=timezone.utc), price=Decimal(91.0), size=Decimal(1.0)),
+    TradeFixture(symbol=symbol_1, timestamp_utc=datetime(2026, 1, 1,12, 4, 0, tzinfo=timezone.utc), price=Decimal(101.0), size=Decimal(1.0)),
+    TradeFixture(symbol=symbol_1, timestamp_utc=datetime(2026, 1, 1,12, 5, 0, tzinfo=timezone.utc), price=Decimal(99.5), size=Decimal(1.0)),
+    TradeFixture(symbol=symbol_1, timestamp_utc=datetime(2026, 1, 1,12, 6, 0, tzinfo=timezone.utc), price=Decimal(91.0), size=Decimal(1.0)),
 ]
 
 MULTI_SYMBOLS_SIMPLE_TRADES = [

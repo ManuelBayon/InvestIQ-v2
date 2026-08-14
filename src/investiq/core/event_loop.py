@@ -6,7 +6,6 @@ from investiq.process.dispatcher import Dispatcher
 
 class CanonicalEventLoop:
 
-
     def __init__(
             self,
             journal: EventTransitionJournal,
@@ -21,9 +20,11 @@ class CanonicalEventLoop:
 
     def _process(self, event: CanonicalEvent) -> None:
         print(f"[EVENT LOOP — PROCESS] : {event}")
+
         result = self._dispatcher.dispatch(event)
-        for emitted in result.emitted_events:
-            self._event_queue.enqueue(emitted)
+
+        for evt in result.emitted_events:
+            self._event_queue.enqueue(evt)
 
         self._journal.append(
             EventTransition(

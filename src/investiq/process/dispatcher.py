@@ -9,7 +9,6 @@ from investiq.handlers.trade_received_handler import TradeReceivedHandler
 
 class Dispatcher:
 
-
     def __init__(
             self,
             trade_received_handler: TradeReceivedHandler,

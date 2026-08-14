@@ -8,11 +8,12 @@ class TradeReceivedHandler:
 
     def __init__(
             self,
-            trade_store: InMemoryMarketStore,
+            market_store: InMemoryMarketStore,
     ):
-        self._trade_store = trade_store
+        self._market_store = market_store
 
 
     def handle(self, event: TradeReceived) -> HandlerResult:
-        self._trade_store.on_trade_received(event)
+        self._market_store.on_trade_received(event)
+
         return HandlerResult()

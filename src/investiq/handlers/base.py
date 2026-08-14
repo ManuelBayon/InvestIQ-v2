@@ -9,6 +9,5 @@ class HandlerResult:
     emitted_events: tuple[CanonicalEvent, ...] = ()
 
 class Handler(Protocol):
-
     def handle(self, event: CanonicalEvent) -> HandlerResult:
         ...

@@ -75,7 +75,6 @@ class IBKRLiveIngress:
                         price=Decimal(tick.price),
                         size=Decimal(tick.size),
                     )
-                    print(event) # debug
                     self._event_queue.enqueue(event)
                 else:
                     continue
