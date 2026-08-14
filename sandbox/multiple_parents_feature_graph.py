@@ -3,14 +3,14 @@ from collections.abc import Sequence
 from investiq.domain.market_store import InMemoryMarketStore
 from investiq.events.trade_received import TradeReceived
 from sandbox.features import PriceSource, Feature, Source
-from tests.fixtures.market.simple import MULTI_SYMBOLS_SIMPLE_TRADES, MONO_SYMBOL_SIMPLE_TRADES
+from tests.fixtures.market.simple import MONO_SYMBOL_SIMPLE_TRADES
 
 class FakeFeature:
     def __init__(
             self,
+            name: str,
             sources: list[Source],
             emissions: list[bool],
-            name: str,
     ):
         self._sources = sources
         self._emissions = emissions
@@ -48,6 +48,9 @@ def bootstrap_feature_graph(features: list[Feature]) -> None:
     print(f"\nFeature A successors {[s.__dict__.get("name") for s in A.successors]}")
     print(f"Feature B successors {[s.__dict__.get("name") for s in B.successors]}")
     print(f"Feature C successors {[s.__dict__.get("name") for s in C.successors]}")
+    print(f"Feature D successors {[s.__dict__.get("name") for s in D.successors]}")
+    print(f"Feature E successors {[s.__dict__.get("name") for s in E.successors]}")
+    print(f"Feature F successors {[s.__dict__.get("name") for s in F.successors]}")
 
 def print_trace(
         eligible_before: list[Feature],
@@ -67,7 +70,8 @@ def print_trace(
     )
 
 
-def on_trade(trade: TradeReceived) -> None:
+def on_trade(trade: TradeReceived, i: int) -> None:
+    print(f"\nTrade {i}")
 
     eligible: list[Feature] = [A]
     emitted = set()
@@ -115,28 +119,46 @@ if __name__ == "__main__":
     store = InMemoryMarketStore(universe)
     price = PriceSource(source=store, symbol=universe[0])
 
-    A = FakeFeature(sources=[price], emissions=[False, True, True, True], name="A")
-    B = FakeFeature(sources=[A], emissions=[False, True, True], name="B")
-    C = FakeFeature(sources=[A, B], emissions=[False, True], name="C")
+    A = FakeFeature(
+        name="A",
+        emissions=[False, True, True, True],
+        sources=[price],
+    )
+
+    B = FakeFeature(
+        name="B",
+        emissions=[False, True, True],
+        sources=[A],
+    )
+
+    C = FakeFeature(
+        name="C",
+        emissions=[False, True, True],
+        sources=[A],
+    )
+
+    D = FakeFeature(
+        name="D",
+        emissions=[False, True],
+        sources=[B],
+    )
+
+    E = FakeFeature(
+        name="E",
+        emissions=[False, True],
+        sources=[A, C],
+    )
+
+    F = FakeFeature(
+        name="F",
+        emissions=[True],
+        sources=[D, E],
+    )
 
     roots = {"SYMBOL_1": A}
-
-    bootstrap_feature_graph([A, B, C])
-
-    trade_0 = MONO_SYMBOL_SIMPLE_TRADES[0]
-    trade_1 = MONO_SYMBOL_SIMPLE_TRADES[1]
-    trade_2 = MONO_SYMBOL_SIMPLE_TRADES[2]
-    trade_3 = MONO_SYMBOL_SIMPLE_TRADES[3]
+    bootstrap_feature_graph([A, B, C, D, E, F])
 
     # Run
-    print("\nTrade 0")
-    on_trade(trade_0)
-
-    print("\nTrade 1")
-    on_trade(trade_1)
-
-    print("\nTrade 2")
-    on_trade(trade_2)
-
-    print("\nTrade 3")
-    on_trade(trade_3)
+    for i in range(4):
+        trade = MONO_SYMBOL_SIMPLE_TRADES[i]
+        on_trade(trade, i)
