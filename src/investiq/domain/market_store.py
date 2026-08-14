@@ -1,6 +1,6 @@
 from investiq.errors import InsufficientHistoryError, UnknownSymbolError
 from investiq.events.trade_received import TradeReceived
-from tests.fixtures.market.simple import MONO_SYMBOL_SIMPLE_TRADES, MULTI_SYMBOLS_SIMPLE_TRADES
+from tests.fixtures.market.simple_trades import MONO_SYMBOL_SIMPLE_TRADES, MULTI_SYMBOLS_SIMPLE_TRADES
 
 
 class InMemoryMarketStore:

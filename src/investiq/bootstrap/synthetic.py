@@ -8,7 +8,7 @@ from investiq.core.event_journal import EventTransitionJournal
 from investiq.core.event_loop import CanonicalEventLoop
 from investiq.core.event_queue import CanonicalEventQueue
 from investiq.handlers.trade_received_handler import TradeReceivedHandler
-from tests.fixtures.market.simple import MONO_SYMBOL_SIMPLE_TRADES
+from tests.fixtures.market.simple_trades import MONO_SYMBOL_SIMPLE_TRADES
 
 
 def bootstrap_synthetical_runtime(run_id: str, num_trades: int) -> SequentialRuntime:
