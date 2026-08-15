@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
 from collections.abc import Sequence
 
@@ -5,6 +6,10 @@ from investiq.domain.market_store import InMemoryMarketStore
 
 
 class Source(Protocol):
+    """
+    Source should raise InsufficientHistory error if
+    not enough data is available.
+    """
     def load(self, window: int) -> Sequence[float]:
         ...
 
@@ -21,6 +26,7 @@ class PriceSource:
     def load(self, window: int) -> Sequence[float]:
         return self._source.price_window(self._symbol, window)
 
+
 @runtime_checkable
 class Feature(Protocol):
     def compute(self) -> bool:
@@ -33,5 +39,9 @@ class Feature(Protocol):
     def load(self, window: int) -> Sequence[float]:
         ...
 
-    @property
-    def successors(self) -> list["Feature"]:...
+
+@dataclass
+class FeatureSpecs:
+    type: type[Feature]
+    sources: list[str]
+    params: dict[str, str]
