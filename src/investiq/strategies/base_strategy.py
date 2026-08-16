@@ -1,15 +1,32 @@
 from dataclasses import dataclass
-from decimal import Decimal
-from typing import Protocol, TypeVar
+from typing import Protocol, ClassVar
+
+from investiq.features.features import FeatureSpecs
+
+
+@dataclass
+class DecisionContext:
+    symbol: str
+    market: dict
+    features: dict
 
 
 @dataclass
 class TradingIntent:
-    strategy_id: str
     symbol: str
-    target: Decimal
+    target: float
 
 
 class Strategy(Protocol):
-    def decide(self, *args, **kwargs) -> list[TradingIntent]:
+    requirements: ClassVar[dict[str, FeatureSpecs]]
+    def decide(
+            self,
+            context: DecisionContext,
+    ) -> list[TradingIntent]:
         ...
+
+
+@dataclass
+class StrategySpecs:
+    type: type[Strategy]
+    params: dict[str, object]

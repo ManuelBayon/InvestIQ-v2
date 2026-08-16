@@ -1,41 +1,35 @@
-from investiq.features.examples import SimpleMovingAverage
-from investiq.features.features import PriceSource, Feature, Source, FeatureSpecs
-from investiq.strategies.base_strategy import TradingIntent
-
+from investiq.features.features import FeatureSpecs
+from investiq.features.simple_moving_average import SimpleMovingAverage
+from investiq.strategies.base_strategy import TradingIntent, DecisionContext
 
 class MovingAverageCrossStrategy:
 
-    requirements = {
-        "price" : FeatureSpecs(
-            type = PriceSource,
-            sources = ["symbol"],
-            params = {}
-        ),
-        "sma_short" : FeatureSpecs(
-            type = SimpleMovingAverage,
-            sources = ["price"],
-            params= {
-                "window" : "short_window"
-            }
-        ),
-        "sma_long" : FeatureSpecs(
-            type = SimpleMovingAverage,
-            sources = ["price"],
-            params = {
-                "window": "long_window"
-            }
-        )
+    requirements : dict[str, FeatureSpecs] = {
+        "sma_short" : SimpleMovingAverage,
+        "sma_long" : SimpleMovingAverage
     }
 
-    def __init__(
+    def decide(
             self,
-            symbol: str,
-            short_window: int,
-            long_window: int
-    ):
-        self._symbol = symbol
-        self._short_window = short_window
-        self._long_window = long_window
+            context: DecisionContext,
+    ) -> list[TradingIntent]:
 
-    def decide(self) -> list[TradingIntent]:
-        return []
+        sma_short = context.features["sma_short"]
+        sma_long = context.features["sma_long"]
+
+        if sma_short > sma_long:
+            return [
+                TradingIntent(
+                    symbol = context.symbol,
+                    target = 1.0
+                )
+            ]
+        elif sma_short < sma_long:
+            return [
+                TradingIntent(
+                    symbol = context.symbol,
+                    target = -1.0
+                )
+            ]
+        else:
+            return []

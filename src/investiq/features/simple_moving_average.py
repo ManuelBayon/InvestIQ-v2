@@ -7,11 +7,7 @@ from investiq.features.features import Feature, Source
 
 class SimpleMovingAverage:
 
-    def __init__(
-            self,
-            source: Source,
-            window: int
-    ):
+    def __init__(self, source: Source, window: int):
         self._source = source
         self._window = window
         self._history : list[float] = []
@@ -33,3 +29,11 @@ class SimpleMovingAverage:
         if len(series) < window:
             raise InsufficientHistoryError
         return series
+
+    def __repr__(self) -> str:
+        return (
+            f"\nSimpleMovingAverage("
+            f"\nsource={self._source}"
+            f"\nwindow={self._window}"
+            f"\nhistory={self._history})\n"
+        )

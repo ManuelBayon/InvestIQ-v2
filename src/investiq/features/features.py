@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable, Callable
 from collections.abc import Sequence
 
 from investiq.domain.market_store import InMemoryMarketStore
@@ -26,6 +26,11 @@ class PriceSource:
     def load(self, window: int) -> Sequence[float]:
         return self._source.price_window(self._symbol, window)
 
+    def __repr__(self) -> str:
+        return (
+            f"PriceSource(source={self._source}, symbol={self._symbol})"
+        )
+
 
 @runtime_checkable
 class Feature(Protocol):
@@ -39,9 +44,12 @@ class Feature(Protocol):
     def load(self, window: int) -> Sequence[float]:
         ...
 
+@dataclass
+class SourceSpecs:
+    source: type[Source]
 
 @dataclass
 class FeatureSpecs:
-    type: type[Feature]
-    sources: list[str]
-    params: dict[str, str]
+    feature: Callable[..., Feature]
+    sources: list["Source | FeatureSpecs"]
+    params: dict[str, object]
