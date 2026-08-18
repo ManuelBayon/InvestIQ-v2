@@ -14,8 +14,8 @@ class MovingAverageCrossStrategy:
             context: DecisionContext,
     ) -> list[TradingIntent]:
 
-        sma_short = context.features["sma_short"]
-        sma_long = context.features["sma_long"]
+        sma_short = context.sma_short
+        sma_long = context.sma_long
 
         if sma_short > sma_long:
             return [

@@ -7,8 +7,8 @@ from investiq.features.features import FeatureSpecs
 @dataclass
 class DecisionContext:
     symbol: str
-    market: dict
-    features: dict
+    price: float
+    features: dict[str, float]
 
 
 @dataclass

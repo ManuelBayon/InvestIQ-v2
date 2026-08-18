@@ -19,11 +19,9 @@ class PriceSource:
             self,
             source: InMemoryMarketStore,
             symbol: str,
-            name: str,
     ):
         self._source = source
         self._symbol = symbol
-        self.name = name
 
     def load(self, window: int) -> Sequence[float]:
         return self._source.price_window(self._symbol, window)

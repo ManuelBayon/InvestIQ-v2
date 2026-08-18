@@ -18,9 +18,9 @@ class Node:
     def __repr__(self) -> str:
         return (
             f"\n{self.kind} NODE"
-            f"\npayload = {self.payload.name}"
-            f"\nparents = {[p.payload.name for p in self.parents]}"
-            f"\nsuccessors = {[s.payload.name for s in self.successors]}"
+            f"\npayload = {self.payload}"
+            f"\nparents = {[p.payload for p in self.parents]}"
+            f"\nsuccessors = {[s.payload for s in self.successors]}"
         )
 
 

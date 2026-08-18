@@ -7,8 +7,9 @@ from investiq.features.features import Source
 
 class SimpleMovingAverage:
 
-    def __init__(self, source: Source, window: int):
-        self._source = source
+    def __init__(self, sources: list[Source], window: int):
+        self.sources = sources
+        self._source = self.sources[0]
         self._window = window
         self._history : list[float] = []
 
@@ -22,7 +23,7 @@ class SimpleMovingAverage:
         return True
 
 
-    def load(self, window: int) -> Sequence[float]:
+    def load(self, window: int = 1) -> Sequence[float]:
         if window < 1:
             raise ValueError(f"window must be positive, got window={window}")
         series = self._history[-window:]
@@ -33,7 +34,7 @@ class SimpleMovingAverage:
     def __repr__(self) -> str:
         return (
             f"\nSimpleMovingAverage("
-            f"\nsource={self._source}"
+            f"\nsources={self.sources}"
             f"\nwindow={self._window}"
             f"\nhistory={self._history})\n"
         )
