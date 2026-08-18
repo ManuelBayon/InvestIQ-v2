@@ -1,21 +1,62 @@
-from investiq.features.features import Feature
+from investiq.features.feature_graph import Node, NodeKind, FeatureGraph
+from investiq.features.features import Feature, Source
 
 
-def bootstrap_feature_graph(roots: dict[str, Feature], features: list[Feature]) -> None:
-    print("\nBootstrap running...\n")
+def bootstrap_feature_graph(
+        sources: list[Source],
+        features: list[Feature]
+) -> FeatureGraph:
 
+    all_nodes: list[Node] = []
+
+    # Initialize sources nodes
+    for source in sources:
+        node = Node(
+            kind=NodeKind.SOURCE,
+            payload=source,
+            parents=[],
+            successors=[]
+        )
+        all_nodes.append(node)
+
+    # Initialize compute nodes
     for feature in features:
-        feature_name = feature.__dict__.get("name")
+        node = Node(
+            kind=NodeKind.COMPUTE,
+            payload=feature,
+            parents=[],
+            successors=[]
+        )
+        all_nodes.append(node)
 
-        if feature in roots.values():
+    # Add parents to all nodes (except sources)
+    for node in all_nodes:
+        if node.kind == NodeKind.SOURCE:
             continue
 
-        sources = feature.__dict__.get("_sources")
-        print(f"Feature {feature_name} source {[s.__dict__.get("name") for s in sources]}")
+        sources = node.payload.sources
+        for source in sources:
+            found = [n for n in all_nodes if n.payload is source]
 
-        for s in sources:
-            s.__dict__.get("_successors").append(feature)
+            if len(found)  == 0:
+                raise ValueError(f"Did not found node for node={node} and source={source}.")
+            if len(found)  > 1:
+                raise ValueError(f"Did found multiple corresponding nodes for node={node} and source={source}.")
 
-    print("\nSuccessors : ")
-    for f in features:
-        print(f"Feature {f.name} successors {[s.__dict__.get("name") for s in f.successors]}")
+            node.parents.append(found[0])
+
+    # Add successors to all nodes
+    for node in all_nodes:
+        if node.kind is NodeKind.SOURCE:
+            continue
+
+        for parent in node.parents:
+            parent.successors.append(node)
+
+    input_nodes = [n for n in all_nodes if n.kind == NodeKind.SOURCE]
+    compute_nodes = [n for n in all_nodes if n.kind == NodeKind.COMPUTE]
+
+    return FeatureGraph(
+        input_nodes=input_nodes,
+        compute_nodes=compute_nodes
+    )

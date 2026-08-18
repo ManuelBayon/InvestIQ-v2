@@ -10,15 +10,15 @@ class FeatureRuntime:
 
     def on_trade_received(self, trade: TradeReceived) -> None:
 
-        eligible: list[Node] = [self._graph.next_node()]
-        emitted = set()
+        eligible: list[Node] = [successor for input_node in self._graph.input_nodes() for successor in input_node.successors]
+        emitted: set[Node] = set()
         step: int = 0
 
         while len(eligible) > 0:
 
             eligible_before = eligible.copy()
             current = eligible.pop(0)
-            emit = current.type.compute()
+            emit = current.payload.compute()
 
             if not emit:
                 print_trace(
@@ -31,9 +31,8 @@ class FeatureRuntime:
             emitted.add(current)
 
             for successor in current.successors:
-                sources = successor.__dict__.get("_sources")
 
-                if set(sources).issubset(emitted):
+                if set(successor.parents).issubset(emitted):
                     eligible.append(successor)
 
             print_trace(

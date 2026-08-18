@@ -9,13 +9,12 @@ class NodeKind(StrEnum):
     COMPUTE = "COMPUTE"
 
 
-@dataclass
+@dataclass(eq=False)
 class Node:
     kind: NodeKind
     payload: Feature | Source
     parents: list["Node"]
     successors: list["Node"]
-
     def __repr__(self) -> str:
         return (
             f"\n{self.kind} NODE"
@@ -27,13 +26,13 @@ class Node:
 
 class FeatureGraph:
 
-    def __init__(self):
-        self._nodes: dict[Feature, Node] = {}
+    def __init__(
+            self,
+            input_nodes: list[Node],
+            compute_nodes: list[Node]
+    ):
+        self._input_nodes: list[Node] = input_nodes
+        self._compute_nodes: list[Node] = compute_nodes
 
-
-    def add_node(self, feature: Feature, node: Node) -> None:
-        self._nodes[feature] = node
-
-
-    def get_node(self, feature: Feature) -> Node:
-        return self._nodes[feature]
+    def input_nodes(self) -> list[Node]:
+        return self._input_nodes
