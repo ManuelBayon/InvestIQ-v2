@@ -4,7 +4,7 @@ from collections.abc import Sequence
 
 from investiq.domain.market_store import InMemoryMarketStore
 
-
+@runtime_checkable
 class Source(Protocol):
     """
     Source should raise InsufficientHistory error if
@@ -18,10 +18,12 @@ class PriceSource:
     def __init__(
             self,
             source: InMemoryMarketStore,
-            symbol: str
+            symbol: str,
+            name: str,
     ):
         self._source = source
         self._symbol = symbol
+        self.name = name
 
     def load(self, window: int) -> Sequence[float]:
         return self._source.price_window(self._symbol, window)
@@ -34,6 +36,7 @@ class PriceSource:
 
 @runtime_checkable
 class Feature(Protocol):
+    sources: Sequence[Source]
     def compute(self) -> bool:
         """
         True  : a new observation has been produced.

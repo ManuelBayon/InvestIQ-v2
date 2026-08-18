@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from statistics import mean
 
 from investiq.errors import InsufficientHistoryError
-from investiq.features.features import Feature, Source
+from investiq.features.features import Source
 
 
 class SimpleMovingAverage:

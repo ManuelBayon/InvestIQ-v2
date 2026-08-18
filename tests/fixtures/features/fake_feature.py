@@ -10,7 +10,7 @@ class FakeFeature:
             sources: list[Source],
             emissions: list[bool],
     ):
-        self._sources = sources
+        self.sources = sources
         self._emissions = emissions
         self._successors: list[Feature] = []
         self._index = 0
