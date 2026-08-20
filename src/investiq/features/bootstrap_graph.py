@@ -1,11 +1,12 @@
 from investiq.features.feature_graph import Node, NodeKind, FeatureGraph
+from investiq.features.feature_runtime import FeatureRuntime
 from investiq.features.features import Feature, Source
 
 
-def bootstrap_feature_graph(
+def bootstrap_feature_runtime(
         sources: list[Source],
         features: list[Feature]
-) -> FeatureGraph:
+) -> FeatureRuntime:
 
     all_nodes: list[Node] = []
 
@@ -34,16 +35,17 @@ def bootstrap_feature_graph(
         if node.kind == NodeKind.SOURCE:
             continue
 
-        sources = node.payload.sources
-        for source in sources:
-            found = [n for n in all_nodes if n.payload is source]
+        source = node.payload.source
+        found = [n for n in all_nodes if n.payload is source]
+        if len(found)  == 0:
+            raise ValueError(
+                f"\nDid not found a node which has for source: \n{source}."
+                f"\nAvailable nodes={all_nodes}."
+            )
+        if len(found)  > 1:
+            raise ValueError(f"Did found multiple nodes for source={source}.")
 
-            if len(found)  == 0:
-                raise ValueError(f"Did not found node for node={node} and source={source}.")
-            if len(found)  > 1:
-                raise ValueError(f"Did found multiple corresponding nodes for node={node} and source={source}.")
-
-            node.parents.append(found[0])
+        node.parents.append(found[0])
 
     # Add successors to all nodes
     for node in all_nodes:
@@ -56,7 +58,8 @@ def bootstrap_feature_graph(
     input_nodes = [n for n in all_nodes if n.kind == NodeKind.SOURCE]
     compute_nodes = [n for n in all_nodes if n.kind == NodeKind.COMPUTE]
 
-    return FeatureGraph(
+    _graph = FeatureGraph(
         input_nodes=input_nodes,
         compute_nodes=compute_nodes
     )
+    return FeatureRuntime(graph=_graph)

@@ -1,56 +1,43 @@
 from dataclasses import dataclass
-from typing import Protocol, runtime_checkable, Callable
-from collections.abc import Sequence
+from typing import Protocol, Callable, runtime_checkable
+from collections.abc import Sequence, Mapping
 
-from investiq.domain.market_store import InMemoryMarketStore
-
-@runtime_checkable
-class Source(Protocol):
-    """
-    Source should raise InsufficientHistory error if
-    not enough data is available.
-    """
-    def load(self, window: int) -> Sequence[float]:
-        ...
-
-
-class PriceSource:
-    def __init__(
-            self,
-            source: InMemoryMarketStore,
-            symbol: str,
-    ):
-        self._source = source
-        self._symbol = symbol
-
-    def load(self, window: int) -> Sequence[float]:
-        return self._source.price_window(self._symbol, window)
-
-    def __repr__(self) -> str:
-        return (
-            f"PriceSource(source={self._source}, symbol={self._symbol})"
-        )
-
+from investiq.features.sources import Source
 
 @runtime_checkable
 class Feature(Protocol):
-    sources: Sequence[Source]
+    @property
+    def source(self) -> Source:...
     def compute(self) -> bool:
         """
         True  : a new observation has been produced.
         False : No new observation.
         """
         ...
-
     def load(self, window: int) -> Sequence[float]:
         ...
+    def latest(self) -> float:...
 
 @dataclass
-class SourceSpecs:
-    source: type[Source]
-
-@dataclass
-class FeatureSpecs:
-    feature: Callable[..., Feature]
-    sources: list["Source | FeatureSpecs"]
+class SourceSpec:
+    source_type: Callable[..., Source]
+    dependencies: dict[str, object]
     params: dict[str, object]
+
+
+@dataclass
+class FeatureSpec:
+    feature_type: Callable[..., Feature]
+    params: Mapping[str, object]
+
+def build_features(source: Source, features: Mapping[str, FeatureSpec]) -> Mapping[str, Feature]:
+    _features_by_name: dict[str, Feature] = {}
+
+    for name, feature_spec in features.items():
+        feature = feature_spec.feature_type(
+            source,
+            **feature_spec.params
+        )
+        _features_by_name[name] = feature
+
+    return _features_by_name

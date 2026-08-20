@@ -1,76 +1,144 @@
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 from investiq.domain.market_store import InMemoryMarketStore
-from investiq.features.bootstrap_graph import bootstrap_feature_graph
-from investiq.features.feature_runtime import FeatureRuntime
-from investiq.features.features import PriceSource, FeatureSpecs
+from investiq.errors import MissingFeatureRequirementError, FeatureTypeMismatchError
+from investiq.features.bootstrap_graph import bootstrap_feature_runtime
+from investiq.features.features import FeatureSpec, build_features, Feature
 from investiq.features.simple_moving_average import SimpleMovingAverage
-from investiq.strategies.base_strategy import StrategySpecs
-from sandbox.strategy import MovingAverageCrossStrategy
+from investiq.features.sources import PriceSource
+from investiq.strategies.base_strategy import StrategySpec, FeatureRequirement, DecisionContext
+from investiq.strategies.simple_moving_average_cross import MovingAverageCrossStrategy
 from tests.fixtures.market.simple_trades import MONO_SYMBOL_SIMPLE_TRADES
 
 
-@dataclass
-class Experiment:
+@dataclass(frozen=True, slots=True)
+class ExperimentSpec:
+    """
+    2026-08-19: Work hypothesis : Mono symbol experiment
+    """
     symbol: str
-    price_source: type[PriceSource]
-    features: dict[str, FeatureSpecs]
-    strategy_specs: StrategySpecs
+    features: Mapping[str, FeatureSpec]
+    strategy_spec: StrategySpec
 
 
-price_source = PriceSource
-
-sma_short = FeatureSpecs(
-    feature=SimpleMovingAverage,
-    sources=[price_source],
+sma_short_spec = FeatureSpec(
+    feature_type=SimpleMovingAverage,
     params={
         "window": 2
     }
 )
 
-sma_long = FeatureSpecs(
-    feature=SimpleMovingAverage,
-    sources=[price_source],
+sma_long_spec = FeatureSpec(
+    feature_type=SimpleMovingAverage,
     params={
-        "window": 5
+        "window": 5,
     }
 )
 
-strategy_specs = StrategySpecs(
-    type=MovingAverageCrossStrategy,
-    params= {}
+strategy_spec = StrategySpec(
+    strategy_type=MovingAverageCrossStrategy,
 )
 
-experiment = Experiment(
-        symbol="SYMBOL_1",
-        price_source=price_source,
-        features={
-            "sma_short": sma_short,
-            "sma_long": sma_long
-        },
-        strategy_specs=strategy_specs,
-    )
+experiment = ExperimentSpec(
+    symbol="SYMBOL_1",
+    features={
+        "sma_short": sma_short_spec,
+        "sma_long": sma_long_spec,
+    },
+    strategy_spec=strategy_spec,
+)
+
+
+def validate_strategy_requirements(
+        requirements: Sequence[FeatureRequirement],
+        available_feature: Mapping[str, Feature],
+) -> None:
+
+    for requirement in requirements:
+
+        name = requirement.name
+        expected_type = requirement.feature_type
+
+        if name not in available_feature:
+            raise MissingFeatureRequirementError(
+                f"Feature {name} is missing."
+                f"Available features are: {available_feature.keys()}."
+            )
+
+        feature = available_feature[name]
+
+        if not isinstance(feature, expected_type):
+            raise FeatureTypeMismatchError(
+                f"Invalid feature type for feature {name}."
+                f"Expected={expected_type}, "
+                f"Actual={type(feature)}."
+            )
+
 
 if __name__ == "__main__":
 
-    # Market data
     universe = (experiment.symbol,)
     store = InMemoryMarketStore(universe)
-    price_source = experiment.price_source(source=store, symbol=experiment.symbol)
 
-    # Features
-    features = [
-        f.feature([price_source], **f.params)
-        for f in experiment.features.values()
-    ]
-    graph = bootstrap_feature_graph(sources=[price_source], features=features)
-    runtime = FeatureRuntime(graph=graph)
+    source = PriceSource(
+        source=store,
+        symbol=experiment.symbol
+    )
 
-    # Strategy
-    strategy = experiment.strategy_specs.type(**strategy_specs.params)
+    features_by_name = build_features(
+        source=source,
+        features=experiment.features
+    )
 
-    for i, trade in enumerate(MONO_SYMBOL_SIMPLE_TRADES):
+    validate_strategy_requirements(
+        requirements=experiment.strategy_spec.strategy_type.requirements,
+        available_feature=features_by_name
+    )
+
+    feature_runtime = bootstrap_feature_runtime(
+        sources=[source],
+        features=list(features_by_name.values())
+    )
+
+    strategy = experiment.strategy_spec.strategy_type()
+
+    strategy_features = {
+        requirement.name : features_by_name[requirement.name]
+        for requirement in strategy.requirements
+    }
+
+    for name, feature in strategy_features.items(): #debug
+        print(f"{name} : {feature}")
+
+    for i, trade in enumerate(MONO_SYMBOL_SIMPLE_TRADES): # debug
+        print(f"\n—————————————  NEW TRADE n°{i+1}  ——————————————\n") # debug
+
         store.on_trade_received(trade)
-        runtime.on_trade_received()
+        emitted = feature_runtime.on_trade_received()
+        emitted_feature = [
+            node.payload
+            for node in emitted
+        ]
 
-        print(f"\n  ————————————  STEP n°{i+1} ————————————  \nfeatures={features}")
+        for e in emitted: # debug
+            print(f"{e.payload}")
+
+        # Check if all features needed by the strategy have emitted
+        all_requirements_emitted = all(
+            feature in emitted_feature
+            for feature in strategy_features.values()
+        )
+
+        if all_requirements_emitted:
+            trading_intent = strategy.decide(
+                context=DecisionContext(
+                    symbol=experiment.symbol,
+                    price=source.last(),
+                    features={
+                        name: feature.latest()
+                        for name, feature in strategy_features.items()
+                    },
+                )
+            )
+            print(f"trading intent: {trading_intent}")

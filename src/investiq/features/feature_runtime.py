@@ -4,15 +4,12 @@ class FeatureRuntime:
 
     def __init__(self, graph: FeatureGraph):
         self._graph = graph
-        self.ready: bool = False
 
 
-    def on_trade_received(self) -> None:
+    def on_trade_received(self) -> tuple[Node, ...]:
 
         eligible: list[Node] = [successor for input_node in self._graph.input_nodes() for successor in input_node.successors]
         emitted: set[Node] = set()
-
-        self.ready = False
 
         while eligible:
 
@@ -28,3 +25,5 @@ class FeatureRuntime:
 
                 if set(successor.parents).issubset(emitted):
                     eligible.append(successor)
+
+        return tuple(emitted)

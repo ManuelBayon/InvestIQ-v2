@@ -1,14 +1,15 @@
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Protocol, ClassVar
+from typing import Protocol, Callable, Sequence, ClassVar
 
-from investiq.features.features import FeatureSpecs
+from investiq.features.features import Feature
 
 
 @dataclass
 class DecisionContext:
     symbol: str
-    price: float
-    features: dict[str, float]
+    price : float
+    features: Mapping[str, float]
 
 
 @dataclass
@@ -16,9 +17,13 @@ class TradingIntent:
     symbol: str
     target: float
 
+@dataclass(frozen=True)
+class FeatureRequirement:
+    name: str
+    feature_type: type[Feature]
 
 class Strategy(Protocol):
-    requirements: ClassVar[dict[str, FeatureSpecs]]
+    requirements: ClassVar[Sequence[FeatureRequirement]]
     def decide(
             self,
             context: DecisionContext,
@@ -27,6 +32,5 @@ class Strategy(Protocol):
 
 
 @dataclass
-class StrategySpecs:
-    type: type[Strategy]
-    params: dict[str, object]
+class StrategySpec:
+    strategy_type: type[Strategy]
