@@ -9,8 +9,8 @@ class Source(Protocol):
     Source should raise InsufficientHistory error if
     not enough data is available.
     """
-    def load(self, window: int) -> Sequence[float]:
-        ...
+    def load(self, window: int) -> Sequence[float]:...
+    def last(self) -> float:...
 
 
 class PriceSource:

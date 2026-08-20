@@ -1,3 +1,5 @@
+from investiq.bootstrap.experiment import ExperimentSpec, build_features, validate_strategy_requirements, bootstrap_feature_runtime
+from investiq.features.sources import PriceSource
 from investiq.ingress.synthetic import SyntheticIngress
 from investiq.runtime.sequential import SequentialRuntime
 from investiq.domain.market_store import InMemoryMarketStore
@@ -11,7 +13,41 @@ from investiq.handlers.trade_received_handler import TradeReceivedHandler
 from tests.fixtures.market.simple_trades import MONO_SYMBOL_SIMPLE_TRADES
 
 
-def bootstrap_synthetical_runtime(run_id: str, num_trades: int) -> SequentialRuntime:
+def bootstrap_synthetical_runtime(
+        run_id: str,
+        num_trades: int,
+        experiment: ExperimentSpec,
+) -> SequentialRuntime:
+
+    universe = (experiment.symbol,)
+    store = InMemoryMarketStore(universe)
+
+    price_source = PriceSource(
+        source=store,
+        symbol=experiment.symbol
+    )
+
+    features_by_name = build_features(
+        source=price_source,
+        features=experiment.features
+    )
+
+    validate_strategy_requirements(
+        requirements=experiment.strategy_spec.strategy_type.requirements,
+        available_feature=features_by_name
+    )
+
+    feature_runtime = bootstrap_feature_runtime(
+        sources=[price_source],
+        features=list(features_by_name.values())
+    )
+
+    strategy = experiment.strategy_spec.strategy_type()
+
+    strategy_features = {
+        requirement.name: features_by_name[requirement.name]
+        for requirement in strategy.requirements
+    }
 
     event_queue = CanonicalEventQueue()
     event_factory = CanonicalEventFactory(run_id=run_id)
@@ -22,15 +58,23 @@ def bootstrap_synthetical_runtime(run_id: str, num_trades: int) -> SequentialRun
         scenario=[t for t in MONO_SYMBOL_SIMPLE_TRADES[:num_trades]]
     )
 
+    trade_received_handler = TradeReceivedHandler(
+        market_store=store,
+        price_source=price_source,
+        symbol=experiment.symbol,
+        feature_runtime=feature_runtime,
+        strategy_features=strategy_features,
+        strategy=strategy,
+    )
+
     event_loop = CanonicalEventLoop(
         event_queue=event_queue,
         journal=EventTransitionJournal(),
         dispatcher=Dispatcher(
-            trade_received_handler=TradeReceivedHandler(
-                market_store=InMemoryMarketStore(("SYMBOL_1",)),
-            )
+            trade_received_handler=trade_received_handler,
         )
     )
+
     return SequentialRuntime(
         run_id=run_id,
         ingress=ingress,

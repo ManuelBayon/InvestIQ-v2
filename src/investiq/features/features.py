@@ -30,14 +30,3 @@ class FeatureSpec:
     feature_type: Callable[..., Feature]
     params: Mapping[str, object]
 
-def build_features(source: Source, features: Mapping[str, FeatureSpec]) -> Mapping[str, Feature]:
-    _features_by_name: dict[str, Feature] = {}
-
-    for name, feature_spec in features.items():
-        feature = feature_spec.feature_type(
-            source,
-            **feature_spec.params
-        )
-        _features_by_name[name] = feature
-
-    return _features_by_name

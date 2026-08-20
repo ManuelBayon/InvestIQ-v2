@@ -1,6 +1,6 @@
 from investiq.errors import InsufficientHistoryError, UnknownSymbolError
 from investiq.events.trade_received import TradeReceived
-from tests.fixtures.market.simple_trades import MONO_SYMBOL_SIMPLE_TRADES, MULTI_SYMBOLS_SIMPLE_TRADES
+from tests.fixtures.market.simple_trades import MULTI_SYMBOLS_SIMPLE_TRADES
 
 
 class InMemoryMarketStore:
@@ -47,6 +47,10 @@ class InMemoryMarketStore:
             raise InsufficientHistoryError(f"asked={n}, available={available_size}")
 
         return [float(trade.price) for trade in self._trades[symbol][-n:]]
+
+
+    def last(self, symbol: str) -> float:
+        return self.price_window(symbol=symbol, n=1)[0]
 
 
     def size(self, symbol) -> int:
