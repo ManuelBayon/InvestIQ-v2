@@ -39,10 +39,10 @@ class TradeReceivedHandler:
             for node in emitted
         ]
 
-        print("\nEmitted features values :") # debug
-        for feature in emitted_features: # debug
-            print(f"{feature}: {feature.latest()}")
-        print("")
+        if emitted_features:
+            print("\n[TRADE_RECEIVED_HANDLER — EMITTED FEATURES] :") # debug
+            for feature in emitted_features: # debug
+                print(f"{feature.name}: {feature.latest()}")
 
         all_requirements_emitted = all(
             feature in emitted_features
@@ -60,5 +60,9 @@ class TradeReceivedHandler:
                     },
                 )
             )
-            print(f"{trading_intent}\n") # debug
+            print( # debug
+                f"\n[TRADE_RECEIVED_HANDLER — TRADING INTENT] :\n"
+                f"{trading_intent}"
+            )
+
         return HandlerResult()

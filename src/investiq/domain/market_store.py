@@ -22,13 +22,15 @@ class InMemoryMarketStore:
             symbol : []
             for symbol in symbols
         }
+        self._universe = symbols
 
     def on_trade_received(self, trade: TradeReceived) -> None:
         try:
             history = self._trades[trade.symbol]
         except KeyError as exc:
             raise UnknownSymbolError(
-                f"symbol={trade.symbol} is outside the configured universe."
+                f"symbol={trade.symbol} "
+                f"is outside the configured universe={self._universe}."
             ) from exc
         history.append(trade)
 

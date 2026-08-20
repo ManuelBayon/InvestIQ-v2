@@ -19,7 +19,10 @@ class CanonicalEventLoop:
 
 
     def _process(self, event: CanonicalEvent) -> None:
-        print(f"[EVENT LOOP — PROCESS] : {event}")
+        print(
+            f"\n————————————————————————————————————————————————————————————————————————————————————\n"
+            f"[EVENT LOOP — PROCESS] : {event}"
+        )
 
         result = self._dispatcher.dispatch(event)
 

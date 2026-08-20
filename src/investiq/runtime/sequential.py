@@ -1,4 +1,3 @@
-
 from investiq.core.event_loop import CanonicalEventLoop
 from investiq.ingress.protocol import Ingress
 

@@ -1,5 +1,6 @@
 from investiq.bootstrap.experiment import ExperimentSpec
-from investiq.bootstrap.synthetic import bootstrap_synthetical_runtime
+from investiq.bootstrap.live import bootstrap_live_runtime
+
 from investiq.features.features import FeatureSpec
 
 from investiq.features.simple_moving_average import SimpleMovingAverage
@@ -10,8 +11,6 @@ from investiq.strategies.simple_moving_average_cross import MovingAverageCrossSt
 
 if __name__ == "__main__":
 
-    # live_runtime = bootstrap_live_runtime("TEST_LIVE_RUN")
-    # live_runtime.run()
 
     sma_short_spec = FeatureSpec(
         feature_type=SimpleMovingAverage,
@@ -32,7 +31,7 @@ if __name__ == "__main__":
     )
 
     exp = ExperimentSpec(
-        symbol="SYMBOL_1",
+        symbol="MNQ",
         features={
             "sma_short": sma_short_spec,
             "sma_long": sma_long_spec,
@@ -40,11 +39,14 @@ if __name__ == "__main__":
         strategy_spec=strategy_spec,
     )
 
+    """
     synthetic_runtime = bootstrap_synthetical_runtime(
         run_id="TEST_RUN",
         num_trades=6,
         experiment=exp
     )
-
     synthetic_runtime.run()
+    """
+    live_runtime = bootstrap_live_runtime("TEST_LIVE_RUN", exp)
+    live_runtime.run()
 

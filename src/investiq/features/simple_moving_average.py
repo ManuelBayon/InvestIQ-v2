@@ -22,6 +22,10 @@ class SimpleMovingAverage:
     def source(self) -> Source:
         return self._source
 
+    @property
+    def name(self) -> str:
+        return f"sma_{self._window}"
+
     def compute(self) -> bool:
         try:
             last_prices = self.source.load(self._window)
