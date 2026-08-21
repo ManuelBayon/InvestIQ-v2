@@ -33,7 +33,7 @@ def bootstrap_synthetical_runtime(
     )
 
     validate_strategy_requirements(
-        requirements=experiment.strategy_spec.strategy_type.requirements,
+        requirements=experiment.strategy.strategy_type.requirements,
         available_feature=features_by_name
     )
 
@@ -42,7 +42,7 @@ def bootstrap_synthetical_runtime(
         features=list(features_by_name.values())
     )
 
-    strategy = experiment.strategy_spec.strategy_type()
+    strategy = experiment.strategy.strategy_type()
 
     strategy_features = {
         requirement.name: features_by_name[requirement.name]
@@ -50,7 +50,10 @@ def bootstrap_synthetical_runtime(
     }
 
     event_queue = CanonicalEventQueue()
-    event_factory = CanonicalEventFactory(run_id=run_id)
+
+    event_factory = CanonicalEventFactory(
+        run_id=run_id
+    )
 
     ingress = SyntheticIngress(
         event_queue=event_queue,

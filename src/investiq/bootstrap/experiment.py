@@ -17,7 +17,7 @@ class ExperimentSpec:
     """
     symbol: str
     features: Mapping[str, FeatureSpec]
-    strategy_spec: StrategySpec
+    strategy: StrategySpec
 
 
 def build_features(source: Source, features: Mapping[str, FeatureSpec]) -> Mapping[str, Feature]:
