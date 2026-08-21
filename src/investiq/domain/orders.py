@@ -1,0 +1,95 @@
+from abc import ABC
+from dataclasses import dataclass
+from decimal import Decimal
+from enum import StrEnum
+from math import isfinite
+
+from investiq.domain.instrument_specs import InstrumentSpec
+
+class Side(StrEnum):
+    BUY = "BUY"
+    SELL = "SELL"
+
+class TimeInForce(StrEnum):
+    DAY = "DAY"
+    GTC = "GTC"
+    IOC = "IOC"
+    FOK = "FOK"
+
+@dataclass(frozen=True, slots=True)
+class Order(ABC):
+    instrument: InstrumentSpec
+    tif: str
+    
+@dataclass(frozen=True)
+class MarketOrder(Order):
+    quantity: Decimal
+    direction : Side
+
+    def __post_init__(self):
+        if not isfinite(self.quantity):
+            raise ValueError(f"quantity must be finite, got quantity={self.quantity}")
+        if not self.quantity > 0:
+            raise ValueError(f"quantity must be positive, got quantity={self.quantity}")
+
+
+@dataclass(frozen=True)
+class LimitOrder(Order):
+    quantity: Decimal
+    direction: Side
+    price: Decimal
+
+    def __post_init__(self):
+        if not isfinite(self.quantity):
+            raise ValueError(f"quantity must be finite, got quantity={self.quantity}")
+        if not self.quantity > 0:
+            raise ValueError(f"quantity must be positive, got quantity={self.quantity}")
+        if not isfinite(self.price):
+            raise ValueError(f"price must be finite, got price={self.price}")
+        if not self.price > 0:
+            raise ValueError(f"price must be positive, got price={self.price}")
+
+
+@dataclass(frozen=True)
+class StopMarketOrder(Order):
+    trigger_price: Decimal
+    triggered_order : MarketOrder
+
+    def __post_init__(self):
+        if not isfinite(self.trigger_price):
+            raise ValueError(f"trigger_price must be finite, got trigger_price={self.trigger_price}")
+        if not self.trigger_price > 0:
+            raise ValueError(f"trigger_price must be positive, got trigger_price={self.trigger_price}")
+
+
+@dataclass(frozen=True)
+class BracketOrder(Order):
+    entry: MarketOrder | LimitOrder
+    stop_loss: list[StopMarketOrder] | None
+    take_profit: list[LimitOrder] | None
+
+    def __post_init__(self):
+        if not self.take_profit and not self.stop_loss:
+            raise ValueError("Must have at leat one stop_loss or one take_profit otherwise don't use brackets.")
+
+        for i, sl in enumerate(self.stop_loss or []):
+            if sl.triggered_order.direction == self.entry.direction:
+                raise ValueError(f"stop_loss(i={i}) direction must be opposite to entry, got direction={sl.triggered_order.direction}")
+
+        for i, tp in enumerate(self.take_profit or []):
+            if tp.direction == self.entry.direction:
+                raise ValueError(f"take_profit(i={i}) direction must be opposite to entry, got direction={tp.direction}")
+
+        sl_quantity = sum(sl.triggered_order.quantity for sl in self.stop_loss or [])
+        if sl_quantity > self.entry.quantity:
+            raise ValueError(
+                f"stop_loss total quantity can't be greater than entry quantity: "
+                f"entry.quantity={self.entry.quantity}"
+                f"stop_loss total quantity={sl_quantity}")
+
+        tp_quantity = sum(tp.quantity for tp in self.take_profit or [])
+        if tp_quantity > self.entry.quantity:
+            raise ValueError(
+                f"take_profit total quantity can't be greater than entry quantity: "
+                f"entry.quantity={self.entry.quantity}"
+                f"take_profit total quantity={tp_quantity}")

@@ -1,29 +1,68 @@
-from copy import deepcopy
+from investiq.errors import InsufficientHistoryError, UnknownSymbolError
+from investiq.events.trade_received import TradeReceived
+from tests.fixtures.market.simple_trades import MULTI_SYMBOLS_SIMPLE_TRADES
 
-from investiq.domain.models import RawTick
 
-class MarketStore:
+class InMemoryMarketStore:
     """
-    2026-06-02
-        - using RawTick.
-        - RawTicks are grouped by symbol.
-        - Key Assumption : RawTicks arrive ordered by timestamp for a given symbol.
-        - The current data structure (dict[str, list[RawTick]]) allows
-        a future ordering policy without major refactor.
-        - view() returns deep copy to validate the data model and causal flow
-        do not treat this as a hardened ownership boundary.
+    In memory trade store.
 
-    2026-05-17
-        Naive stateful in memory market store.
+    TradeReceived events are supposed to be ordered by timestamp for each symbol.
+    TradeReceived are stored by symbol.
     """
-    def __init__(self):
-        self._history: dict[str, list[RawTick]] = {}
 
-    def ingest(self, payload: dict[str, list[RawTick]]) -> None:
-        for symbol in payload:
-            if symbol not in self._history:
-                self._history[symbol] = []
-            self._history[symbol].extend(payload[symbol])
+    def __init__(self, symbols: tuple[str, ...]):
+        if not symbols:
+            raise ValueError("symbols must not be empty.")
 
-    def view(self) -> dict[str, list[RawTick]]:
-        return deepcopy(self._history)
+        if len(symbols) != len(set(symbols)):
+            raise ValueError(f"duplicate symbols: {symbols}")
+
+        self._trades: dict[str, list[TradeReceived]] = {
+            symbol : []
+            for symbol in symbols
+        }
+        self._universe = symbols
+
+    def on_trade_received(self, trade: TradeReceived) -> None:
+        try:
+            history = self._trades[trade.symbol]
+        except KeyError as exc:
+            raise UnknownSymbolError(
+                f"symbol={trade.symbol} "
+                f"is outside the configured universe={self._universe}."
+            ) from exc
+        history.append(trade)
+
+
+    def price_window(self, symbol: str, n: int) -> list[float]:
+        if n < 1:
+            raise ValueError(f"n must be positive, got n={n}")
+
+        if symbol not in self._trades:
+            raise KeyError(
+                f"Unknown symbol={symbol}, registered symbols={[s for s in self._trades]}"
+            )
+
+        available_size  = len(self._trades[symbol])
+        if available_size < n:
+            raise InsufficientHistoryError(f"asked={n}, available={available_size}")
+
+        return [float(trade.price) for trade in self._trades[symbol][-n:]]
+
+
+    def last(self, symbol: str) -> float:
+        return self.price_window(symbol=symbol, n=1)[0]
+
+
+    def size(self, symbol) -> int:
+        return len(self._trades[symbol])
+
+
+if __name__ == "__main__":
+    store = InMemoryMarketStore(("SYMBOL_1", "SYMBOL_2"))
+    trade_0 = MULTI_SYMBOLS_SIMPLE_TRADES[0]
+
+    store.on_trade_received(trade_0)
+    result = store.price_window("SYMBOL_1", 1)
+    print(result)
