@@ -1,20 +1,20 @@
 from ib_insync import Stock, Future
 
-from investiq.domain.instruments import StockSpecs, FutureSpecs
+from investiq.domain.instrument_spec import StockSpec, FutureSpec
 
 
-def map_stock_specs_to_ib_contract(specs: StockSpecs) -> Stock:
+def map_stock_specs_to_ib_contract(spec: StockSpec) -> Stock:
     return Stock(
-        symbol=specs.symbol,
-        exchange=specs.exchange,
-        currency=specs.currency
+        symbol=spec.symbol,
+        exchange=spec.exchange,
+        currency=spec.currency
     )
 
 
-def map_future_specs_to_ib_contract(specs: FutureSpecs) -> Future:
+def map_future_specs_to_ib_contract(spec: FutureSpec) -> Future:
     return Future(
-        symbol=specs.symbol,
-        localSymbol=specs.local_symbol,
-        exchange=specs.exchange,
-        currency=specs.currency,
+        symbol=spec.symbol,
+        localSymbol=spec.local_symbol,
+        exchange=spec.exchange,
+        currency=spec.currency,
     )

@@ -1,7 +1,7 @@
 from typing import Sequence, ClassVar
 
-from investiq.features.simple_moving_average import SimpleMovingAverage
-from investiq.strategies.base_strategy import TradingIntent, DecisionContext, FeatureRequirement
+from investiq.domain.features.simple_moving_average import SimpleMovingAverage
+from investiq.domain.strategies.base_strategy import TradingIntent, DecisionContext, FeatureRequirement
 
 
 class MovingAverageCrossStrategy:

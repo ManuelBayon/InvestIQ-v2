@@ -1,9 +1,8 @@
 from collections.abc import Callable
 
-from investiq.events.trade_received import TradeReceived
-from investiq.core.contracts.events import CanonicalEvent
-from investiq.handlers.base import HandlerResult
-from investiq.handlers.trade_received_handler import TradeReceivedHandler
+from investiq.core.events import CanonicalEvent, TradeReceived
+from investiq.core.handlers.base import HandlerResult
+from investiq.core.handlers.trade_received_handler import TradeReceivedHandler
 
 
 

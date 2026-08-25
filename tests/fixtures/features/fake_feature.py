@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 
-from investiq.features.features import Source, Feature
+from investiq.domain.features.features import Feature
+from investiq.domain.features.sources import Source
 
 
 class FakeFeature:

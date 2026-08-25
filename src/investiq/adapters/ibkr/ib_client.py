@@ -33,14 +33,17 @@ class IBKRClient:
     def run(self) -> None:
         self._ib.run()
 
+
     def subscribe_pending_tickers(
             self,
             handler: Callable[[set[Ticker]], None]
     ) -> None:
         self._ib.pendingTickersEvent += handler
 
+
     def request_market_data(self, contract: Contract) -> Ticker:
         return self._ib.reqMktData(contract=contract)
+
 
     def place_order(
             self,

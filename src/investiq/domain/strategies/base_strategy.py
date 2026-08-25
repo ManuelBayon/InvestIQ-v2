@@ -1,8 +1,8 @@
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Protocol, Callable, Sequence, ClassVar
+from typing import Protocol, Sequence, ClassVar
 
-from investiq.features.features import Feature
+from investiq.domain.features.features import Feature
 
 
 @dataclass

@@ -1,13 +1,13 @@
 from collections.abc import Mapping
 
+from investiq.core.events import TradeReceived
+from investiq.domain.features.features import Feature
 from investiq.domain.market_store import InMemoryMarketStore
-from investiq.events.trade_received import TradeReceived
-from investiq.features.feature_runtime import FeatureRuntime
-from investiq.features.features import Feature
-from investiq.features.sources import PriceSource
+from investiq.domain.features.feature_runtime import FeatureRuntime
+from investiq.domain.features.sources import PriceSource
 
-from investiq.handlers.base import HandlerResult
-from investiq.strategies.base_strategy import DecisionContext, Strategy
+from investiq.core.handlers.base import HandlerResult
+from investiq.domain.strategies.base_strategy import DecisionContext, Strategy
 
 
 class TradeReceivedHandler:

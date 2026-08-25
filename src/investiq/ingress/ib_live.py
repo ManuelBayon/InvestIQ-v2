@@ -1,12 +1,11 @@
 import asyncio
-from decimal import Decimal
 
 from ib_insync import Ticker, Future, Stock
 
 from investiq.adapters.ibkr.ib_client import IBKRClient
-from investiq.adapters.ibkr.ib_contants import TRADE_TICK_TYPES
+from investiq.adapters.ibkr.ib_constants import TRADE_TICK_TYPES
 
-from investiq.events.factory import CanonicalEventFactory
+from investiq.core.event_factory import CanonicalEventFactory
 from investiq.core.event_queue import CanonicalEventQueue
 
 
@@ -72,8 +71,8 @@ class IBKRLiveIngress:
                     event = self._event_factory.create_trade_received(
                         symbol=symbol,
                         timestamp_utc=tick.time,
-                        price=Decimal(tick.price),
-                        size=Decimal(tick.size),
+                        price=tick.price,
+                        size=tick.size,
                     )
                     self._event_queue.enqueue(event)
                 else:

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from investiq.features.feature_runtime import Node
+from investiq.domain.features.feature_runtime import Node
 
 
 def print_trace(

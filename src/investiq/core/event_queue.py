@@ -1,6 +1,7 @@
 from queue import Queue
 
-from investiq.core.contracts.events import CanonicalEvent
+from investiq.core.events import CanonicalEvent
+
 
 class CanonicalEventQueue:
 
