@@ -1,5 +1,7 @@
 from dataclasses import dataclass
-from investiq.core.contracts.events import CanonicalEvent
+
+from investiq.core.events import CanonicalEvent
+
 
 @dataclass(frozen=True, slots=True)
 class EventTransition:

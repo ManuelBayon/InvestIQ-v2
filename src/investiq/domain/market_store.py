@@ -1,6 +1,6 @@
+from investiq.core.events import TradeReceived
 from investiq.errors import InsufficientHistoryError, UnknownSymbolError
-from investiq.events.trade_received import TradeReceived
-from tests.fixtures.market.simple_trades import MULTI_SYMBOLS_SIMPLE_TRADES
+from tests.fixtures.market.simple_trades import MONO_SYMBOL_SIMPLE_TRADES
 
 
 class InMemoryMarketStore:
@@ -11,18 +11,10 @@ class InMemoryMarketStore:
     TradeReceived are stored by symbol.
     """
 
-    def __init__(self, symbols: tuple[str, ...]):
-        if not symbols:
-            raise ValueError("symbols must not be empty.")
+    def __init__(self, symbol: str):
 
-        if len(symbols) != len(set(symbols)):
-            raise ValueError(f"duplicate symbols: {symbols}")
-
-        self._trades: dict[str, list[TradeReceived]] = {
-            symbol : []
-            for symbol in symbols
-        }
-        self._universe = symbols
+        self._trades: dict[str, list[TradeReceived]] = {symbol : []}
+        self._universe = symbol
 
     def on_trade_received(self, trade: TradeReceived) -> None:
         try:
@@ -60,8 +52,8 @@ class InMemoryMarketStore:
 
 
 if __name__ == "__main__":
-    store = InMemoryMarketStore(("SYMBOL_1", "SYMBOL_2"))
-    trade_0 = MULTI_SYMBOLS_SIMPLE_TRADES[0]
+    store = InMemoryMarketStore("SYMBOL_1")
+    trade_0 = MONO_SYMBOL_SIMPLE_TRADES[0]
 
     store.on_trade_received(trade_0)
     result = store.price_window("SYMBOL_1", 1)

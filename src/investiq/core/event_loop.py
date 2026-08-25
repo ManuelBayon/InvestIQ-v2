@@ -1,8 +1,10 @@
-from investiq.core.contracts.events import CanonicalEvent
+
 from investiq.core.event_queue import CanonicalEventQueue
 
 from investiq.core.event_journal import EventTransitionJournal, EventTransition
-from investiq.process.dispatcher import Dispatcher
+from investiq.core.dispatcher import Dispatcher
+from investiq.core.events import CanonicalEvent
+
 
 class CanonicalEventLoop:
 

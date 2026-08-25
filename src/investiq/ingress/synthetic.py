@@ -1,8 +1,7 @@
 from datetime import datetime
 from dataclasses import dataclass
-from decimal import Decimal
 
-from investiq.events.factory import CanonicalEventFactory
+from investiq.core.event_factory import CanonicalEventFactory
 from investiq.core.event_queue import CanonicalEventQueue
 
 
@@ -10,8 +9,8 @@ from investiq.core.event_queue import CanonicalEventQueue
 class TradeFixture:
     symbol: str
     timestamp_utc: datetime
-    price: Decimal
-    size: Decimal
+    price: float
+    size: float
 
 
 class SyntheticIngress:

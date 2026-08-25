@@ -1,7 +1,7 @@
-from dataclasses import dataclass, field
-from enum import StrEnum, auto
+from dataclasses import dataclass
+from enum import StrEnum
 
-from investiq.features.features import Feature, Source
+from investiq.domain.features.features import Feature, Source
 
 
 class NodeKind(StrEnum):

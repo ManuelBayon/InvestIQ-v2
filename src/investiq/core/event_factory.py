@@ -1,7 +1,7 @@
 from datetime import datetime
-from decimal import Decimal
 
-from investiq.events.trade_received import TradeReceived
+from investiq.core.events import TradeReceived
+
 
 class CanonicalEventFactory:
 
@@ -18,8 +18,8 @@ class CanonicalEventFactory:
             self,
             symbol: str,
             timestamp_utc: datetime,
-            price: Decimal,
-            size: Decimal,
+            price: float,
+            size: float,
     ) -> TradeReceived:
 
         event = TradeReceived(

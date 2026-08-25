@@ -2,9 +2,7 @@ from ib_insync import Trade, Fill, CommissionReport, MarketOrder
 
 from investiq.adapters.ibkr.ib_client import IBKRClient
 from investiq.adapters.ibkr.ib_contract_mappers import map_stock_specs_to_ib_contract, map_future_specs_to_ib_contract
-from investiq.domain.instruments import StockSpecs, FutureSpecs
-from investiq.domain.orders import MarketOrderSpecs
-from investiq.events.factory import CanonicalEventFactory
+from investiq.core.event_factory import CanonicalEventFactory
 from investiq.core.event_queue import CanonicalEventQueue
 
 
@@ -69,14 +67,14 @@ class IBKRBrokerAdapter:
         )
         self._event_queue.enqueue(event)
 
-    def place_market_order(self, specs: MarketOrderSpecs) -> None:
+    def place_market_order(self, specs: MarketOrderSpec) -> None:
 
         instrument_specs = specs.instrument
 
-        if isinstance(instrument_specs, StockSpecs):
+        if isinstance(instrument_specs, StockSpec):
             contract = map_stock_specs_to_ib_contract(instrument_specs)
 
-        elif isinstance(instrument_specs, FutureSpecs):
+        elif isinstance(instrument_specs, FutureSpec):
             contract = map_future_specs_to_ib_contract(instrument_specs)
 
         else:

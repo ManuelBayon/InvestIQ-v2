@@ -1,18 +1,33 @@
+from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from decimal import Decimal
 from math import isfinite
 
 from investiq.errors import InvalidTrade
-from investiq.events.events import MarketDataEvent
+
+
+@dataclass(frozen=True)
+class CanonicalEvent(ABC):
+    run_id: str
+    event_id: str
+
+
+@dataclass(frozen=True)
+class ExternalEvent(CanonicalEvent):
+    ...
+
+
+@dataclass(frozen=True)
+class MarketDataEvent(ExternalEvent):
+    ...
 
 
 @dataclass(frozen=True)
 class TradeReceived(MarketDataEvent):
     symbol: str
     timestamp_utc: datetime
-    price: Decimal
-    size: Decimal
+    price: float
+    size: float
     def __post_init__(self):
         if self.timestamp_utc.tzinfo is not timezone.utc:
             raise InvalidTrade("timestamp must be in UTC use datetime.timezone.utc")

@@ -7,13 +7,13 @@ class InstrumentSpec(ABC):
     ...
 
 @dataclass(frozen=True)
-class StockSpecs(InstrumentSpec):
+class StockSpec(InstrumentSpec):
     symbol: str
     exchange: str = "SMART"
     currency: str = "USD"
 
 @dataclass(frozen=True)
-class FutureSpecs(InstrumentSpec):
+class FutureSpec(InstrumentSpec):
     symbol: str
     local_symbol: str
     exchange: str = "CME"

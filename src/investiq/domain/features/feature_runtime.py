@@ -1,4 +1,4 @@
-from investiq.features.feature_graph import FeatureGraph, Node
+from investiq.domain.features.feature_graph import FeatureGraph, Node
 
 class FeatureRuntime:
 
