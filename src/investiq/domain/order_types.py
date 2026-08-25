@@ -34,4 +34,4 @@ class TakeProfit:
 class BracketOrder(Order):
     entry: MarketOrder | LimitOrder
     stop_loss: StopLoss
-    take_profit: LimitOrder
+    take_profit: TakeProfit
