@@ -84,6 +84,7 @@ def bootstrap_synthetical_runtime(
         feature_runtime=feature_runtime,
         strategy_features=strategy_features,
         strategy=strategy,
+        event_factory=event_factory,
     )
 
     event_loop = CanonicalEventLoop(

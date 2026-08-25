@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from math import isfinite
 
+from investiq.domain.order_types import Order
 from investiq.errors import InvalidTrade
 
 
@@ -14,6 +15,10 @@ class CanonicalEvent(ABC):
 
 @dataclass(frozen=True)
 class ExternalEvent(CanonicalEvent):
+    ...
+
+@dataclass(frozen=True)
+class InternalEvent(CanonicalEvent):
     ...
 
 
@@ -35,7 +40,7 @@ class TradeReceived(MarketDataEvent):
             raise InvalidTrade(f"price must be a finite non-negative float: price={self.price}")
         if self.size < 0:
             raise InvalidTrade(f"size must be non-negative: size={self.size}")
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"\nTradeReceived(\n"
             f"\trun_id={self.run_id},\n"
@@ -45,4 +50,15 @@ class TradeReceived(MarketDataEvent):
             f"\tprice={self.price},\n"
             f"\tsize={self.size}\n"
             f")"
+        )
+
+@dataclass(frozen=True)
+class OrderGenerated(InternalEvent):
+    order: Order
+    def __repr__(self) -> str:
+        return (
+            f"\nOrderGenerated(\n"
+            f"\trun_id={self.run_id}\n"
+            f"\tevent_id={self.event_id}\n"
+            f"\torder={self.order}\n"
         )

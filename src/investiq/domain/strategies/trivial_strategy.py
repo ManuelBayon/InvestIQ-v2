@@ -38,6 +38,7 @@ class Return1BracketOrderStrategy:
             self,
             context: DecisionContext,
     ) -> list[Order]:
+
         return [
             BracketOrder(
                 entry=LimitOrder(
@@ -49,3 +50,5 @@ class Return1BracketOrderStrategy:
                 take_profit=TakeProfit(price=5050),
             )
         ]
+
+

@@ -26,15 +26,15 @@ class CanonicalEventLoop:
             f"[EVENT LOOP — PROCESS] : {event}"
         )
 
-        result = self._dispatcher.dispatch(event)
+        handler_result = self._dispatcher.dispatch(event)
 
-        for evt in result.emitted_events:
+        for evt in handler_result.emitted_events:
             self._event_queue.enqueue(evt)
 
         self._journal.append(
             EventTransition(
                 input_event=event,
-                emitted_events=result.emitted_events,
+                emitted_events=handler_result.emitted_events,
             )
         )
 

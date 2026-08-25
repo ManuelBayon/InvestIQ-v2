@@ -24,7 +24,7 @@ if __name__ == "__main__":
     """"""
     bootstrap_synthetical_runtime(
         run_id="TEST_RUN",
-        num_trades=5,
+        num_trades=1,
         experiment=experiment
     ).run()
 

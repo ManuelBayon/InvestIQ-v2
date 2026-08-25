@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from investiq.core.events import TradeReceived
+from investiq.core.events import TradeReceived, OrderGenerated
+from investiq.domain.order_types import Order
 
 
 class CanonicalEventFactory:
@@ -31,3 +32,13 @@ class CanonicalEventFactory:
             size=size,
         )
         return event
+
+    def create_order_generated(
+            self,
+            order: Order
+    ) -> OrderGenerated:
+        return OrderGenerated(
+            run_id=self._run_id,
+            event_id=self._make_next_event_id(),
+            order=order
+        )
