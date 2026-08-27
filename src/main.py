@@ -30,7 +30,7 @@ if __name__ == "__main__":
     )
 
     experiment = ExperimentSpec(
-        symbol="SYMBOL_1",
+        symbol="MNQ",
         features={
             "sma_short": sma_short,
             "sma_long": sma_long
@@ -38,9 +38,18 @@ if __name__ == "__main__":
         strategy=strategy_spec,
     )
 
+    """
     bootstrap_synthetical_runtime(
         run_id="TEST_RUN",
         num_trades=6,
         experiment=experiment
     ).run()
+    """
+
+    bootstrap_live_runtime(
+        run_id="LIVE_RUN",
+        experiment=experiment
+    ).run()
+
+
 

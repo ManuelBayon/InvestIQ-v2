@@ -1,6 +1,7 @@
 from threading import Thread
 
 from investiq.adapters.ibkr.ib_client import IBKRClient
+from investiq.core.internal_event_queue import InternalEventQueue
 from investiq.domain.experiment import ExperimentSpec, build_features, validate_strategy_requirements, \
     bootstrap_feature_runtime
 from investiq.core.dispatcher import Dispatcher
@@ -39,6 +40,7 @@ def bootstrap_live_runtime(
         run_id: str,
         experiment: ExperimentSpec,
 ) -> LiveRuntime:
+
     store = InMemoryMarketStore(experiment.symbol)
 
     price_source = PriceSource(
@@ -71,15 +73,17 @@ def bootstrap_live_runtime(
     ib_client = IBKRClient()
 
     event_factory = CanonicalEventFactory(run_id=run_id)
-    event_queue = ExternalEventQueue()
+    external_event_queue = ExternalEventQueue()
+    internal_event_queue = InternalEventQueue()
 
     ingress = IBKRLiveIngress(
         event_factory=event_factory,
-        event_queue=event_queue,
+        external_event_queue=external_event_queue,
         ibkr_client=ib_client,
     )
 
     trade_received_handler = TradeReceivedHandler(
+        event_factory=event_factory,
         market_store=store,
         price_source=price_source,
         symbol=experiment.symbol,
@@ -89,7 +93,8 @@ def bootstrap_live_runtime(
     )
 
     event_loop = CanonicalEventLoop(
-        event_queue=event_queue,
+        external_event_queue=external_event_queue,
+        internal_event_queue=internal_event_queue,
         journal=EventTransitionJournal(),
         dispatcher=Dispatcher(
             trade_received_handler=trade_received_handler

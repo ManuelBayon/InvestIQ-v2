@@ -67,16 +67,19 @@ class CanonicalEventLoop:
                 internal_event = self._internal_event_queue.dequeue_nowait()
                 self._process(internal_event)
 
-    """
-    *) En attente de la définition précise de la politique de traitement
-    des évènements internes et externe en mode asynchrone.
-    
+
     def run_forever(self) -> None:
+        """
         Blocking method, awaits elements
         To stop the loop, set self._running = False.
+        """
         
         self.running = True
         while self.running:
-            event = self._external_event_queue.dequeue_blocking()
-            self._process(event)
-    """
+
+            external_event = self._external_event_queue.dequeue_blocking()
+            self._process(external_event)
+
+            while not self._internal_event_queue.is_empty:
+                internal_event = self._internal_event_queue.dequeue_nowait()
+                self._process(internal_event)

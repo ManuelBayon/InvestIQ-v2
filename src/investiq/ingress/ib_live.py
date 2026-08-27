@@ -15,11 +15,11 @@ class IBKRLiveIngress:
             self,
             ibkr_client: IBKRClient,
             event_factory: CanonicalEventFactory,
-            event_queue: ExternalEventQueue,
+            external_event_queue: ExternalEventQueue,
     ):
         self._ibkr_client = ibkr_client
         self._event_factory = event_factory
-        self._event_queue = event_queue
+        self._external_event_queue = external_event_queue
 
         self._ibkr_client.subscribe_pending_tickers(
             handler=self.on_pending_ticker
@@ -74,7 +74,7 @@ class IBKRLiveIngress:
                         price=tick.price,
                         size=tick.size,
                     )
-                    self._event_queue.enqueue(event)
+                    self._external_event_queue.enqueue(event)
                 else:
                     continue
 
