@@ -61,4 +61,5 @@ class OrderGenerated(InternalEvent):
             f"\trun_id={self.run_id}\n"
             f"\tevent_id={self.event_id}\n"
             f"\torder={self.order}\n"
+            f")"
         )

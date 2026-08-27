@@ -38,18 +38,9 @@ if __name__ == "__main__":
         strategy=strategy_spec,
     )
 
-    """"""
     bootstrap_synthetical_runtime(
         run_id="TEST_RUN",
-        num_trades=10,
+        num_trades=6,
         experiment=experiment
     ).run()
-
-
-    """
-    bootstrap_live_runtime(
-        run_id="TEST_LIVE_RUN",
-        experiment=experiment
-    ).run()
-    """
 
