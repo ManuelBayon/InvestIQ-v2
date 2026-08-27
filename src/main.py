@@ -4,27 +4,44 @@ from investiq.domain.features.features import FeatureSpec
 from investiq.domain.features.simple_moving_average import SimpleMovingAverage
 
 from investiq.domain.strategies.base_strategy import StrategySpec
-from investiq.domain.strategies.simple_moving_average_cross import MovingAverageCrossStrategy
+from investiq.domain.strategies.moving_average_cross import MovingAverageCrossStrategy
 from investiq.domain.strategies.trivial_strategy import Return1BracketOrderStrategy
 from investiq.runtime.live import bootstrap_live_runtime
 from investiq.runtime.sequential import bootstrap_synthetical_runtime
 
 if __name__ == "__main__":
 
+    sma_short = FeatureSpec(
+        feature_type=SimpleMovingAverage,
+        params={
+            "window": 2
+        }
+    )
+
+    sma_long = FeatureSpec(
+        feature_type=SimpleMovingAverage,
+        params={
+            "window": 5
+        }
+    )
+
     strategy_spec = StrategySpec(
-        strategy_type=Return1BracketOrderStrategy,
+        strategy_type=MovingAverageCrossStrategy,
     )
 
     experiment = ExperimentSpec(
         symbol="SYMBOL_1",
-        features={},
+        features={
+            "sma_short": sma_short,
+            "sma_long": sma_long
+        },
         strategy=strategy_spec,
     )
 
     """"""
     bootstrap_synthetical_runtime(
         run_id="TEST_RUN",
-        num_trades=1,
+        num_trades=10,
         experiment=experiment
     ).run()
 
