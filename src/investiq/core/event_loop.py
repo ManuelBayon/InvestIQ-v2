@@ -1,9 +1,10 @@
 
-from investiq.core.event_queue import CanonicalEventQueue
+from investiq.core.external_event_queue import ExternalEventQueue
 
 from investiq.core.event_journal import EventTransitionJournal, EventTransition
 from investiq.core.dispatcher import Dispatcher
-from investiq.core.events import CanonicalEvent
+from investiq.core.events import CanonicalEvent, InternalEvent, ExternalEvent
+from investiq.core.internal_event_queue import InternalEventQueue
 
 
 class CanonicalEventLoop:
@@ -11,11 +12,13 @@ class CanonicalEventLoop:
     def __init__(
             self,
             journal: EventTransitionJournal,
-            event_queue: CanonicalEventQueue,
+            external_event_queue: ExternalEventQueue,
+            internal_event_queue: InternalEventQueue,
             dispatcher: Dispatcher,
     ):
         self._journal = journal
-        self._event_queue = event_queue
+        self._external_event_queue = external_event_queue
+        self._internal_event_queue = internal_event_queue
         self._dispatcher = dispatcher
         self.running = False
 
@@ -23,13 +26,24 @@ class CanonicalEventLoop:
     def _process(self, event: CanonicalEvent) -> None:
         print(
             f"\n————————————————————————————————————————————————————————————————————————————————————\n"
-            f"[EVENT LOOP — PROCESS] : {event}"
+            f"[EVENT LOOP — PROCESS] : "
+            f"{"InternalEvent" if isinstance(event, InternalEvent) else "ExternalEvent"}"
+            f"{event}"
+
         )
 
         handler_result = self._dispatcher.dispatch(event)
 
         for evt in handler_result.emitted_events:
-            self._event_queue.enqueue(evt)
+            if isinstance(evt, InternalEvent):
+                self._internal_event_queue.enqueue(evt)
+            elif isinstance(evt, ExternalEvent):
+                self._external_event_queue.enqueue(evt)
+            else:
+                raise ValueError(
+                    f"Unsupported event type for event={evt}, "
+                    f"must be either InternalEvent or ExternalEvent"
+                )
 
         self._journal.append(
             EventTransition(
@@ -45,9 +59,16 @@ class CanonicalEventLoop:
         While there are elements returns the elements then ends.
         :return:
         """
-        while not self._event_queue.is_empty:
-            event = self._event_queue.dequeue_nowait()
-            self._process(event)
+        while not self._external_event_queue.is_empty:
+            external_event = self._external_event_queue.dequeue_nowait()
+            self._process(external_event)
+
+            while not self._internal_event_queue.is_empty:
+                internal_event = self._internal_event_queue.dequeue_nowait()
+                self._process(internal_event)
+
+
+
 
 
     def run_forever(self) -> None:
@@ -58,5 +79,5 @@ class CanonicalEventLoop:
         """
         self.running = True
         while self.running:
-            event = self._event_queue.dequeue_blocking()
+            event = self._external_event_queue.dequeue_blocking()
             self._process(event)

@@ -2,7 +2,7 @@ from datetime import datetime
 from dataclasses import dataclass
 
 from investiq.core.event_factory import CanonicalEventFactory
-from investiq.core.event_queue import CanonicalEventQueue
+from investiq.core.external_event_queue import ExternalEventQueue
 
 
 @dataclass(frozen=True)
@@ -18,7 +18,7 @@ class SyntheticIngress:
 
     def __init__(
             self,
-            event_queue: CanonicalEventQueue,
+            event_queue: ExternalEventQueue,
             event_factory: CanonicalEventFactory,
             scenario: list[TradeFixture],
     ):

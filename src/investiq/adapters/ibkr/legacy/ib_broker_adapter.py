@@ -3,7 +3,7 @@ from ib_insync import Trade, Fill, CommissionReport, MarketOrder
 from investiq.adapters.ibkr.ib_client import IBKRClient
 from investiq.adapters.ibkr.ib_contract_mappers import map_stock_specs_to_ib_contract, map_future_specs_to_ib_contract
 from investiq.core.event_factory import CanonicalEventFactory
-from investiq.core.event_queue import CanonicalEventQueue
+from investiq.core.external_event_queue import ExternalEventQueue
 
 
 class IBKRBrokerAdapter:
@@ -12,7 +12,7 @@ class IBKRBrokerAdapter:
             self,
             ibkr_client: IBKRClient,
             event_factory: CanonicalEventFactory,
-            event_queue: CanonicalEventQueue,
+            event_queue: ExternalEventQueue,
     ):
         self._ibkr_client = ibkr_client
         self._event_factory = event_factory

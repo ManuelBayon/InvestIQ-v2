@@ -1,10 +1,10 @@
-from investiq.domain.experiment import ExperimentSpec, build_features, validate_strategy_requirements, \
-    bootstrap_feature_runtime
+from investiq.core.internal_event_queue import InternalEventQueue
+from investiq.domain.experiment import ExperimentSpec, build_features, validate_strategy_requirements, bootstrap_feature_runtime
 from investiq.core.dispatcher import Dispatcher
 from investiq.core.event_factory import CanonicalEventFactory
 from investiq.core.event_journal import EventTransitionJournal
 from investiq.core.event_loop import CanonicalEventLoop
-from investiq.core.event_queue import CanonicalEventQueue
+from investiq.core.external_event_queue import ExternalEventQueue
 from investiq.core.handlers.trade_received_handler import TradeReceivedHandler
 from investiq.domain.features.sources import PriceSource
 from investiq.domain.market_store import InMemoryMarketStore
@@ -65,14 +65,15 @@ def bootstrap_synthetical_runtime(
         for requirement in strategy.requirements
     }
 
-    event_queue = CanonicalEventQueue()
+    external_event_queue = ExternalEventQueue()
+    internal_event_queue = InternalEventQueue()
 
     event_factory = CanonicalEventFactory(
         run_id=run_id
     )
 
     ingress = SyntheticIngress(
-        event_queue=event_queue,
+        event_queue=external_event_queue,
         event_factory=event_factory,
         scenario=[t for t in MONO_SYMBOL_SIMPLE_TRADES[:num_trades]]
     )
@@ -88,7 +89,8 @@ def bootstrap_synthetical_runtime(
     )
 
     event_loop = CanonicalEventLoop(
-        event_queue=event_queue,
+        external_event_queue=external_event_queue,
+        internal_event_queue=internal_event_queue,
         journal=EventTransitionJournal(),
         dispatcher=Dispatcher(
             trade_received_handler=trade_received_handler,
