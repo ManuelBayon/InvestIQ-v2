@@ -1,6 +1,7 @@
 from typing import Sequence, ClassVar
 
 from investiq.domain.features.simple_moving_average import SimpleMovingAverage
+from investiq.domain.order_types import MarketOrder, Order
 from investiq.domain.strategies.base_strategy import TradingIntent, DecisionContext, FeatureRequirement
 
 
@@ -18,7 +19,7 @@ class MovingAverageCrossStrategy:
     )
 
 
-    def decide(self, context: DecisionContext) -> list[TradingIntent]:
+    def decide(self, context: DecisionContext) -> list[Order]:
 
         sma_short = context.features["sma_short"]
         sma_long = context.features["sma_long"]
@@ -26,10 +27,18 @@ class MovingAverageCrossStrategy:
         symbol = context.symbol
 
         if sma_short > sma_long:
-            return [TradingIntent(symbol=symbol, target=1.0)]
+            order = MarketOrder(
+                symbol=context.symbol,
+                quantity=1
+            )
+            return [order]
 
         elif sma_short < sma_long:
-            return [TradingIntent(symbol=symbol, target=-1.0)]
+            order = MarketOrder(
+                symbol=context.symbol,
+                quantity=-1
+            )
+            return [order]
 
         else:
             return []
