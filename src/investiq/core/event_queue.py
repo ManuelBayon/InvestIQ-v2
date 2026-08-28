@@ -3,7 +3,7 @@ from queue import Queue
 from investiq.core.events import CanonicalEvent
 
 
-class ExternalEventQueue:
+class EventQueue:
 
     def __init__(self):
         self._queue: Queue[CanonicalEvent] = Queue()

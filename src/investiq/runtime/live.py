@@ -1,14 +1,13 @@
 from threading import Thread
 
 from investiq.adapters.ibkr.ib_client import IBKRClient
-from investiq.core.internal_event_queue import InternalEventQueue
 from investiq.domain.experiment import ExperimentSpec, build_features, validate_strategy_requirements, \
     bootstrap_feature_runtime
 from investiq.core.dispatcher import Dispatcher
 from investiq.core.event_factory import CanonicalEventFactory
 from investiq.core.event_journal import EventTransitionJournal
 from investiq.core.event_loop import CanonicalEventLoop
-from investiq.core.external_event_queue import ExternalEventQueue
+from investiq.core.event_queue import EventQueue
 from investiq.core.handlers.trade_received_handler import TradeReceivedHandler
 from investiq.domain.features.sources import PriceSource
 from investiq.domain.market_store import InMemoryMarketStore
@@ -73,8 +72,8 @@ def bootstrap_live_runtime(
     ib_client = IBKRClient()
 
     event_factory = CanonicalEventFactory(run_id=run_id)
-    external_event_queue = ExternalEventQueue()
-    internal_event_queue = InternalEventQueue()
+    external_event_queue = EventQueue()
+    internal_event_queue = EventQueue()
 
     ingress = IBKRLiveIngress(
         event_factory=event_factory,

@@ -2,7 +2,7 @@ from datetime import datetime
 from dataclasses import dataclass
 
 from investiq.core.event_factory import CanonicalEventFactory
-from investiq.core.external_event_queue import ExternalEventQueue
+from investiq.core.event_queue import ExternalEventQueue
 
 
 @dataclass(frozen=True)

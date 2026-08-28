@@ -6,7 +6,7 @@ from investiq.adapters.ibkr.ib_client import IBKRClient
 from investiq.adapters.ibkr.ib_constants import TRADE_TICK_TYPES
 
 from investiq.core.event_factory import CanonicalEventFactory
-from investiq.core.external_event_queue import ExternalEventQueue
+from investiq.core.event_queue import EventQueue
 
 
 class IBKRLiveIngress:
@@ -15,7 +15,7 @@ class IBKRLiveIngress:
             self,
             ibkr_client: IBKRClient,
             event_factory: CanonicalEventFactory,
-            external_event_queue: ExternalEventQueue,
+            external_event_queue: EventQueue,
     ):
         self._ibkr_client = ibkr_client
         self._event_factory = event_factory

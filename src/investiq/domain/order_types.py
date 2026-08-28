@@ -8,20 +8,18 @@ class Order(ABC):
 
 
 @dataclass(frozen=True, slots=True)
-class MarketOrder(Order):
-    symbol: str
+class MarketOrderSpec(Order):
     quantity: float
     def __repr__(self) -> str:
-        return f"MarketOrder(symbol={self.symbol}, quantity={self.quantity})"
+        return f"MarketOrder(quantity={self.quantity})"
 
 
 @dataclass(frozen=True, slots=True)
-class LimitOrder(Order):
-    symbol: str
+class LimitOrderSpec(Order):
     quantity: float
     price: float
     def __repr__(self) -> str:
-        return f"LimitOrder(symbol={self.symbol}, quantity={self.quantity}, price={self.price})"
+        return f"LimitOrder(quantity={self.quantity}, price={self.price})"
 
 
 
@@ -41,7 +39,7 @@ class TakeProfit:
 
 @dataclass(frozen=True, slots=True)
 class BracketOrder(Order):
-    entry: MarketOrder | LimitOrder
+    entry: MarketOrderSpec | LimitOrderSpec
     stop_loss: StopLoss
     take_profit: TakeProfit
     def __repr__(self) -> str:

@@ -1,22 +1,26 @@
 from ib_insync import Trade, Fill, CommissionReport, MarketOrder
 
+from investiq.domain.instrument_spec import StockSpec, FutureSpec, InstrumentSpec
+from investiq.domain.order_types import MarketOrderSpec
 from investiq.adapters.ibkr.ib_client import IBKRClient
 from investiq.adapters.ibkr.ib_contract_mappers import map_stock_specs_to_ib_contract, map_future_specs_to_ib_contract
 from investiq.core.event_factory import CanonicalEventFactory
-from investiq.core.external_event_queue import ExternalEventQueue
+from investiq.core.event_queue import EventQueue
 
 
 class IBKRBrokerAdapter:
 
     def __init__(
             self,
-            ibkr_client: IBKRClient,
+            ib_client: IBKRClient,
             event_factory: CanonicalEventFactory,
-            event_queue: ExternalEventQueue,
+            external_event_queue: EventQueue,
     ):
-        self._ibkr_client = ibkr_client
+
+        self._ib_client = ib_client
         self._event_factory = event_factory
-        self._event_queue = event_queue
+        self._external_event_queue = external_event_queue
+
 
     def _on_status_update(self, trade: Trade) -> None:
         status = trade.orderStatus
@@ -27,7 +31,9 @@ class IBKRBrokerAdapter:
             client_id=status.clientId,
             broker_perm_id=status.permId,
         )
-        self._event_queue.enqueue(event)
+        print(event)
+        self._external_event_queue.enqueue(event)
+
 
     def _on_fill(self, trade: Trade, fill: Fill) -> None:
         status = trade.orderStatus
@@ -45,7 +51,9 @@ class IBKRBrokerAdapter:
             price=execution.price,
             cumul_qty=execution.cumQty,
         )
-        self._event_queue.enqueue(event)
+        print(event)
+        self._external_event_queue.enqueue(event)
+
 
     def _on_commission_report(
             self,
@@ -65,29 +73,40 @@ class IBKRBrokerAdapter:
             currency=report.currency,
             realized_pnl=report.realizedPNL,
         )
-        self._event_queue.enqueue(event)
+        print(event)
+        self._external_event_queue.enqueue(event)
 
-    def place_market_order(self, specs: MarketOrderSpec) -> None:
 
-        instrument_specs = specs.instrument
+    def place_market_order(
+            self,
+            contract_spec: InstrumentSpec,
+            order_spec: MarketOrderSpec
+    ) -> None:
 
-        if isinstance(instrument_specs, StockSpec):
-            contract = map_stock_specs_to_ib_contract(instrument_specs)
+        if isinstance(contract_spec, StockSpec):
+            contract = map_stock_specs_to_ib_contract(contract_spec)
 
-        elif isinstance(instrument_specs, FutureSpec):
-            contract = map_future_specs_to_ib_contract(instrument_specs)
+        elif isinstance(contract_spec, FutureSpec):
+            contract = map_future_specs_to_ib_contract(contract_spec)
 
         else:
             raise NotImplementedError(
-                f"Unsupported instrument type: {type(instrument_specs).__name__}"
+                f"Unsupported instrument type: "
+                f"{type(contract_spec).__name__}, "
+                f"available are Stock and Future."
             )
 
         # Build market order
-        order = MarketOrder(action=specs.direction.name, totalQuantity=specs.quantity)
-        order.tif = specs.tif
+        action = "BUY" if order_spec.quantity > 0 else "SELL"
+        order = MarketOrder(
+            action=action,
+            totalQuantity=abs(order_spec.quantity)
+        )
+        order.tif = "DAY"
 
         # Place market order
-        trade = self._ibkr_client.place_order(contract=contract, order=order)
+        trade = self._ib_client.place_order(contract=contract, order=order)
+        print(trade)
 
         # Subscribe to broker events
         trade.statusEvent += self._on_status_update

@@ -1,5 +1,5 @@
 
-from investiq.core.external_event_queue import ExternalEventQueue
+from investiq.core.event_queue import ExternalEventQueue
 
 from investiq.core.event_journal import EventTransitionJournal, EventTransition
 from investiq.core.dispatcher import Dispatcher
