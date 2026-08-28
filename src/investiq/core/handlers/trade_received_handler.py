@@ -57,7 +57,6 @@ class TradeReceivedHandler:
         if all_requirements_emitted:
             orders = self._strategy.decide(
                 context=DecisionContext(
-                    symbol=self._symbol,
                     price=self._price_source.last(),
                     features={
                         name: feature.latest()

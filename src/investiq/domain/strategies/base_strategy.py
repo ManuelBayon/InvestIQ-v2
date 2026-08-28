@@ -8,7 +8,6 @@ from investiq.domain.order_types import Order
 
 @dataclass
 class DecisionContext:
-    symbol: str
     price : float
     features: Mapping[str, float]
 
@@ -30,8 +29,3 @@ class Strategy(Protocol):
             context: DecisionContext,
     ) -> list[Order]:
         ...
-
-
-@dataclass
-class StrategySpec:
-    strategy_type: type[Strategy]

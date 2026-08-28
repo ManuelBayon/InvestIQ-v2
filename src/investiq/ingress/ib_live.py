@@ -13,15 +13,15 @@ class IBKRLiveIngress:
 
     def __init__(
             self,
-            ibkr_client: IBKRClient,
+            ib_client: IBKRClient,
             event_factory: CanonicalEventFactory,
             external_event_queue: EventQueue,
     ):
-        self._ibkr_client = ibkr_client
+        self._ib_client = ib_client
         self._event_factory = event_factory
         self._external_event_queue = external_event_queue
 
-        self._ibkr_client.subscribe_pending_tickers(
+        self._ib_client.subscribe_pending_tickers(
             handler=self.on_pending_ticker
         )
         self._ib_loop = None
@@ -35,7 +35,7 @@ class IBKRLiveIngress:
         """
         Example : reqMktData(symbol="AMD", exchange= "SMART", currency= "USD")
         """
-        self._ibkr_client.request_market_data(
+        self._ib_client.request_market_data(
             contract=Stock(
                 symbol=symbol,
                 exchange=exchange,
@@ -53,7 +53,7 @@ class IBKRLiveIngress:
         """
         Example : reqMktData(Future(symbol="NQ", local_symbol="NQU6", exchange"CME"))
         """
-        self._ibkr_client.request_market_data(
+        self._ib_client.request_market_data(
             contract=Future(
                 symbol=symbol,
                 localSymbol=local_symbol,
@@ -83,7 +83,7 @@ class IBKRLiveIngress:
         self._ib_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self._ib_loop)
 
-        self._ibkr_client.connect()
-        self._ibkr_client.set_market_data_type()
+        self._ib_client.connect()
+        self._ib_client.set_market_data_type()
         self.subscribe_to_future(symbol="MNQ", local_symbol="MNQU6")
-        self._ibkr_client.run()
+        self._ib_client.run()

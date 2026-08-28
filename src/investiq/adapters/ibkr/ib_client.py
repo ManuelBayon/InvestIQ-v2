@@ -1,6 +1,4 @@
-import asyncio
 from collections.abc import Callable
-from threading import Event
 
 from ib_insync import IB, Ticker, Contract, Order, Trade
 
@@ -10,7 +8,6 @@ class IBKRClient:
     def __init__(self):
         self._ib = IB()
         self._ib_loop = None
-        self.connected = Event()
 
     def connect(
             self,
@@ -35,11 +32,6 @@ class IBKRClient:
         self._ib.reqMarketDataType(marketDataType=data_type)
 
     def run(self) -> None:
-        self._ib_loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(self._ib_loop)
-
-        self.connect()
-        self.connected.set()
         self._ib.run()
 
     def subscribe_pending_tickers(

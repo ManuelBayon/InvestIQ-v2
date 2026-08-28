@@ -1,10 +1,9 @@
 
-from investiq.core.event_queue import ExternalEventQueue
+from investiq.core.event_queue import EventQueue
 
 from investiq.core.event_journal import EventTransitionJournal, EventTransition
 from investiq.core.dispatcher import Dispatcher
 from investiq.core.events import CanonicalEvent, InternalEvent, ExternalEvent
-from investiq.core.internal_event_queue import InternalEventQueue
 
 
 class CanonicalEventLoop:
@@ -12,8 +11,8 @@ class CanonicalEventLoop:
     def __init__(
             self,
             journal: EventTransitionJournal,
-            external_event_queue: ExternalEventQueue,
-            internal_event_queue: InternalEventQueue,
+            external_event_queue: EventQueue,
+            internal_event_queue: EventQueue,
             dispatcher: Dispatcher,
     ):
         self._journal = journal

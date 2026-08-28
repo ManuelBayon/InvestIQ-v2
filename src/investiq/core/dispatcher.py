@@ -2,6 +2,7 @@ from collections.abc import Callable
 
 from investiq.core.events import CanonicalEvent, TradeReceived, OrderGenerated
 from investiq.core.handlers.base import HandlerResult
+from investiq.core.handlers.order_generated_handler import OrderGeneratedHandler
 from investiq.core.handlers.trade_received_handler import TradeReceivedHandler
 
 
@@ -11,8 +12,10 @@ class Dispatcher:
     def __init__(
             self,
             trade_received_handler: TradeReceivedHandler,
+            order_generated_handler: OrderGeneratedHandler,
     ):
         self._trade_received_handler = trade_received_handler
+        self._order_generated_handler = order_generated_handler
 
         self._dispatch_table: dict[type[CanonicalEvent], Callable] = {
             TradeReceived: self._on_trade_received,
@@ -25,7 +28,7 @@ class Dispatcher:
 
 
     def _on_orders_generated(self, event: OrderGenerated) -> HandlerResult:
-        return HandlerResult()
+        return self._order_generated_handler.handle(event)
 
 
     def dispatch(self, event: CanonicalEvent) -> HandlerResult:

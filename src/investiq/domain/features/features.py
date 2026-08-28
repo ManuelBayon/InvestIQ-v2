@@ -20,6 +20,6 @@ class Feature(Protocol):
 
 @dataclass
 class FeatureSpec:
-    feature_type: Callable[..., Feature]
+    feature: Callable[..., Feature]
     params: Mapping[str, object]
 

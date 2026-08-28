@@ -1,8 +1,9 @@
 from datetime import datetime
 from dataclasses import dataclass
 
+from investiq.adapters.ibkr.ib_client import IBKRClient
 from investiq.core.event_factory import CanonicalEventFactory
-from investiq.core.event_queue import ExternalEventQueue
+from investiq.core.event_queue import EventQueue
 
 
 @dataclass(frozen=True)
@@ -18,13 +19,13 @@ class SyntheticIngress:
 
     def __init__(
             self,
-            event_queue: ExternalEventQueue,
-            event_factory: CanonicalEventFactory,
             scenario: list[TradeFixture],
+            event_queue: EventQueue,
+            event_factory: CanonicalEventFactory,
     ):
+        self._scenario = scenario
         self._event_queue = event_queue
         self._event_factory = event_factory
-        self._scenario = scenario
 
 
     def start(self) -> None:

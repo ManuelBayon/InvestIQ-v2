@@ -2,12 +2,13 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 from investiq.domain.features.features import FeatureSpec, Feature
+from investiq.domain.instrument_spec import InstrumentSpec
 from investiq.errors import MissingFeatureRequirementError, FeatureTypeMismatchError
 from investiq.domain.features.feature_graph import Node, NodeKind, FeatureGraph
 from investiq.domain.features.feature_runtime import FeatureRuntime
 
 from investiq.domain.features.sources import Source
-from investiq.domain.strategies.base_strategy import StrategySpec, FeatureRequirement
+from investiq.domain.strategies.base_strategy import FeatureRequirement, Strategy
 
 
 @dataclass(frozen=True, slots=True)
@@ -15,16 +16,17 @@ class ExperimentSpec:
     """
     2026-08-19: Work hypothesis : Mono symbol experiment
     """
-    symbol: str
+    run_id: str
+    instrument: InstrumentSpec
     features: Mapping[str, FeatureSpec]
-    strategy: StrategySpec
+    strategy: type[Strategy]
 
 
 def build_features(source: Source, features: Mapping[str, FeatureSpec]) -> Mapping[str, Feature]:
     _features_by_name: dict[str, Feature] = {}
 
     for name, feature_spec in features.items():
-        feature = feature_spec.feature_type(
+        feature = feature_spec.feature(
             source,
             **feature_spec.params
         )

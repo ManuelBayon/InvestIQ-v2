@@ -8,7 +8,7 @@ from investiq.core.event_factory import CanonicalEventFactory
 from investiq.core.event_queue import EventQueue
 
 
-class IBKRBrokerAdapter:
+class IBKRAdapter:
 
     def __init__(
             self,
@@ -23,6 +23,7 @@ class IBKRBrokerAdapter:
 
 
     def _on_status_update(self, trade: Trade) -> None:
+        print("IB CALLBACK STATUS UPDATED")
         status = trade.orderStatus
         event = self._event_factory.create_order_status_updated(
             order_id=status.orderId,
@@ -36,6 +37,7 @@ class IBKRBrokerAdapter:
 
 
     def _on_fill(self, trade: Trade, fill: Fill) -> None:
+        print("IB CALLBACK FILL RECEIVED")
         status = trade.orderStatus
         execution = fill.execution
         event = self._event_factory.create_fill_received(
@@ -61,6 +63,7 @@ class IBKRBrokerAdapter:
             fill: Fill,
             report: CommissionReport
     ) -> None:
+        print("IB CALLBACK COMMISSION RECEIVED")
         status = trade.orderStatus
         execution = fill.execution
         event = self._event_factory.create_commission_report_received(

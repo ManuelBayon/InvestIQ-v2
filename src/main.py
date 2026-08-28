@@ -2,51 +2,47 @@ from investiq.domain.experiment import ExperimentSpec
 from investiq.domain.features.features import FeatureSpec
 
 from investiq.domain.features.simple_moving_average import SimpleMovingAverage
+from investiq.domain.instrument_spec import FutureSpec
 
-from investiq.domain.strategies.base_strategy import StrategySpec
 from investiq.domain.strategies.moving_average_cross import MovingAverageCrossStrategy
-from investiq.runtime.live import bootstrap_live_runtime
-
-from investiq.runtime.sequential import bootstrap_synthetical_runtime
+from investiq.runtime.builder import build_runtime
+from investiq.runtime.sequential import SequentialRuntimeConfig
+from tests.fixtures.market.simple_trades import MONO_SYMBOL_SIMPLE_TRADES
 
 if __name__ == "__main__":
 
     sma_short = FeatureSpec(
-        feature_type=SimpleMovingAverage,
+        feature=SimpleMovingAverage,
         params={
             "window": 2
         }
     )
 
     sma_long = FeatureSpec(
-        feature_type=SimpleMovingAverage,
+        feature=SimpleMovingAverage,
         params={
             "window": 5
         }
     )
 
-    strategy_spec = StrategySpec(
-        strategy_type=MovingAverageCrossStrategy,
-    )
-
     experiment = ExperimentSpec(
-        symbol="SYMBOL_1",
+        run_id="TEST_SYNTHETIC_RUN",
+        instrument=FutureSpec(
+            symbol="MNQ",
+            local_symbol="MNQU6"
+        ),
         features={
             "sma_short": sma_short,
-            "sma_long": sma_long
+            "sma_long": sma_long,
         },
-        strategy=strategy_spec,
+        strategy=MovingAverageCrossStrategy,
     )
 
-    bootstrap_synthetical_runtime(
-        run_id="TEST_RUN",
-        num_trades=6,
-        experiment=experiment
-    ).run()
-
-    """
-    bootstrap_live_runtime(
-        run_id="LIVE_RUN",
-        experiment=experiment
-    ).run()
-    """
+    runtime = build_runtime(
+        config=SequentialRuntimeConfig(
+            experiment=experiment,
+            trades=MONO_SYMBOL_SIMPLE_TRADES,
+            num_trades=5
+        )
+    )
+    runtime.run()

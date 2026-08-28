@@ -2,8 +2,7 @@ from datetime import datetime, timezone
 
 from investiq.ingress.synthetic import TradeFixture
 
-symbol_1 = "SYMBOL_1"
-symbol_2 = "SYMBOL_2"
+symbol_1 = "MNQ"
 
 MONO_SYMBOL_SIMPLE_TRADES = [
     TradeFixture(symbol=symbol_1, timestamp_utc=datetime(2026, 1, 1,12, 0, 0, tzinfo=timezone.utc), price=100.0, size=1.0),
