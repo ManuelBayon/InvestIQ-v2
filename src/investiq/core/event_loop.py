@@ -3,7 +3,7 @@ from investiq.core.event_queue import EventQueue
 
 from investiq.core.event_journal import EventTransitionJournal, EventTransition
 from investiq.core.dispatcher import Dispatcher
-from investiq.core.events import CanonicalEvent, InternalEvent, ExternalEvent
+from investiq.core.events import CanonicalEvent, InternalEvent
 
 
 class CanonicalEventLoop:
@@ -36,8 +36,6 @@ class CanonicalEventLoop:
         for evt in handler_result.emitted_events:
             if isinstance(evt, InternalEvent):
                 self._internal_event_queue.enqueue(evt)
-            elif isinstance(evt, ExternalEvent):
-                self._external_event_queue.enqueue(evt)
             else:
                 raise ValueError(
                     f"Unsupported event type for event={evt}, "

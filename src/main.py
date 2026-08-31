@@ -7,7 +7,7 @@ from investiq.domain.instrument_spec import FutureSpec
 from investiq.domain.strategies.moving_average_cross import MovingAverageCrossStrategy
 from investiq.runtime.builder import build_runtime
 from investiq.runtime.sequential import SequentialRuntimeConfig
-from tests.fixtures.market.simple_trades import MONO_SYMBOL_SIMPLE_TRADES
+from tests.fixtures.simple_trades import MONO_SYMBOL_SIMPLE_TRADES
 
 if __name__ == "__main__":
 
@@ -29,7 +29,8 @@ if __name__ == "__main__":
         run_id="TEST_SYNTHETIC_RUN",
         instrument=FutureSpec(
             symbol="MNQ",
-            local_symbol="MNQU6"
+            local_symbol="MNQU6",
+            exchange="CME"
         ),
         features={
             "sma_short": sma_short,
@@ -38,11 +39,9 @@ if __name__ == "__main__":
         strategy=MovingAverageCrossStrategy,
     )
 
-    runtime = build_runtime(
-        config=SequentialRuntimeConfig(
-            experiment=experiment,
-            trades=MONO_SYMBOL_SIMPLE_TRADES,
-            num_trades=5
-        )
+    config = SequentialRuntimeConfig(
+        experiment=experiment,
+        trades=MONO_SYMBOL_SIMPLE_TRADES,
+        num_trades=5
     )
-    runtime.run()
+    build_runtime(config=config).run()

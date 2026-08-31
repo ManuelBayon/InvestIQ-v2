@@ -59,16 +59,16 @@ class OrderStatusUpdated(ExternalEvent):
     parent_id: int
     status: str
     client_id: int
-    broker_perm_id: int
+    perm_id: int
 
     def __repr__(self) -> str:
         return (
-            f"OrderStatusUpdated(\n"
+            f"\nOrderStatusUpdated(\n"
             f"\torder_id={self.order_id}\n"
             f"\tparent_id={self.parent_id}\n"
             f"\tstatus={self.status}\n"
             f"\tclient_id={self.client_id}\n"
-            f"\tperm_id={self.broker_perm_id}\n"
+            f"\tperm_id={self.perm_id}\n"
             f")"
         )
 
@@ -78,7 +78,7 @@ class FillReceived(ExternalEvent):
     order_id: int
     parent_id: int
     client_id: int
-    broker_perm_id: int
+    perm_id: int
     exec_id: str
     timestamp_utc: datetime
     account_num: str
@@ -89,14 +89,14 @@ class FillReceived(ExternalEvent):
 
     def __repr__(self) -> str:
         return (
-            f"FillReceived(\n"
+            f"\nFillReceived(\n"
             f"\torder_id={self.order_id}\n"
             f"\tparent_id={self.parent_id}\n"
             f"\tclient_id={self.client_id}\n"
-            f"\tperm_id={self.broker_perm_id}\n"
+            f"\tperm_id={self.perm_id}\n"
             f"\texec_id={self.exec_id}\n"
-            f"\ttimestamp_utc={self.timestamp_utc}\n"
             f"\taccount_num={self.account_num}\n"
+            f"\ttimestamp_utc={self.timestamp_utc}\n"
             f"\tqty_executed={self.qty_executed}\n"
             f"\tside={self.side}\n"
             f"\tprice={self.price}\n"
@@ -110,7 +110,7 @@ class CommissionReportReceived(ExternalEvent):
     order_id: int
     parent_id: int
     client_id: int
-    broker_perm_id: int
+    perm_id: int
     exec_id: str
     commission: float
     currency: str
@@ -118,18 +118,17 @@ class CommissionReportReceived(ExternalEvent):
 
     def __repr__(self) -> str:
         return (
-            f"CommissionReportReceived(\n"
+            f"\nCommissionReportReceived(\n"
             f"\torder_id={self.order_id}\n"
             f"\tparent_id={self.parent_id}\n"
             f"\tclient_id={self.client_id}\n"
-            f"\tperm_id={self.broker_perm_id}\n"
+            f"\tperm_id={self.perm_id}\n"
             f"\texec_id={self.exec_id}\n"
             f"\tcommission={self.commission}\n"
-            f"\taccount_num={self.currency}\n"
+            f"\tcurrency={self.currency}\n"
             f"\trealized_pnl={self.realized_pnl}\n"
             f")"
         )
-
 
 
 @dataclass(frozen=True)
@@ -143,5 +142,3 @@ class OrderGenerated(InternalEvent):
             f"\torder={self.order}\n"
             f")"
         )
-
-

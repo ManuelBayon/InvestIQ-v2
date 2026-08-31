@@ -23,28 +23,28 @@ class IBKRAdapter:
 
 
     def _on_status_update(self, trade: Trade) -> None:
-        print("IB CALLBACK STATUS UPDATED")
+        print("IB CALLBACK STATUS UPDATED") # debug
         status = trade.orderStatus
         event = self._event_factory.create_order_status_updated(
             order_id=status.orderId,
             parent_id=status.parentId,
             status=status.status,
             client_id=status.clientId,
-            broker_perm_id=status.permId,
+            perm_id=status.permId,
         )
         print(event)
         self._external_event_queue.enqueue(event)
 
 
     def _on_fill(self, trade: Trade, fill: Fill) -> None:
-        print("IB CALLBACK FILL RECEIVED")
+        print("IB CALLBACK FILL RECEIVED") # debug
         status = trade.orderStatus
         execution = fill.execution
         event = self._event_factory.create_fill_received(
             order_id=status.orderId,
             parent_id=status.parentId,
             client_id=status.clientId,
-            broker_perm_id=status.permId,
+            perm_id=status.permId,
             exec_id=execution.execId,
             timestamp_utc=execution.time,
             account_num=execution.acctNumber,
@@ -63,14 +63,14 @@ class IBKRAdapter:
             fill: Fill,
             report: CommissionReport
     ) -> None:
-        print("IB CALLBACK COMMISSION RECEIVED")
+        print("IB CALLBACK COMMISSION RECEIVED") # debug
         status = trade.orderStatus
         execution = fill.execution
         event = self._event_factory.create_commission_report_received(
             order_id=status.orderId,
             parent_id=status.parentId,
             client_id=status.clientId,
-            broker_perm_id=status.permId,
+            perm_id=status.permId,
             exec_id=execution.execId,
             commission=report.commission,
             currency=report.currency,
@@ -109,7 +109,6 @@ class IBKRAdapter:
 
         # Place market order
         trade = self._ib_client.place_order(contract=contract, order=order)
-        print(trade)
 
         # Subscribe to broker events
         trade.statusEvent += self._on_status_update

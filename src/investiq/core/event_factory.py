@@ -52,7 +52,7 @@ class CanonicalEventFactory:
             parent_id,
             status,
             client_id,
-            broker_perm_id
+            perm_id
     ) -> OrderStatusUpdated:
         event = OrderStatusUpdated(
             run_id=self._run_id,
@@ -61,7 +61,7 @@ class CanonicalEventFactory:
             parent_id=parent_id,
             status=status,
             client_id=client_id,
-            broker_perm_id=broker_perm_id
+            perm_id=perm_id
         )
         return event
 
@@ -71,7 +71,7 @@ class CanonicalEventFactory:
             order_id,
             parent_id,
             client_id,
-            broker_perm_id,
+            perm_id,
             exec_id,
             timestamp_utc,
             account_num,
@@ -87,7 +87,7 @@ class CanonicalEventFactory:
             order_id=order_id,
             parent_id=parent_id,
             client_id=client_id,
-            broker_perm_id=broker_perm_id,
+            perm_id=perm_id,
             exec_id=exec_id,
             timestamp_utc=timestamp_utc,
             account_num=account_num,
@@ -104,7 +104,7 @@ class CanonicalEventFactory:
             order_id,
             parent_id,
             client_id,
-            broker_perm_id,
+            perm_id,
             exec_id,
             commission,
             currency,
@@ -117,7 +117,7 @@ class CanonicalEventFactory:
             order_id=order_id,
             parent_id=parent_id,
             client_id=client_id,
-            broker_perm_id=broker_perm_id,
+            perm_id=perm_id,
             exec_id=exec_id,
             commission=commission,
             currency=currency,

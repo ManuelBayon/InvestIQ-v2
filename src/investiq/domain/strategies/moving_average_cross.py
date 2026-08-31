@@ -1,7 +1,7 @@
 from typing import Sequence, ClassVar
 
 from investiq.domain.features.simple_moving_average import SimpleMovingAverage
-from investiq.domain.order_types import MarketOrderSpec, Order
+from investiq.domain.order_types import MarketOrderSpec, Order, LimitOrderSpec
 from investiq.domain.strategies.base_strategy import TradingIntent, DecisionContext, FeatureRequirement
 
 
@@ -24,10 +24,10 @@ class MovingAverageCrossStrategy:
         sma_long = context.features["sma_long"]
 
         if sma_short > sma_long:
-            return [MarketOrderSpec(quantity=1)]
+            return [LimitOrderSpec(quantity=1, price=context.price - 5)]
 
         elif sma_short < sma_long:
-            return [MarketOrderSpec(quantity=-1)]
+            return [LimitOrderSpec(quantity=1, price=context.price - 5)]
 
         else:
             return []

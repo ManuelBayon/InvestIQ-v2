@@ -1,6 +1,6 @@
+
 from investiq.core.events import TradeReceived
 from investiq.errors import InsufficientHistoryError, UnknownSymbolError
-from tests.fixtures.market.simple_trades import MONO_SYMBOL_SIMPLE_TRADES
 
 
 class InMemoryMarketStore:
@@ -49,12 +49,3 @@ class InMemoryMarketStore:
 
     def size(self, symbol) -> int:
         return len(self._trades[symbol])
-
-
-if __name__ == "__main__":
-    store = InMemoryMarketStore("SYMBOL_1")
-    trade_0 = MONO_SYMBOL_SIMPLE_TRADES[0]
-
-    store.on_trade_received(trade_0)
-    result = store.price_window("SYMBOL_1", 1)
-    print(result)

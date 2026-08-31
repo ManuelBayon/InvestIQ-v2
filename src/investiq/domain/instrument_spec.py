@@ -14,5 +14,5 @@ class StockSpec(InstrumentSpec):
 @dataclass(frozen=True)
 class FutureSpec(InstrumentSpec):
     local_symbol: str
-    exchange: str = "CME"
+    exchange: str
     currency: str = "USD"
