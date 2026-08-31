@@ -1,3 +1,4 @@
+import asyncio
 from dataclasses import dataclass
 from threading import Thread
 
@@ -27,6 +28,7 @@ class LiveRuntime:
     def run(self) -> None:
         self._ib_client.connect()
 
-        thread = Thread(target=self._event_loop.run_forever)
+        thread = Thread(target=self._event_loop.run_forever, name="canonical_thread")
         thread.start()
+
         self._ingress.start()

@@ -1,7 +1,7 @@
-from ib_insync import Trade, Fill, CommissionReport, MarketOrder
+from ib_insync import Trade, Fill, CommissionReport, MarketOrder, Contract, LimitOrder
 
 from investiq.domain.instrument_spec import StockSpec, FutureSpec, InstrumentSpec
-from investiq.domain.order_types import MarketOrderSpec
+from investiq.domain.order_types import MarketOrderSpec, LimitOrderSpec
 from investiq.adapters.ibkr.ib_client import IBKRClient
 from investiq.adapters.ibkr.ib_contract_mappers import map_stock_specs_to_ib_contract, map_future_specs_to_ib_contract
 from investiq.core.event_factory import CanonicalEventFactory
@@ -80,26 +80,35 @@ class IBKRAdapter:
         self._external_event_queue.enqueue(event)
 
 
+    def build_contract(self, spec: InstrumentSpec) -> Contract:
+        if isinstance(spec, StockSpec):
+            contract = map_stock_specs_to_ib_contract(spec)
+        elif isinstance(spec, FutureSpec):
+            contract = map_future_specs_to_ib_contract(spec)
+        else:
+            raise NotImplementedError(
+                f"Unsupported instrument type: "
+                f"{type(spec).__name__}, "
+                f"available are Stock and Future."
+            )
+        return contract
+
+
+    def subscribe_to_trade_events(self, trade: Trade) -> None:
+        trade.statusEvent += self._on_status_update
+        trade.fillEvent += self._on_fill
+        trade.commissionReportEvent += self._on_commission_report
+
+
     def place_market_order(
             self,
             contract_spec: InstrumentSpec,
             order_spec: MarketOrderSpec
     ) -> None:
+        # Build contract
+        contract = self.build_contract(contract_spec)
 
-        if isinstance(contract_spec, StockSpec):
-            contract = map_stock_specs_to_ib_contract(contract_spec)
-
-        elif isinstance(contract_spec, FutureSpec):
-            contract = map_future_specs_to_ib_contract(contract_spec)
-
-        else:
-            raise NotImplementedError(
-                f"Unsupported instrument type: "
-                f"{type(contract_spec).__name__}, "
-                f"available are Stock and Future."
-            )
-
-        # Build market order
+        # Build Market Order
         action = "BUY" if order_spec.quantity > 0 else "SELL"
         order = MarketOrder(
             action=action,
@@ -107,10 +116,28 @@ class IBKRAdapter:
         )
         order.tif = "DAY"
 
-        # Place market order
+        # Place order and subscribe to trade events
         trade = self._ib_client.place_order(contract=contract, order=order)
+        self.subscribe_to_trade_events(trade)
 
-        # Subscribe to broker events
-        trade.statusEvent += self._on_status_update
-        trade.fillEvent += self._on_fill
-        trade.commissionReportEvent += self._on_commission_report
+
+    def place_limit_order(
+            self,
+            contract_spec: InstrumentSpec,
+            order_spec: LimitOrderSpec
+    ) -> None:
+        # Build contract
+        contract = self.build_contract(contract_spec)
+
+        # Build order
+        action = "BUY" if order_spec.quantity > 0 else "SELL"
+        order = LimitOrder(
+            action=action,
+            totalQuantity=abs(order_spec.quantity),
+            lmtPrice=order_spec.price
+        )
+        order.tif = "DAY"
+
+        # Place order and subscribe to trade events
+        trade = self._ib_client.place_order(contract=contract, order=order)
+        self.subscribe_to_trade_events(trade)

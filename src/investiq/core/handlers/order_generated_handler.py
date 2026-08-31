@@ -23,10 +23,15 @@ class OrderGeneratedHandler:
                 contract_spec=self._instrument_spec,
                 order_spec=event.order
             )
+        elif isinstance(event.order, LimitOrderSpec):
+            self._ib_adapter.place_limit_order(
+                contract_spec=self._instrument_spec,
+                order_spec=event.order
+            )
         else:
             raise InvalidOrderType(
                 f"Order type not recognize, "
                 f"order.__class__={event.order.__class__}"
             )
-        self._ib_adapter._ib_client._ib.sleep(5) # debug
+
         return HandlerResult(emitted_events=())

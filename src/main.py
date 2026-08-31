@@ -6,6 +6,7 @@ from investiq.domain.instrument_spec import FutureSpec
 
 from investiq.domain.strategies.moving_average_cross import MovingAverageCrossStrategy
 from investiq.runtime.builder import build_runtime
+from investiq.runtime.live import LiveRuntimeConfig
 from investiq.runtime.sequential import SequentialRuntimeConfig
 from tests.fixtures.simple_trades import MONO_SYMBOL_SIMPLE_TRADES
 
@@ -39,9 +40,7 @@ if __name__ == "__main__":
         strategy=MovingAverageCrossStrategy,
     )
 
-    config = SequentialRuntimeConfig(
+    config = LiveRuntimeConfig(
         experiment=experiment,
-        trades=MONO_SYMBOL_SIMPLE_TRADES,
-        num_trades=5
     )
     build_runtime(config=config).run()
