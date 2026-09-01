@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from threading import Thread
 
 from investiq.adapters.ibkr.ib_client import IBClient
 from investiq.core.event_loop import CanonicalEventLoop
@@ -27,5 +28,13 @@ class SequentialRuntime(Runtime):
 
     def run(self) -> None:
         self._ib_client.connect()
+
         self._ingress.start()
-        self._event_loop.run_until_empty()
+
+        canonical_thread = Thread(
+            target=self._event_loop.run_forever,
+            name="canonical_thread"
+        )
+
+        canonical_thread.start()
+        self._ib_client.run()

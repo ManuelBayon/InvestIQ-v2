@@ -4,11 +4,11 @@ from investiq.domain.features.features import FeatureSpec
 from investiq.domain.features.simple_moving_average import SimpleMovingAverage
 from investiq.domain.instrument_spec import FutureSpec
 
-from investiq.domain.strategies.moving_average_cross import MovingAverageCrossStrategy
 from investiq.runtime.builder import build_runtime
 from investiq.runtime.live import LiveRuntimeConfig
 from investiq.runtime.sequential import SequentialRuntimeConfig
 from tests.fixtures.simple_trades import MONO_SYMBOL_SIMPLE_TRADES
+from tests.fixtures.strategies import MarketOrderStrategy
 
 if __name__ == "__main__":
 
@@ -37,10 +37,13 @@ if __name__ == "__main__":
             "sma_short": sma_short,
             "sma_long": sma_long,
         },
-        strategy=MovingAverageCrossStrategy,
+        strategy=MarketOrderStrategy,
+    )
+    config_live = LiveRuntimeConfig(experiment)
+    config_seq = SequentialRuntimeConfig(
+        experiment=experiment,
+        trades=MONO_SYMBOL_SIMPLE_TRADES,
+        num_trades=2
     )
 
-    config = LiveRuntimeConfig(
-        experiment=experiment,
-    )
-    build_runtime(config=config).run()
+    build_runtime(config_seq).run()
