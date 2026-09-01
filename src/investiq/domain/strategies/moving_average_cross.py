@@ -24,10 +24,10 @@ class MovingAverageCrossStrategy:
         sma_long = context.features["sma_long"]
 
         if sma_short > sma_long:
-            return [LimitOrderSpec(quantity=1, price=context.price - 5)]
+            return [LimitOrderSpec(quantity=1, price=context.price - 1)]
 
         elif sma_short < sma_long:
-            return [LimitOrderSpec(quantity=1, price=context.price - 5)]
+            return [LimitOrderSpec(quantity=-1, price=context.price + 1)]
 
         else:
             return []

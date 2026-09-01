@@ -1,5 +1,3 @@
-import threading
-
 from ib_insync import Trade, Fill, CommissionReport, MarketOrder, Contract, LimitOrder
 
 from investiq.domain.instrument_spec import StockSpec, FutureSpec, InstrumentSpec
@@ -25,7 +23,6 @@ class IBKRAdapter:
 
 
     def _on_status_update(self, trade: Trade) -> None:
-        print("IB CALLBACK STATUS UPDATED") # debug
         status = trade.orderStatus
         event = self._event_factory.create_order_status_updated(
             order_id=status.orderId,
@@ -34,12 +31,10 @@ class IBKRAdapter:
             client_id=status.clientId,
             perm_id=status.permId,
         )
-        print(event)
         self._external_event_queue.enqueue(event)
 
 
     def _on_fill(self, trade: Trade, fill: Fill) -> None:
-        print("IB CALLBACK FILL RECEIVED") # debug
         status = trade.orderStatus
         execution = fill.execution
         event = self._event_factory.create_fill_received(
@@ -55,7 +50,6 @@ class IBKRAdapter:
             price=execution.price,
             cumul_qty=execution.cumQty,
         )
-        print(event)
         self._external_event_queue.enqueue(event)
 
 
@@ -65,7 +59,6 @@ class IBKRAdapter:
             fill: Fill,
             report: CommissionReport
     ) -> None:
-        print("IB CALLBACK COMMISSION RECEIVED") # debug
         status = trade.orderStatus
         execution = fill.execution
         event = self._event_factory.create_commission_report_received(
@@ -78,7 +71,6 @@ class IBKRAdapter:
             currency=report.currency,
             realized_pnl=report.realizedPNL,
         )
-        print(event)
         self._external_event_queue.enqueue(event)
 
 
@@ -103,6 +95,7 @@ class IBKRAdapter:
         trade.fillEvent += self._on_fill
         trade.commissionReportEvent += self._on_commission_report
 
+
     def place_market_order(
             self,
             contract_spec: InstrumentSpec,
@@ -125,7 +118,6 @@ class IBKRAdapter:
             contract,
             order
         )
-
 
 
     def place_limit_order(
