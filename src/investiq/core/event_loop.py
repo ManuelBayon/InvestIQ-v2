@@ -1,3 +1,4 @@
+import threading
 
 from investiq.core.event_queue import EventQueue
 
@@ -70,7 +71,6 @@ class CanonicalEventLoop:
         Blocking method, awaits elements
         To stop the loop, set self._running = False.
         """
-        
         self.running = True
         while self.running:
 

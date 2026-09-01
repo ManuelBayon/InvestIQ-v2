@@ -4,11 +4,10 @@ from collections.abc import Callable
 from ib_insync import IB, Ticker, Contract, Order, Trade
 
 
-class IBKRClient:
+class IBClient:
 
     def __init__(self):
         self._ib = IB()
-        self._ib_loop = None
 
     def connect(
             self,
@@ -16,11 +15,7 @@ class IBKRClient:
             port: int = 7497,
             client_id: int = 1,
     ) -> None:
-        self._ib.connect(
-            host=host,
-            port=port,
-            clientId=client_id
-        )
+        self._ib.connect(host=host, port=port, clientId=client_id)
 
     def disconnect(self):
         self._ib.disconnect()
@@ -33,10 +28,14 @@ class IBKRClient:
         self._ib.reqMarketDataType(marketDataType=data_type)
 
     def run(self) -> None:
-        print(f"IBKRClient.run loop is {asyncio.get_running_loop()}")
+        loop = asyncio.get_event_loop_policy().get_event_loop()
+        self.ib_loop = loop
         self._ib.run()
 
-    def subscribe_pending_tickers(self, handler: Callable[[set[Ticker]], None]) -> None:
+    def subscribe_pending_tickers(
+            self,
+            handler: Callable[[set[Ticker]], None]
+    ) -> None:
         self._ib.pendingTickersEvent += handler
 
 

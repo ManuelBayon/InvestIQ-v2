@@ -1,7 +1,7 @@
 from datetime import datetime
 from dataclasses import dataclass
 
-from investiq.adapters.ibkr.ib_client import IBKRClient
+from investiq.adapters.ibkr.ib_client import IBClient
 from investiq.core.event_factory import CanonicalEventFactory
 from investiq.core.event_queue import EventQueue
 

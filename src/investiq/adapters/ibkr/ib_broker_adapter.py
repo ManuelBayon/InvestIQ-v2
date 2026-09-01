@@ -1,8 +1,10 @@
+import threading
+
 from ib_insync import Trade, Fill, CommissionReport, MarketOrder, Contract, LimitOrder
 
 from investiq.domain.instrument_spec import StockSpec, FutureSpec, InstrumentSpec
 from investiq.domain.order_types import MarketOrderSpec, LimitOrderSpec
-from investiq.adapters.ibkr.ib_client import IBKRClient
+from investiq.adapters.ibkr.ib_client import IBClient
 from investiq.adapters.ibkr.ib_contract_mappers import map_stock_specs_to_ib_contract, map_future_specs_to_ib_contract
 from investiq.core.event_factory import CanonicalEventFactory
 from investiq.core.event_queue import EventQueue
@@ -12,7 +14,7 @@ class IBKRAdapter:
 
     def __init__(
             self,
-            ib_client: IBKRClient,
+            ib_client: IBClient,
             event_factory: CanonicalEventFactory,
             external_event_queue: EventQueue,
     ):
@@ -94,11 +96,12 @@ class IBKRAdapter:
         return contract
 
 
-    def subscribe_to_trade_events(self, trade: Trade) -> None:
+    def _place_order_on_ib_thread(self, contract, order) -> None:
+        trade = self._ib_client.place_order(contract=contract, order=order)
+
         trade.statusEvent += self._on_status_update
         trade.fillEvent += self._on_fill
         trade.commissionReportEvent += self._on_commission_report
-
 
     def place_market_order(
             self,
@@ -117,8 +120,12 @@ class IBKRAdapter:
         order.tif = "DAY"
 
         # Place order and subscribe to trade events
-        trade = self._ib_client.place_order(contract=contract, order=order)
-        self.subscribe_to_trade_events(trade)
+        self._ib_client.ib_loop.call_soon_threadsafe(
+            self._place_order_on_ib_thread,
+            contract,
+            order
+        )
+
 
 
     def place_limit_order(
@@ -139,5 +146,8 @@ class IBKRAdapter:
         order.tif = "DAY"
 
         # Place order and subscribe to trade events
-        trade = self._ib_client.place_order(contract=contract, order=order)
-        self.subscribe_to_trade_events(trade)
+        self._ib_client.ib_loop.call_soon_threadsafe(
+            self._place_order_on_ib_thread,
+            contract,
+            order
+        )

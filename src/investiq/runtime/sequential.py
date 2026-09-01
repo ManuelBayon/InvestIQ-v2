@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from investiq.adapters.ibkr.ib_client import IBKRClient
+from investiq.adapters.ibkr.ib_client import IBClient
 from investiq.core.event_loop import CanonicalEventLoop
 
 from investiq.ingress.protocol import Ingress
@@ -19,7 +19,7 @@ class SequentialRuntime(Runtime):
             self,
             ingress: Ingress,
             event_loop: CanonicalEventLoop,
-            ib_client: IBKRClient
+            ib_client: IBClient
     ):
         self._ingress = ingress
         self._event_loop = event_loop

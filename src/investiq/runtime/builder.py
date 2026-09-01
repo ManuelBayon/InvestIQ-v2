@@ -1,5 +1,5 @@
 from investiq.adapters.ibkr.ib_broker_adapter import IBKRAdapter
-from investiq.adapters.ibkr.ib_client import IBKRClient
+from investiq.adapters.ibkr.ib_client import IBClient
 
 from investiq.core.dispatcher import Dispatcher
 from investiq.core.event_factory import CanonicalEventFactory
@@ -13,7 +13,7 @@ from investiq.domain.experiment import build_features, validate_strategy_require
 from investiq.domain.features.sources import PriceSource
 from investiq.domain.market_store import InMemoryMarketStore
 
-from investiq.ingress.ib_live import IBKRLiveIngress
+from investiq.ingress.ib_live import IBLiveIngress
 from investiq.ingress.synthetic import SyntheticIngress
 
 from investiq.runtime.base import RuntimeConfig
@@ -50,7 +50,7 @@ def build_runtime(config: RuntimeConfig) -> Runtime:
         for requirement in strategy.requirements
     }
 
-    ib_client = IBKRClient()
+    ib_client = IBClient()
 
     external_event_queue = EventQueue()
     internal_event_queue = EventQueue()
@@ -99,7 +99,7 @@ def build_runtime(config: RuntimeConfig) -> Runtime:
             ib_client=ib_client,
         )
     elif isinstance(config, LiveRuntimeConfig):
-        ingress = IBKRLiveIngress(
+        ingress = IBLiveIngress(
             external_event_queue=external_event_queue,
             event_factory=event_factory,
             ib_client=ib_client

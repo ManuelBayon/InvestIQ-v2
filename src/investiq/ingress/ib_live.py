@@ -1,20 +1,17 @@
-import asyncio
-import threading
-
 from ib_insync import Ticker, Future, Stock
 
-from investiq.adapters.ibkr.ib_client import IBKRClient
+from investiq.adapters.ibkr.ib_client import IBClient
 from investiq.adapters.ibkr.ib_constants import TRADE_TICK_TYPES
 
 from investiq.core.event_factory import CanonicalEventFactory
 from investiq.core.event_queue import EventQueue
 
 
-class IBKRLiveIngress:
+class IBLiveIngress:
 
     def __init__(
             self,
-            ib_client: IBKRClient,
+            ib_client: IBClient,
             event_factory: CanonicalEventFactory,
             external_event_queue: EventQueue,
     ):
@@ -59,7 +56,6 @@ class IBKRLiveIngress:
         )
 
     def on_pending_ticker(self, tickers: set[Ticker]) -> None:
-        print("FROM IBKR CALLBACK")
         for ticker in tickers:
             symbol = ticker.contract.symbol
 
@@ -77,8 +73,6 @@ class IBKRLiveIngress:
 
 
     def start(self) -> None:
-        print(f"current thread is {threading.current_thread().name}")
-        print(f"Loop in IBKRLiveIngress.run(): {asyncio.get_running_loop()}")
         self._ib_client.set_market_data_type()
         self.subscribe_to_future(symbol="MNQ", local_symbol="MNQU6")
         self._ib_client.subscribe_pending_tickers(handler=self.on_pending_ticker)
