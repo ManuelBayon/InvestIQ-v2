@@ -10,6 +10,7 @@ from investiq.errors import InvalidTrade
 @dataclass(frozen=True)
 class CanonicalEvent(ABC):
     run_id: str
+    causation_id: str
     event_id: str
 
 
@@ -44,6 +45,7 @@ class TradeReceived(MarketDataEvent):
         return (
             f"\nTradeReceived(\n"
             f"\trun_id={self.run_id},\n"
+            f"\tcausation_id={self.causation_id},\n"
             f"\tevent_id={self.event_id},\n"
             f"\tsymbol={self.symbol},\n"
             f"\ttimestamp_utc={self.timestamp_utc:%Y-%m-%dT%H:%M:%S.%f}Z,\n"
@@ -64,6 +66,9 @@ class OrderStatusUpdated(ExternalEvent):
     def __repr__(self) -> str:
         return (
             f"\nOrderStatusUpdated(\n"
+            f"\trun_id={self.run_id},\n"
+            f"\tcausation_id={self.causation_id},\n"
+            f"\tevent_id={self.event_id},\n"
             f"\torder_id={self.order_id}\n"
             f"\tparent_id={self.parent_id}\n"
             f"\tstatus={self.status}\n"
@@ -90,6 +95,9 @@ class FillReceived(ExternalEvent):
     def __repr__(self) -> str:
         return (
             f"\nFillReceived(\n"
+            f"\trun_id={self.run_id},\n"
+            f"\tcausation_id={self.causation_id},\n"
+            f"\tevent_id={self.event_id},\n"
             f"\torder_id={self.order_id}\n"
             f"\tparent_id={self.parent_id}\n"
             f"\tclient_id={self.client_id}\n"
@@ -119,6 +127,9 @@ class CommissionReportReceived(ExternalEvent):
     def __repr__(self) -> str:
         return (
             f"\nCommissionReportReceived(\n"
+            f"\trun_id={self.run_id},\n"
+            f"\tcausation_id={self.causation_id},\n"
+            f"\tevent_id={self.event_id},\n"
             f"\torder_id={self.order_id}\n"
             f"\tparent_id={self.parent_id}\n"
             f"\tclient_id={self.client_id}\n"
@@ -138,6 +149,7 @@ class OrderGenerated(InternalEvent):
         return (
             f"\nOrderGenerated(\n"
             f"\trun_id={self.run_id}\n"
+            f"\tcausation_id={self.causation_id},\n"
             f"\tevent_id={self.event_id}\n"
             f"\torder={self.order}\n"
             f")"

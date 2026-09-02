@@ -66,7 +66,10 @@ class TradeReceivedHandler:
             )
 
             for order in orders:
-                order_generated = self._event_factory.create_order_generated(order)
+                order_generated = self._event_factory.create_order_generated(
+                    causation_id=event.event_id,
+                    order=order
+                )
                 orders_generated.append(order_generated)
 
         return HandlerResult(

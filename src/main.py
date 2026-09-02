@@ -8,7 +8,7 @@ from investiq.runtime.builder import build_runtime
 from investiq.runtime.live import LiveRuntimeConfig
 from investiq.runtime.sequential import SequentialRuntimeConfig
 from tests.fixtures.simple_trades import MONO_SYMBOL_SIMPLE_TRADES
-from tests.fixtures.strategies import MarketOrderStrategy
+from tests.fixtures.strategies import MarketOrderStrategy, BracketOrderStrategy
 
 if __name__ == "__main__":
 
@@ -37,13 +37,15 @@ if __name__ == "__main__":
             "sma_short": sma_short,
             "sma_long": sma_long,
         },
-        strategy=MarketOrderStrategy,
-    )
-    config_live = LiveRuntimeConfig(experiment)
-    config_seq = SequentialRuntimeConfig(
-        experiment=experiment,
-        trades=MONO_SYMBOL_SIMPLE_TRADES,
-        num_trades=2
+        strategy=BracketOrderStrategy,
     )
 
-    build_runtime(config_seq).run()
+    config_live = LiveRuntimeConfig(experiment)
+    config_seq = SequentialRuntimeConfig(
+        experiment,
+        trades=MONO_SYMBOL_SIMPLE_TRADES,
+        num_trades=1
+    )
+
+    runtime = build_runtime(config_seq)
+    runtime.run()

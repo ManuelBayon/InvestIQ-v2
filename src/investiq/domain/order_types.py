@@ -36,9 +36,9 @@ class LimitOrderSpec(Order):
 
 
 @dataclass(frozen=True, slots=True)
-class BracketOrder(Order):
+class BracketOrderSpec(Order):
     entry: MarketOrderSpec | LimitOrderSpec
-    stop_loss: StopLoss
-    take_profit: TakeProfit
+    stop_loss: StopLoss | None = None
+    take_profit: TakeProfit | None = None
     def __repr__(self) -> str:
         return f"BracketOrder(entry={self.entry}, stop_loss={self.stop_loss}, take_profit={self.take_profit})"

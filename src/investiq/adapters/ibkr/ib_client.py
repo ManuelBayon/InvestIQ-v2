@@ -49,3 +49,7 @@ class IBClient:
     @property
     def is_connected(self) -> bool:
         return self._ib.isConnected()
+
+    @property
+    def next_id(self) -> int:
+        return self._ib.client.getReqId()

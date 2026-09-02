@@ -2,7 +2,7 @@ from investiq.adapters.ibkr.ib_broker_adapter import IBKRAdapter
 from investiq.core.events import OrderGenerated
 from investiq.core.handlers.base import HandlerResult
 from investiq.domain.instrument_spec import InstrumentSpec
-from investiq.domain.order_types import MarketOrderSpec, LimitOrderSpec
+from investiq.domain.order_types import MarketOrderSpec, LimitOrderSpec, BracketOrderSpec
 from investiq.errors import InvalidOrderType
 
 
@@ -25,6 +25,11 @@ class OrderGeneratedHandler:
             )
         elif isinstance(event.order, LimitOrderSpec):
             self._ib_adapter.place_limit_order(
+                contract_spec=self._instrument_spec,
+                order_spec=event.order
+            )
+        elif isinstance(event.order, BracketOrderSpec):
+            self._ib_adapter.place_bracket_order(
                 contract_spec=self._instrument_spec,
                 order_spec=event.order
             )

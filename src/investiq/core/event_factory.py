@@ -12,7 +12,7 @@ class CanonicalEventFactory:
         self._next_event_id: int = 1
 
     def _make_next_event_id(self) -> str:
-        event_id =  f"EVT_{self._next_event_id:05d}"
+        event_id = f"EVT_{self._next_event_id:05d}"
         self._next_event_id += 1
         return event_id
 
@@ -26,6 +26,7 @@ class CanonicalEventFactory:
 
         event = TradeReceived(
             run_id=self._run_id,
+            causation_id="None",
             event_id=self._make_next_event_id(),
             symbol=symbol,
             timestamp_utc=timestamp_utc,
@@ -37,10 +38,12 @@ class CanonicalEventFactory:
 
     def create_order_generated(
             self,
+            causation_id: str,
             order: Order
     ) -> OrderGenerated:
         return OrderGenerated(
             run_id=self._run_id,
+            causation_id=causation_id,
             event_id=self._make_next_event_id(),
             order=order
         )
@@ -56,6 +59,7 @@ class CanonicalEventFactory:
     ) -> OrderStatusUpdated:
         event = OrderStatusUpdated(
             run_id=self._run_id,
+            causation_id="None",
             event_id=self._make_next_event_id(),
             order_id=order_id,
             parent_id=parent_id,
@@ -83,6 +87,7 @@ class CanonicalEventFactory:
 
         event = FillReceived(
             run_id=self._run_id,
+            causation_id="None",
             event_id=self._make_next_event_id(),
             order_id=order_id,
             parent_id=parent_id,
@@ -113,6 +118,7 @@ class CanonicalEventFactory:
 
         event = CommissionReportReceived(
             run_id=self._run_id,
+            causation_id="None",
             event_id=self._make_next_event_id(),
             order_id=order_id,
             parent_id=parent_id,
