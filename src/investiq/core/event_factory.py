@@ -2,7 +2,7 @@ from datetime import datetime
 
 from investiq.core.events import TradeReceived, OrderGenerated, OrderStatusUpdated, FillReceived, \
     CommissionReportReceived
-from investiq.domain.order_types import Order
+from investiq.domain.orders import Order
 
 
 class CanonicalEventFactory:

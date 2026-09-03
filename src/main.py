@@ -47,5 +47,5 @@ if __name__ == "__main__":
         num_trades=1
     )
 
-    runtime = build_runtime(config_seq)
+    runtime = build_runtime(config_live)
     runtime.run()

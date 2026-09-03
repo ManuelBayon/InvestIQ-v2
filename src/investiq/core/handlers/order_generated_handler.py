@@ -2,7 +2,7 @@ from investiq.adapters.ibkr.ib_broker_adapter import IBKRAdapter
 from investiq.core.events import OrderGenerated
 from investiq.core.handlers.base import HandlerResult
 from investiq.domain.instrument_spec import InstrumentSpec
-from investiq.domain.order_types import MarketOrderSpec, LimitOrderSpec, BracketOrderSpec
+from investiq.domain.orders import MarketOrderSpec, LimitOrderSpec, BracketOrderSpec
 from investiq.errors import InvalidOrderType
 
 

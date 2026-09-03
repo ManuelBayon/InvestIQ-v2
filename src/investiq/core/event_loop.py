@@ -24,13 +24,7 @@ class CanonicalEventLoop:
 
 
     def _process(self, event: CanonicalEvent) -> None:
-        print(
-            f"\n————————————————————————————————————————————————————————————————————————————————————\n"
-            f"[EVENT LOOP — PROCESS] : "
-            f"{"InternalEvent" if isinstance(event, InternalEvent) else "ExternalEvent"}"
-            f"{event}"
-
-        )
+        print(event)
 
         handler_result = self._dispatcher.dispatch(event)
 

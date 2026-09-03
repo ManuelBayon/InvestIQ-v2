@@ -41,4 +41,4 @@ class BracketOrderSpec(Order):
     stop_loss: StopLoss | None = None
     take_profit: TakeProfit | None = None
     def __repr__(self) -> str:
-        return f"BracketOrder(entry={self.entry}, stop_loss={self.stop_loss}, take_profit={self.take_profit})"
+        return f"Bracket({self.entry}, SL={self.stop_loss}, TP={self.take_profit})"

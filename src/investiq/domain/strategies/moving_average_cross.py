@@ -1,7 +1,7 @@
 from typing import Sequence, ClassVar
 
 from investiq.domain.features.simple_moving_average import SimpleMovingAverage
-from investiq.domain.order_types import Order, LimitOrderSpec
+from investiq.domain.orders import Order, LimitOrderSpec
 from investiq.domain.strategies.base_strategy import DecisionContext, FeatureRequirement
 
 

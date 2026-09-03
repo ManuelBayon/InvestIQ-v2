@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Protocol, Sequence, ClassVar
 
 from investiq.domain.features.features import Feature
-from investiq.domain.order_types import Order
+from investiq.domain.orders import Order
 
 
 @dataclass

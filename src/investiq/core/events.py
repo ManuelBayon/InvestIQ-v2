@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from math import isfinite
 
-from investiq.domain.order_types import Order
+from investiq.domain.orders import Order
 from investiq.errors import InvalidTrade
 
 
@@ -43,15 +43,12 @@ class TradeReceived(MarketDataEvent):
             raise InvalidTrade(f"size must be non-negative: size={self.size}")
     def __repr__(self) -> str:
         return (
-            f"\nTradeReceived(\n"
-            f"\trun_id={self.run_id},\n"
-            f"\tcausation_id={self.causation_id},\n"
-            f"\tevent_id={self.event_id},\n"
-            f"\tsymbol={self.symbol},\n"
-            f"\ttimestamp_utc={self.timestamp_utc:%Y-%m-%dT%H:%M:%S.%f}Z,\n"
-            f"\tprice={self.price},\n"
-            f"\tsize={self.size}\n"
-            f")"
+            f"{self.event_id} "
+            f"TradeReceived : "
+            f"symbol={self.symbol}, "
+            f"timestamp={self.timestamp_utc}, "
+            f"price={self.price}, "
+            f"size={self.size}"
         )
 
 
@@ -65,16 +62,11 @@ class OrderStatusUpdated(ExternalEvent):
 
     def __repr__(self) -> str:
         return (
-            f"\nOrderStatusUpdated(\n"
-            f"\trun_id={self.run_id},\n"
-            f"\tcausation_id={self.causation_id},\n"
-            f"\tevent_id={self.event_id},\n"
-            f"\torder_id={self.order_id}\n"
-            f"\tparent_id={self.parent_id}\n"
-            f"\tstatus={self.status}\n"
-            f"\tclient_id={self.client_id}\n"
-            f"\tperm_id={self.perm_id}\n"
-            f")"
+            f"{self.event_id} "
+            f"OrderStatusUpdated : "
+            f"order={self.order_id}, "
+            f"parent={self.parent_id}, "
+            f"status={self.status}"
         )
 
 
@@ -94,22 +86,15 @@ class FillReceived(ExternalEvent):
 
     def __repr__(self) -> str:
         return (
-            f"\nFillReceived(\n"
-            f"\trun_id={self.run_id},\n"
-            f"\tcausation_id={self.causation_id},\n"
-            f"\tevent_id={self.event_id},\n"
-            f"\torder_id={self.order_id}\n"
-            f"\tparent_id={self.parent_id}\n"
-            f"\tclient_id={self.client_id}\n"
-            f"\tperm_id={self.perm_id}\n"
-            f"\texec_id={self.exec_id}\n"
-            f"\taccount_num={self.account_num}\n"
-            f"\ttimestamp_utc={self.timestamp_utc}\n"
-            f"\tqty_executed={self.qty_executed}\n"
-            f"\tside={self.side}\n"
-            f"\tprice={self.price}\n"
-            f"\tcumul_qty={self.cumul_qty}\n"
-            f")"
+            f"{self.event_id} "
+            f"FillReceived : "
+            f"order={self.order_id}, "
+            f"parent={self.parent_id}, "
+            f"timestamp={self.timestamp_utc}, "
+            f"qty_executed={self.qty_executed}, "
+            f"side={self.side}, "
+            f"price={self.price}, "
+            f"cumul_qty={self.cumul_qty}"
         )
 
 
@@ -126,19 +111,13 @@ class CommissionReportReceived(ExternalEvent):
 
     def __repr__(self) -> str:
         return (
-            f"\nCommissionReportReceived(\n"
-            f"\trun_id={self.run_id},\n"
-            f"\tcausation_id={self.causation_id},\n"
-            f"\tevent_id={self.event_id},\n"
-            f"\torder_id={self.order_id}\n"
-            f"\tparent_id={self.parent_id}\n"
-            f"\tclient_id={self.client_id}\n"
-            f"\tperm_id={self.perm_id}\n"
-            f"\texec_id={self.exec_id}\n"
-            f"\tcommission={self.commission}\n"
-            f"\tcurrency={self.currency}\n"
-            f"\trealized_pnl={self.realized_pnl}\n"
-            f")"
+            f"{self.event_id} "
+            f"CommissionReport : "
+            f"order={self.order_id}, "
+            f"parent={self.parent_id}, "
+            f"commission={self.commission}, "
+            f"currency={self.currency}, "
+            f"realized_pnl={self.realized_pnl}"
         )
 
 
@@ -147,10 +126,8 @@ class OrderGenerated(InternalEvent):
     order: Order
     def __repr__(self) -> str:
         return (
-            f"\nOrderGenerated(\n"
-            f"\trun_id={self.run_id}\n"
-            f"\tcausation_id={self.causation_id},\n"
-            f"\tevent_id={self.event_id}\n"
-            f"\torder={self.order}\n"
-            f")"
+            f"{self.event_id} "
+            f"OrderGenerated : "
+            f"causation={self.causation_id}, "
+            f"order={self.order}"
         )
