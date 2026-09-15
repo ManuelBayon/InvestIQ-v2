@@ -1,7 +1,7 @@
 from typing import Sequence, ClassVar
 
 from investiq.domain.orders import MarketOrderSpec, Order, BracketOrderSpec, StopLoss, LimitOrderSpec, TakeProfit
-from investiq.domain.strategies.base_strategy import TradingIntent, DecisionContext, FeatureRequirement
+from investiq.domain.strategies.base_strategy import DecisionContext, FeatureRequirement
 
 
 class MarketOrderStrategy:

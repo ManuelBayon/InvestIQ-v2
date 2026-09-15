@@ -12,11 +12,6 @@ class DecisionContext:
     features: Mapping[str, float]
 
 
-@dataclass
-class TradingIntent:
-    symbol: str
-    target: float
-
 @dataclass(frozen=True)
 class FeatureRequirement:
     name: str

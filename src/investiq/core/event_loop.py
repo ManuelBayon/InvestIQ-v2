@@ -1,5 +1,3 @@
-import threading
-
 from investiq.core.event_queue import EventQueue
 
 from investiq.core.event_journal import EventTransitionJournal, EventTransition
