@@ -54,47 +54,56 @@
       </root>
     </mxGraphModel>
   </diagram>
-  <diagram id="1DM_6CRMaBa_EX1offU7" name="Flux Live">
-    <mxGraphModel dx="2616" dy="1109" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+  <diagram id="1DM_6CRMaBa_EX1offU7" name="TradeReceived + Bracket">
+    <mxGraphModel dx="2795" dy="1220" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="hHJToW6xigWSWgAabtXv-9" edge="1" parent="1" source="hHJToW6xigWSWgAabtXv-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;endArrow=none;endFill=0;" target="hHJToW6xigWSWgAabtXv-5">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="hHJToW6xigWSWgAabtXv-9" edge="1" parent="1" source="hHJToW6xigWSWgAabtXv-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;endArrow=none;endFill=0;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-200" y="110" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="hHJToW6xigWSWgAabtXv-8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Appelé par ib_insync lors de pendingTickersEvent" vertex="1">
-          <mxGeometry height="60" width="130" x="-210" y="80" as="geometry" />
+          <mxGeometry height="60" width="130" x="-370" y="80" as="geometry" />
         </mxCell>
         <mxCell id="6Yz39oIVZUZdZKmO_grs-22" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1" value="Thread principal / boucle IB" vertex="1">
-          <mxGeometry height="40" width="240" x="-40" y="40" as="geometry" />
+          <mxGeometry height="40" width="400" x="-200" y="40" as="geometry" />
         </mxCell>
         <mxCell id="hHJToW6xigWSWgAabtXv-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;fontStyle=1" value="File externe" vertex="1">
           <mxGeometry height="40" width="280" x="200" y="40" as="geometry" />
         </mxCell>
         <mxCell id="hHJToW6xigWSWgAabtXv-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1" value="Thread canonique" vertex="1">
-          <mxGeometry height="40" width="640" x="480" y="40" as="geometry" />
+          <mxGeometry height="40" width="760" x="480" y="40" as="geometry" />
         </mxCell>
-        <mxCell id="hHJToW6xigWSWgAabtXv-11" edge="1" parent="1" source="hHJToW6xigWSWgAabtXv-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="hHJToW6xigWSWgAabtXv-10">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="hHJToW6xigWSWgAabtXv-11" edge="1" parent="1" source="hHJToW6xigWSWgAabtXv-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="Rdi3T0y0KHttZxYIJxNR-13">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint y="171" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="hHJToW6xigWSWgAabtXv-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;fontColor=#333333;strokeColor=#666666;" value="&lt;b&gt;Exécuter&lt;/b&gt;&lt;div&gt;&lt;b&gt;on_pending_ticker(tickers)&lt;/b&gt;&lt;/div&gt;" vertex="1">
-          <mxGeometry height="60" width="240" x="-40" y="80" as="geometry" />
+          <mxGeometry height="60" width="400" x="-200" y="80" as="geometry" />
         </mxCell>
-        <mxCell id="hHJToW6xigWSWgAabtXv-20" edge="1" parent="1" source="hHJToW6xigWSWgAabtXv-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;dashed=1;" target="hHJToW6xigWSWgAabtXv-14">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="hHJToW6xigWSWgAabtXv-20" edge="1" parent="1" source="Rdi3T0y0KHttZxYIJxNR-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="hHJToW6xigWSWgAabtXv-14">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="160" y="450" />
+              <mxPoint x="160" y="390" />
+              <mxPoint x="354" y="390" />
+            </Array>
+            <mxPoint x="220" y="370" as="sourcePoint" />
+            <mxPoint x="290" y="260" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="hHJToW6xigWSWgAabtXv-21" connectable="0" parent="hHJToW6xigWSWgAabtXv-20" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="enqueue(event)" vertex="1">
           <mxGeometry relative="1" x="-0.3575" y="1" as="geometry">
-            <mxPoint x="15" y="1" as="offset" />
+            <mxPoint x="92" y="1" as="offset" />
           </mxGeometry>
-        </mxCell>
-        <mxCell id="hHJToW6xigWSWgAabtXv-10" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;fontColor=#333333;strokeColor=#666666;" value="&lt;b&gt;Pour chaque tick du ticker de l&#39;instrument étudié&lt;/b&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Si tick.typeType dans&amp;nbsp;&lt;/div&gt;&lt;div&gt;TRADE_TICK_TYPES :&amp;nbsp;&lt;/div&gt;&lt;div&gt;1. Créer TradeReceived&amp;nbsp;&lt;/div&gt;&lt;div&gt;2. Déposer l&#39;évènement dans la file externe&lt;/div&gt;" vertex="1">
-          <mxGeometry height="130" width="240" x="-40" y="171" as="geometry" />
         </mxCell>
         <mxCell id="l4Mu9F1C_QsDTBA8qDbA-7" edge="1" parent="1" source="hHJToW6xigWSWgAabtXv-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" target="l4Mu9F1C_QsDTBA8qDbA-2">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="420" y="135" />
+              <mxPoint x="354" y="135" />
             </Array>
             <mxPoint x="330" y="130" as="sourcePoint" />
             <mxPoint x="460" y="130" as="targetPoint" />
@@ -102,11 +111,11 @@
         </mxCell>
         <mxCell id="l4Mu9F1C_QsDTBA8qDbA-8" connectable="0" parent="l4Mu9F1C_QsDTBA8qDbA-7" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="dequeue_blocking( )" vertex="1">
           <mxGeometry relative="1" x="-0.2372" as="geometry">
-            <mxPoint x="-6" y="-22" as="offset" />
+            <mxPoint x="33" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="hHJToW6xigWSWgAabtXv-14" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;fontColor=#333333;strokeColor=#666666;" value="TradeReceived" vertex="1">
-          <mxGeometry height="40" width="120" x="310" y="216" as="geometry" />
+          <mxGeometry height="40" width="120" x="294" y="264.5" as="geometry" />
         </mxCell>
         <mxCell id="l4Mu9F1C_QsDTBA8qDbA-10" edge="1" parent="1" source="l4Mu9F1C_QsDTBA8qDbA-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="l4Mu9F1C_QsDTBA8qDbA-9">
           <mxGeometry relative="1" as="geometry" />
@@ -126,7 +135,7 @@
         <mxCell id="CMdTFa2ET5VHL7rbbDOa-4" edge="1" parent="1" source="CMdTFa2ET5VHL7rbbDOa-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;startArrow=classic;startFill=1;endArrow=none;endFill=0;" target="CMdTFa2ET5VHL7rbbDOa-1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="480" y="490" />
+              <mxPoint x="480" y="510" />
             </Array>
             <mxPoint x="310" y="499.40999999999997" as="sourcePoint" />
             <mxPoint x="460" y="499.40999999999997" as="targetPoint" />
@@ -145,7 +154,7 @@
             <mxPoint x="1" y="6" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="CMdTFa2ET5VHL7rbbDOa-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=default;" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;b&gt;Pour chaque évènement dans HandlerResult.events&lt;/b&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;Si isinstance(event, InternalEvent) :&lt;/div&gt;&lt;div&gt;→ Déposer l&#39;évènement dans la file interne&lt;/div&gt;&lt;div&gt;Sinon :&amp;nbsp;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;→&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp;&lt;/span&gt;Lève ValueError&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+        <mxCell id="CMdTFa2ET5VHL7rbbDOa-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=default;" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;b&gt;Pour chaque évènement dans HandlerResult&lt;/b&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;Si isinstance(event, InternalEvent) :&lt;/div&gt;&lt;div&gt;→ Déposer l&#39;évènement dans la file interne&lt;/div&gt;&lt;div&gt;Sinon :&amp;nbsp;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;→&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp;&lt;/span&gt;Lève ValueError&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
           <mxGeometry height="140" width="280" x="480" y="430" as="geometry" />
         </mxCell>
         <mxCell id="CMdTFa2ET5VHL7rbbDOa-40" edge="1" parent="1" source="CMdTFa2ET5VHL7rbbDOa-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="CMdTFa2ET5VHL7rbbDOa-9">
@@ -157,7 +166,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="CMdTFa2ET5VHL7rbbDOa-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;fontColor=#333333;strokeColor=#666666;" value="IntentGenerated" vertex="1">
-          <mxGeometry height="40" width="120" x="200" y="470" as="geometry" />
+          <mxGeometry height="40" width="120" x="200" y="490" as="geometry" />
         </mxCell>
         <mxCell id="CMdTFa2ET5VHL7rbbDOa-18" edge="1" parent="1" source="CMdTFa2ET5VHL7rbbDOa-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="CMdTFa2ET5VHL7rbbDOa-9">
           <mxGeometry relative="1" as="geometry" />
@@ -184,8 +193,10 @@
             <mxPoint y="27" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="CMdTFa2ET5VHL7rbbDOa-31" edge="1" parent="1" source="CMdTFa2ET5VHL7rbbDOa-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="CMdTFa2ET5VHL7rbbDOa-22">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="CMdTFa2ET5VHL7rbbDOa-31" edge="1" parent="1" source="CMdTFa2ET5VHL7rbbDOa-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="Rdi3T0y0KHttZxYIJxNR-31">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="875" y="980" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="CMdTFa2ET5VHL7rbbDOa-37" connectable="0" parent="CMdTFa2ET5VHL7rbbDOa-31" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="BracketOrderSpec" vertex="1">
           <mxGeometry relative="1" x="0.7677" as="geometry">
@@ -227,17 +238,107 @@
         <mxCell id="CMdTFa2ET5VHL7rbbDOa-21" parent="1" style="rounded=0;html=1;fillColor=none;strokeColor=default;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); text-align: left;&quot;&gt;→ ib_adapter.&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;text-align: left; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;place_limit_order(...)&lt;/span&gt;&lt;/div&gt;" vertex="1">
           <mxGeometry height="70" width="150" x="640" y="980" as="geometry" />
         </mxCell>
-        <mxCell id="CMdTFa2ET5VHL7rbbDOa-22" parent="1" style="rounded=0;html=1;fillColor=none;strokeColor=default;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); text-align: left;&quot;&gt;→ ib_adapter.&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;text-align: left; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;place_bracket_order(...)&lt;/span&gt;&lt;/div&gt;" vertex="1">
-          <mxGeometry height="70" width="150" x="800" y="980" as="geometry" />
-        </mxCell>
         <mxCell id="CMdTFa2ET5VHL7rbbDOa-23" parent="1" style="rounded=0;html=1;fillColor=none;strokeColor=default;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;text-align: left; background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Lever InvalidOrderType&lt;/span&gt;&lt;/div&gt;" vertex="1">
-          <mxGeometry height="70" width="150" x="960" y="980" as="geometry" />
+          <mxGeometry height="70" width="150" x="1080" y="980" as="geometry" />
         </mxCell>
-        <mxCell id="CMdTFa2ET5VHL7rbbDOa-38" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Dans ce scénario&amp;nbsp;&lt;div&gt;une intention BracketOrderSpec a été produite&lt;/div&gt;" vertex="1">
-          <mxGeometry height="60" width="120" x="820" y="470" as="geometry" />
+        <mxCell id="CMdTFa2ET5VHL7rbbDOa-38" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Dans ce scénario, un IntentGenerated&amp;nbsp;contenant un BracketOrderSpec&amp;nbsp;a été produit : entrée Market + SL + TP." vertex="1">
+          <mxGeometry height="90" width="150" x="820" y="455" as="geometry" />
         </mxCell>
         <mxCell id="CMdTFa2ET5VHL7rbbDOa-39" edge="1" parent="1" source="CMdTFa2ET5VHL7rbbDOa-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;dashed=1;" target="CMdTFa2ET5VHL7rbbDOa-1">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-29" edge="1" parent="1" source="Rdi3T0y0KHttZxYIJxNR-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;fontFamily=Helvetica;fontSize=12;fontColor=default;endArrow=none;endFill=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint y="510" />
+              <mxPoint x="-120" y="510" />
+            </Array>
+            <mxPoint x="-120" y="360" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;fontColor=#333333;strokeColor=#666666;" value="&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(51, 51, 51), rgb(193, 193, 193));&quot;&gt;1. Créer TradeReceived&amp;nbsp;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(51, 51, 51), rgb(193, 193, 193));&quot;&gt;2.&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(51, 51, 51), rgb(193, 193, 193));&quot;&gt;Déposer l&#39;évènement&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(51, 51, 51), rgb(193, 193, 193));&quot;&gt;dans la file externe&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="200" x="-100" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-25" edge="1" parent="1" source="Rdi3T0y0KHttZxYIJxNR-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontFamily=Helvetica;fontSize=12;fontColor=default;" target="Rdi3T0y0KHttZxYIJxNR-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-26" connectable="0" parent="Rdi3T0y0KHttZxYIJxNR-25" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=0;strokeColor=default;fontFamily=Helvetica;fontSize=12;fontColor=default;fillColor=none;" value="Oui" vertex="1">
+          <mxGeometry relative="1" x="-0.1076" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-27" edge="1" parent="1" source="Rdi3T0y0KHttZxYIJxNR-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Helvetica;fontSize=12;fontColor=default;" target="Rdi3T0y0KHttZxYIJxNR-13">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-120" y="360" />
+              <mxPoint x="-120" y="190" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-28" connectable="0" parent="Rdi3T0y0KHttZxYIJxNR-27" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=0;strokeColor=default;fontFamily=Helvetica;fontSize=12;fontColor=default;fillColor=none;" value="Non" vertex="1">
+          <mxGeometry relative="1" x="-0.7504" y="-1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-2" parent="1" style="rhombus;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="40" width="40" x="-20" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-5" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;div style=&quot;color: rgb(51, 51, 51);&quot;&gt;Type admissible ?&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="100" x="30" y="345" as="geometry" />
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-18" edge="1" parent="1" source="Rdi3T0y0KHttZxYIJxNR-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontFamily=Helvetica;fontSize=12;fontColor=default;" target="Rdi3T0y0KHttZxYIJxNR-17">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint y="260" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-20" connectable="0" parent="Rdi3T0y0KHttZxYIJxNR-18" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=0;strokeColor=default;fontFamily=Helvetica;fontSize=12;fontColor=default;fillColor=none;" value="Oui" vertex="1">
+          <mxGeometry relative="1" x="-0.307" y="-1" as="geometry">
+            <mxPoint x="1" y="3" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-21" edge="1" parent="1" source="Rdi3T0y0KHttZxYIJxNR-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontFamily=Helvetica;fontSize=12;fontColor=default;" target="Rdi3T0y0KHttZxYIJxNR-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-22" connectable="0" parent="Rdi3T0y0KHttZxYIJxNR-21" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=0;strokeColor=default;fontFamily=Helvetica;fontSize=12;fontColor=default;fillColor=none;" value="Non" vertex="1">
+          <mxGeometry relative="1" x="-0.3554" y="1" as="geometry">
+            <mxPoint x="52" y="41" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-13" parent="1" style="rhombus;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="40" width="42.5" x="-21.25" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-14" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;span style=&quot;color: rgb(51, 51, 51);&quot;&gt;Reste-t-il un tick à traiter ?&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="90" x="20" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-24" edge="1" parent="1" source="Rdi3T0y0KHttZxYIJxNR-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontFamily=Helvetica;fontSize=12;fontColor=default;" target="Rdi3T0y0KHttZxYIJxNR-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-17" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" value="Prendre le tick&lt;div&gt;suivant&lt;/div&gt;" vertex="1">
+          <mxGeometry height="44.5" width="120" x="-60" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-19" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" value="Retour du callback" vertex="1">
+          <mxGeometry height="44.5" width="120" x="80" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-34" edge="1" parent="1" source="Rdi3T0y0KHttZxYIJxNR-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;fontFamily=Helvetica;fontSize=12;fontColor=default;entryX=1;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="Rdi3T0y0KHttZxYIJxNR-35">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="800" y="1125" />
+            </Array>
+            <mxPoint x="200.00000000000045" y="1107.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-36" connectable="0" parent="Rdi3T0y0KHttZxYIJxNR-34" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=0;strokeColor=default;fontFamily=Helvetica;fontSize=12;fontColor=default;fillColor=none;" value="ib_call_soon_threadsafe(...)" vertex="1">
+          <mxGeometry relative="1" x="0.0894" y="3" as="geometry">
+            <mxPoint x="19" y="-3" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-31" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=default;align=center;" value="&lt;div style=&quot;&quot;&gt;&lt;b&gt;Construire le Bracket et&amp;nbsp;&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;b&gt;planifier sa soumission&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;b&gt;&lt;br&gt;&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;→ construire le contrat au format IBKR&lt;/div&gt;&lt;div style=&quot;&quot;&gt;→ construire l&#39;ordre parent&lt;/div&gt;&lt;div style=&quot;&quot;&gt;→ Si stop-loss présent : construire le SL&lt;/div&gt;&lt;div style=&quot;&quot;&gt;→ Si take-profit présent : construire le TP&lt;/div&gt;&lt;div style=&quot;&quot;&gt;→ Plannifier&amp;nbsp; _place_bracket_on_ib_thread(contract, bracket)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="170" width="270" x="800" y="980" as="geometry" />
+        </mxCell>
+        <mxCell id="Rdi3T0y0KHttZxYIJxNR-35" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=12;fontColor=default;fillColor=none;" value="&lt;div&gt;&lt;b&gt;Exécuter&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;_place_bracket_on_ib_thread(contract, bracket)&lt;/span&gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;&lt;br&gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;Pour chaque ordre du bracket :&lt;/div&gt;&lt;div&gt;→ _ib_client.place_order(contract, order)&lt;/div&gt;&lt;div&gt;→ souscrire à&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;statusEvent,&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;fillEvent,&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;commissionReportEvent&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="350" x="-150" y="1080" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
