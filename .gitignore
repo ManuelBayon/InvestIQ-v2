@@ -2,7 +2,8 @@
 .idea/
 .venv/
 .obsidian/
-docs/
 __pycache__/
 __init__.py
 *.pyc
+*.drawio.bkp
+/src/main.py
