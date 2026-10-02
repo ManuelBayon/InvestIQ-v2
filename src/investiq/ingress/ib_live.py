@@ -5,6 +5,7 @@ from investiq.adapters.ibkr.ib_constants import TRADE_TICK_TYPES
 
 from investiq.core.event_factory import CanonicalEventFactory
 from investiq.core.event_queue import EventQueue
+from investiq.domain.instrument_spec import InstrumentSpec, FutureSpec, StockSpec
 
 
 class IBLiveIngress:
@@ -14,10 +15,12 @@ class IBLiveIngress:
             ib_client: IBClient,
             event_factory: CanonicalEventFactory,
             external_event_queue: EventQueue,
+            instrument: InstrumentSpec,
     ):
         self._ib_client = ib_client
         self._event_factory = event_factory
         self._external_event_queue = external_event_queue
+        self._instrument = instrument
 
     def subscribe_to_stock(
             self,
@@ -73,7 +76,26 @@ class IBLiveIngress:
 
 
     def start(self) -> None:
+
         self._ib_client.set_market_data_type()
-        self.subscribe_to_future(symbol="MNQ", local_symbol="MNQU6")
+
+        if isinstance(self._instrument, FutureSpec):
+            self.subscribe_to_future(
+                symbol=self._instrument.symbol,
+                local_symbol=self._instrument.local_symbol,
+                exchange=self._instrument.exchange,
+                currency=self._instrument.currency,
+            )
+        elif isinstance(self._instrument, StockSpec):
+            self.subscribe_to_stock(
+                symbol=self._instrument.symbol,
+                exchange=self._instrument.exchange,
+                currency=self._instrument.currency,
+            )
+        else:
+            raise NotImplementedError(
+                f"Unsupported instrument {type(self._instrument).__name__}"
+            )
+
         self._ib_client.subscribe_pending_tickers(handler=self.on_pending_ticker)
         self._ib_client.run()

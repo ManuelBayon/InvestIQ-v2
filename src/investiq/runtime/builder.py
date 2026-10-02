@@ -103,6 +103,7 @@ def build_runtime(config: RuntimeConfig) -> Runtime:
         )
     elif isinstance(config, LiveRuntimeConfig):
         ingress = IBLiveIngress(
+            instrument=experiment.instrument,
             external_event_queue=external_event_queue,
             event_factory=event_factory,
             ib_client=ib_client
