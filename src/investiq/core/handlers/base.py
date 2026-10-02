@@ -5,4 +5,4 @@ from investiq.core.events import CanonicalEvent
 
 @dataclass(frozen=True)
 class HandlerResult:
-    emitted_events: tuple[CanonicalEvent, ...] = ()
+    events: tuple[CanonicalEvent, ...] = ()

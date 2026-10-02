@@ -3,14 +3,13 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from math import isfinite
 
-from investiq.domain.orders import Order
+from investiq.domain.orders import OrderSpec
 from investiq.errors import InvalidTrade
 
 
 @dataclass(frozen=True)
 class CanonicalEvent(ABC):
     run_id: str
-    causation_id: str
     event_id: str
 
 
@@ -46,7 +45,7 @@ class TradeReceived(MarketDataEvent):
             f"{self.event_id} "
             f"TradeReceived : "
             f"symbol={self.symbol}, "
-            f"timestamp={self.timestamp_utc}, "
+            f"timestamp_utc={self.timestamp_utc}, "
             f"price={self.price}, "
             f"size={self.size}"
         )
@@ -64,9 +63,11 @@ class OrderStatusUpdated(ExternalEvent):
         return (
             f"{self.event_id} "
             f"OrderStatusUpdated : "
-            f"order={self.order_id}, "
-            f"parent={self.parent_id}, "
-            f"status={self.status}"
+            f"order_id={self.order_id}, "
+            f"parent_id={self.parent_id}, "
+            f"status={self.status}, "
+            f"client_id={self.client_id}, "
+            f"perm_id={self.perm_id}"
         )
 
 
@@ -88,9 +89,13 @@ class FillReceived(ExternalEvent):
         return (
             f"{self.event_id} "
             f"FillReceived : "
-            f"order={self.order_id}, "
-            f"parent={self.parent_id}, "
+            f"order_id={self.order_id}, "
+            f"parent_id={self.parent_id}, "
+            f"client_id={self.client_id}, "
+            f"perm_id={self.perm_id}, "
+            f"exec_id={self.exec_id}, "
             f"timestamp={self.timestamp_utc}, "
+            f"account_num={self.account_num}, "
             f"qty_executed={self.qty_executed}, "
             f"side={self.side}, "
             f"price={self.price}, "
@@ -113,8 +118,10 @@ class CommissionReportReceived(ExternalEvent):
         return (
             f"{self.event_id} "
             f"CommissionReport : "
-            f"order={self.order_id}, "
-            f"parent={self.parent_id}, "
+            f"order_id={self.order_id}, "
+            f"parent_id={self.parent_id}, "
+            f"perm_id={self.perm_id}, "
+            f"exec_id={self.exec_id}, "
             f"commission={self.commission}, "
             f"currency={self.currency}, "
             f"realized_pnl={self.realized_pnl}"
@@ -122,12 +129,13 @@ class CommissionReportReceived(ExternalEvent):
 
 
 @dataclass(frozen=True)
-class OrderGenerated(InternalEvent):
-    order: Order
+class IntentGenerated(InternalEvent):
+    causation_id: str
+    order_spec: OrderSpec
     def __repr__(self) -> str:
         return (
             f"{self.event_id} "
-            f"OrderGenerated : "
-            f"causation={self.causation_id}, "
-            f"order={self.order}"
+            f"IntentGenerated : "
+            f"causation_id={self.causation_id}, "
+            f"order={self.order_spec}"
         )

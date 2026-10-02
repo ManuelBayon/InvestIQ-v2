@@ -1,6 +1,6 @@
 from typing import Sequence, ClassVar
 
-from investiq.domain.orders import MarketOrderSpec, Order, BracketOrderSpec, StopLoss, LimitOrderSpec, TakeProfit
+from investiq.domain.orders import MarketOrderSpec, OrderSpec, BracketOrderSpec, StopLoss, LimitOrderSpec, TakeProfit
 from investiq.domain.strategies.base_strategy import DecisionContext, FeatureRequirement
 
 
@@ -11,7 +11,7 @@ class MarketOrderStrategy:
     def __init__(self):
         self._num_trade = 0
 
-    def decide(self, context: DecisionContext) -> list[Order]:
+    def decide(self, context: DecisionContext) -> list[OrderSpec]:
         order_list = []
         if self._num_trade % 5 == 0:
             order_list.append(
@@ -35,7 +35,7 @@ class LimitOrderStrategy:
     def decide(
             self,
             context: DecisionContext
-    ) -> list[Order]:
+    ) -> list[OrderSpec]:
         order_list = []
         if self._num_trade % 5 == 0:
             order_list.append(
@@ -58,7 +58,7 @@ class BracketOrderStrategy:
     def decide(
             self,
             context: DecisionContext
-    ) -> list[Order]:
+    ) -> list[OrderSpec]:
         order_list = []
         if self._num_trade % 5 == 0:
             order_list.append(

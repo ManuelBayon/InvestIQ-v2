@@ -3,6 +3,7 @@ from investiq.core.event_queue import EventQueue
 from investiq.core.event_journal import EventTransitionJournal, EventTransition
 from investiq.core.dispatcher import Dispatcher
 from investiq.core.events import CanonicalEvent, InternalEvent
+from investiq.core.handlers.base import HandlerResult
 
 
 class CanonicalEventLoop:
@@ -24,9 +25,9 @@ class CanonicalEventLoop:
     def _process(self, event: CanonicalEvent) -> None:
         print(event)
 
-        handler_result = self._dispatcher.dispatch(event)
+        handler_result: HandlerResult = self._dispatcher.dispatch(event)
 
-        for evt in handler_result.emitted_events:
+        for evt in handler_result.events:
             if isinstance(evt, InternalEvent):
                 self._internal_event_queue.enqueue(evt)
             else:
@@ -38,7 +39,7 @@ class CanonicalEventLoop:
         self._journal.append(
             EventTransition(
                 input_event=event,
-                emitted_events=handler_result.emitted_events,
+                emitted_events=handler_result.events,
             )
         )
 

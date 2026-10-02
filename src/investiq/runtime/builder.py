@@ -1,3 +1,5 @@
+from collections.abc import Mapping
+
 from investiq.adapters.ibkr.ib_broker_adapter import IBKRAdapter
 from investiq.adapters.ibkr.ib_client import IBClient
 
@@ -6,10 +8,11 @@ from investiq.core.event_factory import CanonicalEventFactory
 from investiq.core.event_journal import EventTransitionJournal
 from investiq.core.event_loop import CanonicalEventLoop
 from investiq.core.event_queue import EventQueue
-from investiq.core.handlers.order_generated_handler import OrderGeneratedHandler
+from investiq.core.handlers.intent_generated_handler import IntentGeneratedHandler
 from investiq.core.handlers.trade_received_handler import TradeReceivedHandler
 
 from investiq.domain.experiment import build_features, validate_strategy_requirements, bootstrap_feature_runtime
+from investiq.domain.features.features import Feature
 from investiq.domain.features.sources import PriceSource
 from investiq.domain.market_store import InMemoryMarketStore
 
@@ -29,7 +32,7 @@ def build_runtime(config: RuntimeConfig) -> Runtime:
     store = InMemoryMarketStore(symbol)
     price_source = PriceSource(source=store, symbol=symbol)
 
-    features_by_name = build_features(
+    features_by_name: Mapping[str, Feature] = build_features(
         source=price_source,
         features=experiment.features
     )
@@ -72,7 +75,7 @@ def build_runtime(config: RuntimeConfig) -> Runtime:
         event_factory=event_factory,
     )
 
-    order_generated_handler = OrderGeneratedHandler(
+    order_generated_handler = IntentGeneratedHandler(
         ib_adapter=ib_adapter,
         instrument=experiment.instrument
     )

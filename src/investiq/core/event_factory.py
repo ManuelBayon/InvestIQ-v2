@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from investiq.core.events import TradeReceived, OrderGenerated, OrderStatusUpdated, FillReceived, \
+from investiq.core.events import TradeReceived, IntentGenerated, OrderStatusUpdated, FillReceived, \
     CommissionReportReceived
-from investiq.domain.orders import Order
+from investiq.domain.orders import OrderSpec
 
 
 class CanonicalEventFactory:
@@ -26,7 +26,6 @@ class CanonicalEventFactory:
 
         event = TradeReceived(
             run_id=self._run_id,
-            causation_id="None",
             event_id=self._make_next_event_id(),
             symbol=symbol,
             timestamp_utc=timestamp_utc,
@@ -36,16 +35,16 @@ class CanonicalEventFactory:
         return event
 
 
-    def create_order_generated(
+    def create_intent_generated(
             self,
             causation_id: str,
-            order: Order
-    ) -> OrderGenerated:
-        return OrderGenerated(
+            order: OrderSpec
+    ) -> IntentGenerated:
+        return IntentGenerated(
             run_id=self._run_id,
             causation_id=causation_id,
             event_id=self._make_next_event_id(),
-            order=order
+            order_spec=order
         )
 
 
@@ -59,7 +58,6 @@ class CanonicalEventFactory:
     ) -> OrderStatusUpdated:
         event = OrderStatusUpdated(
             run_id=self._run_id,
-            causation_id="None",
             event_id=self._make_next_event_id(),
             order_id=order_id,
             parent_id=parent_id,
@@ -87,7 +85,6 @@ class CanonicalEventFactory:
 
         event = FillReceived(
             run_id=self._run_id,
-            causation_id="None",
             event_id=self._make_next_event_id(),
             order_id=order_id,
             parent_id=parent_id,
@@ -118,7 +115,6 @@ class CanonicalEventFactory:
 
         event = CommissionReportReceived(
             run_id=self._run_id,
-            causation_id="None",
             event_id=self._make_next_event_id(),
             order_id=order_id,
             parent_id=parent_id,

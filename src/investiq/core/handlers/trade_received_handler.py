@@ -42,20 +42,15 @@ class TradeReceivedHandler:
             for node in emitted
         ]
 
-        if emitted_features:
-            print("\n[TRADE_RECEIVED_HANDLER — EMITTED FEATURES] :") # debug
-            for feature in emitted_features: # debug
-                print(f"{feature.name}: {feature.latest()}")
-
         all_requirements_emitted = all(
             feature in emitted_features
             for feature in self._strategy_features.values()
         )
 
-        orders_generated = []
+        intents_generated = []
 
         if all_requirements_emitted:
-            orders = self._strategy.decide(
+            order_specs = self._strategy.decide(
                 context=DecisionContext(
                     price=self._price_source.last(),
                     features={
@@ -65,13 +60,13 @@ class TradeReceivedHandler:
                 )
             )
 
-            for order in orders:
-                order_generated = self._event_factory.create_order_generated(
+            for spec in order_specs:
+                intent_generated = self._event_factory.create_intent_generated(
                     causation_id=event.event_id,
-                    order=order
+                    order=spec
                 )
-                orders_generated.append(order_generated)
+                intents_generated.append(intent_generated)
 
         return HandlerResult(
-            emitted_events=tuple(orders_generated)
+            events=tuple(intents_generated)
         )

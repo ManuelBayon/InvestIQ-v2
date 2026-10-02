@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Protocol, Sequence, ClassVar
 
 from investiq.domain.features.features import Feature
-from investiq.domain.orders import Order
+from investiq.domain.orders import OrderSpec
 
 
 @dataclass
@@ -22,5 +22,5 @@ class Strategy(Protocol):
     def decide(
             self,
             context: DecisionContext,
-    ) -> list[Order]:
+    ) -> list[OrderSpec]:
         ...

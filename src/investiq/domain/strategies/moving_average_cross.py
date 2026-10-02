@@ -1,7 +1,7 @@
 from typing import Sequence, ClassVar
 
 from investiq.domain.features.simple_moving_average import SimpleMovingAverage
-from investiq.domain.orders import Order, LimitOrderSpec
+from investiq.domain.orders import OrderSpec, LimitOrderSpec
 from investiq.domain.strategies.base_strategy import DecisionContext, FeatureRequirement
 
 
@@ -18,7 +18,7 @@ class MovingAverageCrossStrategy:
         )
     )
 
-    def decide(self, context: DecisionContext) -> list[Order]:
+    def decide(self, context: DecisionContext) -> list[OrderSpec]:
 
         sma_short = context.features["sma_short"]
         sma_long = context.features["sma_long"]
