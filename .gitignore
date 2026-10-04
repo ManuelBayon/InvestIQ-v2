@@ -7,3 +7,4 @@ __init__.py
 *.pyc
 *.drawio.bkp
 /src/main.py
+docs/04. Planning/
