@@ -8,7 +8,7 @@ from investiq.runtime.builder import build_runtime
 from investiq.runtime.live import LiveRuntimeConfig
 from investiq.runtime.sequential import SequentialRuntimeConfig
 from tests.fixtures.simple_trades import MONO_SYMBOL_SIMPLE_TRADES
-from tests.fixtures.strategies import MarketOrderStrategy, BracketOrderStrategy
+from tests.fixtures.strategies import BracketOrderStrategy
 
 if __name__ == "__main__":
 
@@ -30,7 +30,7 @@ if __name__ == "__main__":
         run_id="TEST_SYNTHETIC_RUN",
         instrument=FutureSpec(
             symbol="MNQ",
-            local_symbol="MNQU6",
+            local_symbol="MNQZ6",
             exchange="CME"
         ),
         features={
@@ -41,11 +41,7 @@ if __name__ == "__main__":
     )
 
     config_live = LiveRuntimeConfig(experiment)
-    config_seq = SequentialRuntimeConfig(
-        experiment,
-        trades=MONO_SYMBOL_SIMPLE_TRADES,
-        num_trades=1
-    )
+    config_seq = SequentialRuntimeConfig(experiment, MONO_SYMBOL_SIMPLE_TRADES, 1)
 
-    runtime = build_runtime(config_live)
+    runtime = build_runtime(config_seq)
     runtime.run()

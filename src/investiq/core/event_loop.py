@@ -51,7 +51,7 @@ class CanonicalEventLoop:
         :return:
         """
         while not self._external_event_queue.is_empty:
-            external_event = self._external_event_queue.dequeue_nowait()
+            external_event = self._external_event_queue.dequeue_blocking()
             self._process(external_event)
 
             while not self._internal_event_queue.is_empty:

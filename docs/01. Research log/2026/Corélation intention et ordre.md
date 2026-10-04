@@ -241,4 +241,28 @@ FillReceived:
 ---
 ### 8. `CommissionReportReceived`
 
-A continuer...
+```
+commissionReportEvent:
+	order_id=278
+	parent_id=0
+	exec_id="0000e1a7.6aa503e1.01.01"
+	commission=0.61
+	currency="USD"
+	realized_pnl=0.0
+```
+
++ Fait le mapping entre l'identifiant broker et l'identifiant interne.
+
+```
+CommissionReportReceived:
+	run_id="TEST_RUN"
+	event_id="EVT_00010"
+	order_id=001
+	parent_id=0
+	exec_id="0000e1a7.6aa503e1.01.01"
+	commission=0.61
+	currency="USD"
+	realized_pnl=0.0
+```
+
+- Journalise l'évènement `CommissionReportReceived`

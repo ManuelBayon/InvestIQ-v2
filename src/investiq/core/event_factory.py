@@ -44,7 +44,7 @@ class CanonicalEventFactory:
             run_id=self._run_id,
             causation_id=causation_id,
             event_id=self._make_next_event_id(),
-            order_spec=order
+            spec=order
         )
 
 
@@ -59,8 +59,8 @@ class CanonicalEventFactory:
         event = OrderStatusUpdated(
             run_id=self._run_id,
             event_id=self._make_next_event_id(),
-            order_id=order_id,
-            parent_id=parent_id,
+            broker_id=order_id,
+            broker_parent_id=parent_id,
             status=status,
             client_id=client_id,
             perm_id=perm_id

@@ -30,8 +30,7 @@ class LiveRuntime:
 
         canonical_thread = Thread(
             target=self._event_loop.run_forever,
-            name="canonical_thread"
+            name="CanonicalThread"
         )
-
         canonical_thread.start()
         self._ingress.start()

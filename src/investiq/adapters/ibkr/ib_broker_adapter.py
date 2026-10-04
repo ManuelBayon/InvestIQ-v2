@@ -179,12 +179,13 @@ class IBKRAdapter:
             parent_action = "BUY" if entry.quantity > 0 else "SELL"
             parent = MarketOrder(
                 action=parent_action,
-                totalQuantity=abs(entry.quantity)
+                totalQuantity=abs(entry.quantity),
             )
-            parent.orderId = self._ib_client.next_id
+            order_id: int = self._ib_client.next_id
+            parent.orderId = order_id
+            print(f"parent order_id: {order_id}")
             parent.tif = "DAY"
             parent.transmit = False
-
             bracket.append(parent)
 
         elif isinstance(entry, LimitOrderSpec):
@@ -194,7 +195,9 @@ class IBKRAdapter:
                 totalQuantity=abs(entry.quantity),
                 lmtPrice=entry.price
             )
-            parent.orderId = self._ib_client.next_id
+            order_id: int = self._ib_client.next_id
+            parent.orderId = order_id
+            print(f"parent order_id: {order_id}")
             parent.tif = "DAY"
             parent.transmit = False
 
@@ -207,8 +210,10 @@ class IBKRAdapter:
                 totalQuantity= abs(entry.quantity),
                 stopPrice=order_spec.stop_loss.price,
             )
+            order_id: int = self._ib_client.next_id
             stop_loss.parentId = parent.orderId
-            stop_loss.orderId = self._ib_client.next_id
+            stop_loss.orderId = order_id
+            print(f"stop_loss order_id: {order_id}")
             stop_loss.tif = "DAY"
             stop_loss.transmit = False if order_spec.take_profit else True
 
@@ -222,7 +227,9 @@ class IBKRAdapter:
                 lmtPrice=order_spec.take_profit.price
             )
             take_profit.parentId = parent.orderId
-            take_profit.orderId = self._ib_client.next_id
+            order_id: int = self._ib_client.next_id
+            take_profit.orderId = order_id
+            print(f"take_profit order_id: {order_id}")
             take_profit.tif = "DAY"
             take_profit.transmit = True
 

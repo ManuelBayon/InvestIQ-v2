@@ -53,21 +53,17 @@ class TradeReceived(MarketDataEvent):
 
 @dataclass(frozen=True)
 class OrderStatusUpdated(ExternalEvent):
-    order_id: int
-    parent_id: int
+    broker_id: int
+    broker_parent_id: int
     status: str
-    client_id: int
-    perm_id: int
 
     def __repr__(self) -> str:
         return (
             f"{self.event_id} "
             f"OrderStatusUpdated : "
-            f"order_id={self.order_id}, "
-            f"parent_id={self.parent_id}, "
+            f"broker_id={self.broker_id}, "
+            f"broker_parent_id={self.broker_parent_id}, "
             f"status={self.status}, "
-            f"client_id={self.client_id}, "
-            f"perm_id={self.perm_id}"
         )
 
 
@@ -75,15 +71,13 @@ class OrderStatusUpdated(ExternalEvent):
 class FillReceived(ExternalEvent):
     order_id: int
     parent_id: int
-    client_id: int
-    perm_id: int
-    exec_id: str
+    exec_id:str
     timestamp_utc: datetime
-    account_num: str
     qty_executed: float
     side: str
     price: float
     cumul_qty: float
+
 
     def __repr__(self) -> str:
         return (
@@ -91,11 +85,8 @@ class FillReceived(ExternalEvent):
             f"FillReceived : "
             f"order_id={self.order_id}, "
             f"parent_id={self.parent_id}, "
-            f"client_id={self.client_id}, "
-            f"perm_id={self.perm_id}, "
             f"exec_id={self.exec_id}, "
             f"timestamp={self.timestamp_utc}, "
-            f"account_num={self.account_num}, "
             f"qty_executed={self.qty_executed}, "
             f"side={self.side}, "
             f"price={self.price}, "
@@ -107,8 +98,6 @@ class FillReceived(ExternalEvent):
 class CommissionReportReceived(ExternalEvent):
     order_id: int
     parent_id: int
-    client_id: int
-    perm_id: int
     exec_id: str
     commission: float
     currency: str
@@ -120,7 +109,6 @@ class CommissionReportReceived(ExternalEvent):
             f"CommissionReport : "
             f"order_id={self.order_id}, "
             f"parent_id={self.parent_id}, "
-            f"perm_id={self.perm_id}, "
             f"exec_id={self.exec_id}, "
             f"commission={self.commission}, "
             f"currency={self.currency}, "
@@ -131,11 +119,11 @@ class CommissionReportReceived(ExternalEvent):
 @dataclass(frozen=True)
 class IntentGenerated(InternalEvent):
     causation_id: str
-    order_spec: OrderSpec
+    spec: OrderSpec
     def __repr__(self) -> str:
         return (
             f"{self.event_id} "
             f"IntentGenerated : "
             f"causation_id={self.causation_id}, "
-            f"order={self.order_spec}"
+            f"spec={self.spec}"
         )

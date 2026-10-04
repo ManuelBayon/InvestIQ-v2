@@ -18,25 +18,25 @@ class IntentGeneratedHandler:
 
     def handle(self, intent: IntentGenerated) -> HandlerResult:
 
-        if isinstance(intent.order_spec, MarketOrderSpec):
+        if isinstance(intent.spec, MarketOrderSpec):
             self._ib_adapter.place_market_order(
                 contract_spec=self._instrument_spec,
-                order_spec=intent.order_spec
+                order_spec=intent.spec
             )
-        elif isinstance(intent.order_spec, LimitOrderSpec):
+        elif isinstance(intent.spec, LimitOrderSpec):
             self._ib_adapter.place_limit_order(
                 contract_spec=self._instrument_spec,
-                order_spec=intent.order_spec
+                order_spec=intent.spec
             )
-        elif isinstance(intent.order_spec, BracketOrderSpec):
+        elif isinstance(intent.spec, BracketOrderSpec):
             self._ib_adapter.place_bracket_order(
                 contract_spec=self._instrument_spec,
-                order_spec=intent.order_spec
+                order_spec=intent.spec
             )
         else:
             raise InvalidOrderType(
                 f"Order type not recognize, "
-                f"order.__class__={intent.order_spec.__class__}"
+                f"order.__class__={intent.spec.__class__}"
             )
 
         return HandlerResult(events=())
