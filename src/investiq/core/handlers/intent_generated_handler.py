@@ -1,5 +1,6 @@
-from investiq.adapters.ibkr.ib_broker_adapter import IBKRAdapter
-from investiq.core.events import IntentGenerated
+from investiq.adapters.ibkr.ib_broker_adapter import IBAdapter
+from investiq.core.event_factory import EventFactory
+from investiq.core.events import IntentGenerated, OrderCreated, OrderRole
 from investiq.core.handlers.base import HandlerResult
 from investiq.domain.instrument_spec import InstrumentSpec
 from investiq.domain.orders import MarketOrderSpec, LimitOrderSpec, BracketOrderSpec
@@ -10,13 +11,17 @@ class IntentGeneratedHandler:
 
     def __init__(
             self,
-            ib_adapter: IBKRAdapter,
-            instrument: InstrumentSpec
+            ib_adapter: IBAdapter,
+            instrument: InstrumentSpec,
+            event_factory: EventFactory,
     ):
         self._ib_adapter = ib_adapter
         self._instrument_spec = instrument
+        self._event_factory = event_factory
 
     def handle(self, intent: IntentGenerated) -> HandlerResult:
+
+        orders_created = []
 
         if isinstance(intent.spec, MarketOrderSpec):
             self._ib_adapter.place_market_order(
@@ -29,6 +34,36 @@ class IntentGeneratedHandler:
                 order_spec=intent.spec
             )
         elif isinstance(intent.spec, BracketOrderSpec):
+
+            # Create entry
+            entry_created = self._event_factory.create_order_created(
+                intention_id=intent.event_id,
+                order_id=1,
+                parent_id=None,
+                role=OrderRole.ENTRY
+            )
+            orders_created.append(entry_created)
+
+            if intent.spec.stop_loss:
+                # Create stop loss
+                stop_loss_created = self._event_factory.create_order_created(
+                    intention_id=intent.event_id,
+                    order_id=2,
+                    parent_id=1,
+                    role=OrderRole.STOP_LOSS
+                )
+                orders_created.append(stop_loss_created)
+
+            if intent.spec.take_profit:
+                # Create take profit
+                take_profit_created = self._event_factory.create_order_created(
+                    intention_id=intent.event_id,
+                    order_id=3,
+                    parent_id=1,
+                    role=OrderRole.TAKE_PROFIT
+                )
+                orders_created.append(take_profit_created)
+
             self._ib_adapter.place_bracket_order(
                 contract_spec=self._instrument_spec,
                 order_spec=intent.spec
@@ -39,4 +74,6 @@ class IntentGeneratedHandler:
                 f"order.__class__={intent.spec.__class__}"
             )
 
-        return HandlerResult(events=())
+        return HandlerResult(
+            events=tuple(orders_created)
+        )

@@ -1,6 +1,7 @@
 from abc import ABC
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from enum import StrEnum, auto
 from math import isfinite
 
 from investiq.domain.orders import OrderSpec
@@ -127,3 +128,16 @@ class IntentGenerated(InternalEvent):
             f"causation_id={self.causation_id}, "
             f"spec={self.spec}"
         )
+
+class OrderRole(StrEnum):
+    ENTRY = auto()
+    STOP_LOSS = auto()
+    TAKE_PROFIT = auto()
+
+
+@dataclass(frozen=True, slots=True)
+class OrderCreated(InternalEvent):
+    intention_id: str
+    order_id: int
+    parent_id: int | None
+    role: OrderRole

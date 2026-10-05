@@ -4,16 +4,16 @@ from investiq.domain.instrument_spec import StockSpec, FutureSpec, InstrumentSpe
 from investiq.domain.orders import MarketOrderSpec, LimitOrderSpec, BracketOrderSpec
 from investiq.adapters.ibkr.ib_client import IBClient
 from investiq.adapters.ibkr.ib_contract_mappers import map_stock_specs_to_ib_contract, map_future_specs_to_ib_contract
-from investiq.core.event_factory import CanonicalEventFactory
+from investiq.core.event_factory import EventFactory
 from investiq.core.event_queue import EventQueue
 
 
-class IBKRAdapter:
+class IBAdapter:
 
     def __init__(
             self,
             ib_client: IBClient,
-            event_factory: CanonicalEventFactory,
+            event_factory: EventFactory,
             external_event_queue: EventQueue,
     ):
 

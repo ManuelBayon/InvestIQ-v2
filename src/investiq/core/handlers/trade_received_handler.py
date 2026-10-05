@@ -1,6 +1,6 @@
 from collections.abc import Mapping
 
-from investiq.core.event_factory import CanonicalEventFactory
+from investiq.core.event_factory import EventFactory
 from investiq.core.events import TradeReceived
 from investiq.domain.features.features import Feature
 from investiq.domain.market_store import InMemoryMarketStore
@@ -21,7 +21,7 @@ class TradeReceivedHandler:
             feature_runtime: FeatureRuntime,
             strategy_features: Mapping[str, Feature],
             strategy: Strategy,
-            event_factory: CanonicalEventFactory
+            event_factory: EventFactory
     ):
         self._market_store = market_store
         self._price_source = price_source

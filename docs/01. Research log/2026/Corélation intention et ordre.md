@@ -76,17 +76,17 @@ IntentGenerated:
 ---
 ### 3. `IntentGenerated`
 
+##  Création de l'ordre
+
 **Parent : BUY@Market**
- 
+
 ```
 OrderCreated:
 	run_id="TEST_RUN"
 	event_id="EVT_00003"
 	intention_id="EVT_00002"
-	order_id=001
-	parent=None
-	broker_id=278
-	broker_parent_id=0
+	order_id=1
+	parent_id=None
 ```
 
 **Stop-Loss : Stop@29800**
@@ -97,9 +97,7 @@ OrderCreated:
 	event_id="EVT_00004"
 	intention_id=EVT_00002
 	order_id=002
-	parent=001
-	broker_id=279
-	broker_parent_id=278
+	parent_id=001
 ```
 
 **Take-Profit : Limit@ 30200**
@@ -110,8 +108,49 @@ OrderCreated:
 	event_id="EVT_00005"
 	intention_id=EVT_00002
 	order_id=003
-	parent=001
-	broker_id=280
+	parent_id=001
+```
+
+---
+### Test de la création des ordres
+
+Une intention bracket avec entrée, SL et TP produit trois événements de création correctement reliés et demande à l’adaptateur de soumettre le bracket attendu.
+
+- Mocker `IBKRAdapter`
+
+---
+## Corrélation identifiant interne et broker
+
+**Parent : BUY@Market**
+
+```
+BrokerOrderAssigned:
+	run_id="TEST_RUN"
+	event_id="EVT_00006"
+	order_id=001
+	broker_order_id=278
+	broker_parent_id=0
+```
+
+**Stop-Loss : Stop@29800**
+
+```
+BrokerOrderAssigned:
+	run_id="TEST_RUN"
+	event_id="EVT_00007"
+	order_id=002
+	broker_order_id=279
+	broker_parent_id=278
+```
+
+**Take-Profit : Limit@ 30200**
+
+```
+BrokerOrderAssigned:
+	run_id="TEST_RUN"
+	event_id="EVT_00008"
+	order_id=003
+	broker_order_id=280
 	broker_parent_id=278
 ```
 
@@ -132,7 +171,7 @@ statusEvent:
 ```
 OrderStatusUpdated:
 	run_id="TEST_RUN"
-	event_id="EVT_00006"
+	event_id="EVT_00009"
 	order_id=002
 	parent_id=001
 	status="PreSubmitted"
@@ -157,7 +196,7 @@ statusEvent:
 ```
 OrderStatusUpdated:
 	run_id="TEST_RUN"
-	event_id="EVT_00007"
+	event_id="EVT_00010"
 	order_id=003
 	parent_id=001
 	status="PreSubmitted"
@@ -180,7 +219,7 @@ statusEvent:
 ```
 OrderStatusUpdated:
 	run_id="TEST_RUN"
-	event_id="EVT_00008"
+	event_id="EVT_00011"
 	order_id=001
 	parent_id=None
 	status="PreSubmitted"
@@ -225,7 +264,7 @@ Ne change pas l'objet Order :
 ```
 FillReceived:
 	run_id="TEST_RUN"
-	event_id="EVT_00009"
+	event_id="EVT_00012"
 	order_id=001
 	parent_id=None
 	exec_id="0000e1a7.6aa503e1.01.01"
@@ -255,7 +294,7 @@ statusEvent:
 ```
 OrderStatusUpdated:
 	run_id="TEST_RUN"
-	event_id="EVT_00010"
+	event_id="EVT_00013"
 	order_id=001
 	parent_id=None
 	status="Filled"
@@ -281,7 +320,7 @@ commissionReportEvent:
 ```
 CommissionReportReceived:
 	run_id="TEST_RUN"
-	event_id="EVT_00011"
+	event_id="EVT_00014"
 	order_id=001
 	parent_id=0
 	exec_id="0000e1a7.6aa503e1.01.01"
@@ -299,24 +338,26 @@ CommissionReportReceived:
 Order:
 	order_id=001
 	parent_id=None
-	broker_id=278
+	
+	broker_order_id=278
 	broker_parent_id=0
+	
 	intention_id = "EVT_00002"
 	
 	last_broker_status="Filled"
-	filled_qty=1.0
-	average_fill_price = 30000.0
 	
-	executions:
-		[
-			Execution:
-				exec_id="0000e1a7.6aa503e1.01.01"	
-				timestamp_utc=datetime(...)
-				quantity=1.0
-				side="BUY"
-				price=30000.0
-			
-		]
+	filled_qty=1.0
+	avg_fill_price=30000.0
+	
+	executions=[
+		Execution(
+			exec_id="0000e1a7.6aa503e1.01.01"	
+			timestamp_utc=datetime(...)
+			quantity=1.0
+			side="BUY"
+			price=30000.0
+		),
+	]
 	
 	commission:
 		currency="USD"

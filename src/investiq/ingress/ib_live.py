@@ -3,7 +3,7 @@ from ib_insync import Ticker, Future, Stock
 from investiq.adapters.ibkr.ib_client import IBClient
 from investiq.adapters.ibkr.ib_constants import TRADE_TICK_TYPES
 
-from investiq.core.event_factory import CanonicalEventFactory
+from investiq.core.event_factory import EventFactory
 from investiq.core.event_queue import EventQueue
 from investiq.domain.instrument_spec import InstrumentSpec, FutureSpec, StockSpec
 
@@ -13,7 +13,7 @@ class IBLiveIngress:
     def __init__(
             self,
             ib_client: IBClient,
-            event_factory: CanonicalEventFactory,
+            event_factory: EventFactory,
             external_event_queue: EventQueue,
             instrument: InstrumentSpec,
     ):

@@ -1,10 +1,10 @@
 from collections.abc import Mapping
 
-from investiq.adapters.ibkr.ib_broker_adapter import IBKRAdapter
+from investiq.adapters.ibkr.ib_broker_adapter import IBAdapter
 from investiq.adapters.ibkr.ib_client import IBClient
 
 from investiq.core.dispatcher import Dispatcher
-from investiq.core.event_factory import CanonicalEventFactory
+from investiq.core.event_factory import EventFactory
 from investiq.core.event_journal import EventTransitionJournal
 from investiq.core.event_loop import CanonicalEventLoop
 from investiq.core.event_queue import EventQueue
@@ -57,9 +57,9 @@ def build_runtime(config: RuntimeConfig) -> Runtime:
 
     external_event_queue = EventQueue()
     internal_event_queue = EventQueue()
-    event_factory = CanonicalEventFactory(run_id=config.experiment.run_id)
+    event_factory = EventFactory(run_id=config.experiment.run_id)
 
-    ib_adapter = IBKRAdapter(
+    ib_adapter = IBAdapter(
         ib_client=ib_client,
         event_factory=event_factory,
         external_event_queue=external_event_queue,
@@ -77,6 +77,7 @@ def build_runtime(config: RuntimeConfig) -> Runtime:
 
     order_generated_handler = IntentGeneratedHandler(
         ib_adapter=ib_adapter,
+        event_factory=event_factory,
         instrument=experiment.instrument
     )
 

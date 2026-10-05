@@ -1,11 +1,11 @@
 from datetime import datetime
 
 from investiq.core.events import TradeReceived, IntentGenerated, OrderStatusUpdated, FillReceived, \
-    CommissionReportReceived
+    CommissionReportReceived, OrderCreated, OrderRole
 from investiq.domain.orders import OrderSpec
 
 
-class CanonicalEventFactory:
+class EventFactory:
 
     def __init__(self, run_id: str):
         self._run_id = run_id
@@ -38,13 +38,13 @@ class CanonicalEventFactory:
     def create_intent_generated(
             self,
             causation_id: str,
-            order: OrderSpec
+            order_spec: OrderSpec
     ) -> IntentGenerated:
         return IntentGenerated(
             run_id=self._run_id,
             causation_id=causation_id,
             event_id=self._make_next_event_id(),
-            spec=order
+            spec=order_spec
         )
 
 
@@ -126,3 +126,21 @@ class CanonicalEventFactory:
             realized_pnl=realized_pnl
         )
         return event
+
+    def create_order_created(
+            self,
+            intention_id,
+            order_id,
+            parent_id,
+            role: OrderRole,
+
+    ) -> OrderCreated:
+        return OrderCreated(
+            run_id=self._run_id,
+            event_id=self._make_next_event_id(),
+            intention_id=intention_id,
+            order_id=order_id,
+            parent_id=parent_id,
+            role=role
+        )
+
