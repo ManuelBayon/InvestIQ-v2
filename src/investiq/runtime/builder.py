@@ -8,6 +8,7 @@ from investiq.core.event_factory import EventFactory
 from investiq.core.event_journal import EventTransitionJournal
 from investiq.core.event_loop import CanonicalEventLoop
 from investiq.core.event_queue import EventQueue
+from investiq.core.order_id_generator import OrderIdGenerator
 from investiq.core.handlers.intent_generated_handler import IntentGeneratedHandler
 from investiq.core.handlers.trade_received_handler import TradeReceivedHandler
 
@@ -58,6 +59,7 @@ def build_runtime(config: RuntimeConfig) -> Runtime:
     external_event_queue = EventQueue()
     internal_event_queue = EventQueue()
     event_factory = EventFactory(run_id=config.experiment.run_id)
+    order_id_generator = OrderIdGenerator()
 
     ib_adapter = IBAdapter(
         ib_client=ib_client,
@@ -78,7 +80,8 @@ def build_runtime(config: RuntimeConfig) -> Runtime:
     order_generated_handler = IntentGeneratedHandler(
         ib_adapter=ib_adapter,
         event_factory=event_factory,
-        instrument=experiment.instrument
+        instrument=experiment.instrument,
+        order_id_generator=order_id_generator,
     )
 
     event_loop = CanonicalEventLoop(

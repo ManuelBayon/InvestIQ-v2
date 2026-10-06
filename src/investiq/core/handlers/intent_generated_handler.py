@@ -2,6 +2,7 @@ from investiq.adapters.ibkr.ib_broker_adapter import IBAdapter
 from investiq.core.event_factory import EventFactory
 from investiq.core.events import IntentGenerated, OrderCreated, OrderRole
 from investiq.core.handlers.base import HandlerResult
+from investiq.core.order_id_generator import OrderIdGenerator
 from investiq.domain.instrument_spec import InstrumentSpec
 from investiq.domain.orders import MarketOrderSpec, LimitOrderSpec, BracketOrderSpec
 from investiq.errors import InvalidOrderType
@@ -14,10 +15,12 @@ class IntentGeneratedHandler:
             ib_adapter: IBAdapter,
             instrument: InstrumentSpec,
             event_factory: EventFactory,
+            order_id_generator: OrderIdGenerator,
     ):
         self._ib_adapter = ib_adapter
         self._instrument_spec = instrument
         self._event_factory = event_factory
+        self._order_id_generator = order_id_generator
 
     def handle(self, intent: IntentGenerated) -> HandlerResult:
 
@@ -38,7 +41,7 @@ class IntentGeneratedHandler:
             # Create entry
             entry_created = self._event_factory.create_order_created(
                 intention_id=intent.event_id,
-                order_id=1,
+                order_id=self._order_id_generator.next_id(),
                 parent_id=None,
                 role=OrderRole.ENTRY
             )
@@ -48,8 +51,8 @@ class IntentGeneratedHandler:
                 # Create stop loss
                 stop_loss_created = self._event_factory.create_order_created(
                     intention_id=intent.event_id,
-                    order_id=2,
-                    parent_id=1,
+                    order_id=self._order_id_generator.next_id(),
+                    parent_id=entry_created.order_id,
                     role=OrderRole.STOP_LOSS
                 )
                 orders_created.append(stop_loss_created)
@@ -58,8 +61,8 @@ class IntentGeneratedHandler:
                 # Create take profit
                 take_profit_created = self._event_factory.create_order_created(
                     intention_id=intent.event_id,
-                    order_id=3,
-                    parent_id=1,
+                    order_id=self._order_id_generator.next_id(),
+                    parent_id=entry_created.order_id,
                     role=OrderRole.TAKE_PROFIT
                 )
                 orders_created.append(take_profit_created)
