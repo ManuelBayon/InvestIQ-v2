@@ -1,6 +1,6 @@
-### 1. Réception nouvelle donnée marché par `IBKR`
+### 1. Receiving new market data from `IBKR`
 
-**Réception du marché — thread IB** : le callback construit `TradeReceived` et le place dans la file canonique.
+**Market data reception — IB thread**: the callback constructs `TradeReceived` and places it in the canonical queue.
 
 ```
 TradeReceived:
@@ -12,14 +12,14 @@ TradeReceived:
 	size=1.0
 ```
 
-### 2. Thread canonique : `TradeReceivedHandler.handle(event)`
+### 2. Canonical thread: `TradeReceivedHandler.handle(event)`
 
-Responsabilités : 
-- Mettre à jour le MarketStore
-- Mettre à jour les indicateurs
-- Vérifier que le contexte permet une décision
-- Appeler strategy.decide(context)
-- Retourner éventuellement IntentGenerated
+Responsibilities: 
+- Update the MarketStore
+- Update the indicators
+- Check that the context is ready for a decision
+- Call strategy.decide(context)
+- Return IntentGenerated if applicable
 
 
 ```
@@ -50,30 +50,30 @@ IntentGenerated(
 )
 ```
 
-| Élément                       | Périmètre V1                                                     |
+| Element                       | V1 scope                                                     |
 | ----------------------------- | ---------------------------------------------------------------- |
-| Instrument                    | Un instrument par intention                                      |
-| Entrée                        | Market ou Limit, BUY ou SELL                                     |
-| Sorties                       | Un Stop Market et un Limit, facultatifs                          |
-| Quantités                     | Chaque sortie présente porte sur toute la quantité de l’entrée   |
-| Activation                    | Après exécution complète de l’entrée                             |
-| Coordination                  | Une sortie entièrement exécutée entraîne l’annulation de l’autre |
-| Entrée annulée sans exécution | Abandon des sorties                                              |
-| ==🟠Exécutions partielles==         | ==🟠Hors scénarios validés en V1==                                     |
-**Variantes autorisées :**
+| Instrument                    | One instrument per intent                                      |
+| Entry                        | Market or Limit, BUY or SELL                                     |
+| Exits                       | An optional Stop Market order and an optional Limit order                          |
+| Quantities                     | Each configured exit covers the full entry quantity   |
+| Activation                    | After the entry is fully filled                             |
+| Coordination                  | A fully filled exit triggers cancellation of the other |
+| Entry canceled without any fills | Discard the exit orders                                              |
+| ==🟠Partial fills==         | ==🟠Outside the scenarios validated in V1==                                     |
+**Allowed variants:**
 
-- `entry` : `MarketOrderSpec` ou `LimitOrderSpec`.
-- `stop_loss` : `StopOrderSpec` ou `None`.
-- `take_profit` : `LimitOrderSpec` ou `None`.
+- `entry` : `MarketOrderSpec` or `LimitOrderSpec`.
+- `stop_loss` : `StopOrderSpec` or `None`.
+- `take_profit` : `LimitOrderSpec` or `None`.
 
 ---
-###  3. Thread canonique : `IntentGeneratedHandler.handle(event)`
+###  3. Canonical thread: `IntentGeneratedHandler.handle(event)`
 
-Responsabilités : 
-- Découper l'intention en 2 ou 3 `OrderToPrepare`
-- Allouer un identifiant (interne) à chaque ordre
-- Établir le lien de parenté (interne)
-- Retourner les commandes à exécuter
+Responsibilities: 
+- Split the intent into 2 or 3 `OrderToPrepare` objects
+- Allocate an internal ID to each order
+- Establish the internal parent-child relationship
+- Return the commands to execute
 
 ```
 prepare=PrepareBracket(
@@ -108,11 +108,11 @@ return HandlerResult(
 )
 ```
 
-### 4. Thread canonique : `PrepareBracket.handle(command)`
+### 4. Canonical thread: `PrepareBracket.handle(command)`
 
-Responsabilités : 
-- Programmer la préparation des ordres sur la boucle IB via `call_soon_threadsafe(...)`
-- Terminer sans attendre.
+Responsibilities: 
+- Schedule order preparation on the IB event loop via `call_soon_threadsafe(...)`
+- Return without waiting.
 
 ```
 self._ib_client.ib_loop.call_soon_threadsafe(
@@ -121,14 +121,14 @@ self._ib_client.ib_loop.call_soon_threadsafe(
 )
 ```
 
-### 5. Thread IB : `ib_adapter.prepare_on_ib_thread(command)`
+### 5. IB thread: `ib_adapter.prepare_on_ib_thread(command)`
 
-- Corréler l'évènement à l'identifiant d'intention et de préparation
-- Pour chaque ordre du bracket créer `PrepareOrder` avec :
-	- identifiants internes (ordre et parent)
-	- identifiants brokers (ordre et parents)
-	- valeur du flag `transmit`,
-- Placer `BracketPrepared` dans la file canonique interne pour traitement.
+- Correlate the event with the intent and preparation IDs
+- For each order in the bracket, create `PrepareOrder` with:
+	- internal IDs (order and parent)
+	- broker IDs (order and parent)
+	- the value of the flag `transmit`,
+- Place `BracketPrepared` in the internal canonical queue for processing.
 
 ```
 prepared = BracketPrepared(
@@ -170,13 +170,13 @@ prepared = BracketPrepared(
 internal_event_queue.enqueue(prepared)
 ```
 
-### 6. Thread canonique : `BracketPreparedHandler.handle(event)`
+### 6. Canonical thread: `BracketPreparedHandler.handle(event)`
 
-Responsabilités :
-- Créer l'évènement canonique `OrderCreated` qui permettra au projecteur d'établir la vue des ordres.
-- Créer la commande `IBSubmitOrder` pour chaque ordre.
+Responsibilities:
+- Create the canonical `OrderCreated` event so that the projector can build the order view.
+- Create an `IBSubmitOrder` command for each order.
 
-**Entrée — ordre interne `1`, ordre broker `278`**
+**Entry — internal order `1`, broker order `278`**
 
 ```
 entry_created = OrderCreated(
@@ -202,7 +202,7 @@ submit_entry = IBSubmitOrder(
 )
 ```
 
-**StopLoss — ordre interne `2`, ordre broker `279`**
+**StopLoss — internal order `2`, broker order `279`**
 
 ```
 stop_loss_created = OrderCreated(
@@ -228,7 +228,7 @@ submit_stop_loss = IBSubmitOrder(
 )
 ```
 
-**TakeProfit — ordre interne `3`, ordre broker `280`**
+**TakeProfit — internal order `3`, broker order `280`**
 
 ```
 take_profit_created = OrderCreated(
@@ -260,25 +260,25 @@ return HandlerResult(
     commands=(submit_entry, submit_stop_loss, submit_take_profit),
 )
 ```
-### 7. Traitement du résultat par la boucle canonique
+### 7. Processing the result in the canonical loop
 
-Responsabilité : 
-- Journaliser les évènements canoniques
-- Mettre à jour la table de corrélation
-- Pousser les `IBSubmitOrder` dans l'ordre, dans la file interne pour traitement.
+Responsibility: 
+- Append canonical events to the journal
+- Update the correlation table
+- Enqueue the `IBSubmitOrder` commands in order in the internal queue for processing.
 
 ```
-1. Journaliser les trois events OrderCreated.
-2. Mettre à jour la table de corrélation :
-       broker 278 ↔ interne 1
-       broker 279 ↔ interne 2
-       broker 280 ↔ interne 3
-3. Acheminer les commandes IBSubmitOrder :entrée → stop-loss → take-profit
+1. Append the three OrderCreated events to the journal.
+2. Update the correlation table:
+       broker 278 ↔ internal 1
+       broker 279 ↔ internal 2
+       broker 280 ↔ internal 3
+3. Dispatch the IBSubmitOrder commands: entry → stop-loss → take-profit
 ```
 
-### 8. Thread canonique : `IBSubmitOrderHandler.handle(command)`
+### 8. Canonical thread: `IBSubmitOrderHandler.handle(command)`
 
-Responsabilité : Planifier la soumission des ordres dans le thread IB
+Responsibility: Schedule order submission on the IB thread
 
 ```
 def handle(self, command):
@@ -289,12 +289,12 @@ def handle(self, command):
 ```
 
 
-### 9. Thread IB : `ib_adapter.submit_on_ib_thread(command)`
+### 9. IB thread: `ib_adapter.submit_on_ib_thread(command)`
 
-Responsabilités : 
-- Convertir `command.instrument_id` au format instrument IBKR,
-- Convertir la commande en ordre au format IBKR.
-- Placer les ordres via `ib_insync ib.placeOrder(instrument, order)`
+Responsibilities: 
+- Resolve `command.instrument_id` to an IBKR contract,
+- Convert the command into an IBKR order.
+- Place the orders using `ib_insync ib.placeOrder(instrument, order)`
 
 ```
 def submit_on_ib_thread(self, command):

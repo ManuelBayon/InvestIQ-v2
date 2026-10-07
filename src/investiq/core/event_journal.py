@@ -1,18 +1,24 @@
-from dataclasses import dataclass
+from collections.abc import Iterator
 
 from investiq.core.events import CanonicalEvent
 
 
-@dataclass(frozen=True, slots=True)
-class EventTransition:
-    input_event: CanonicalEvent
-    emitted_events: tuple[CanonicalEvent, ...]
+class EventJournal:
+    """Ordered canonical facts in memory. Reading the journal has no side effects."""
 
+    def __init__(self) -> None:
+        self._events: list[CanonicalEvent] = []
+        self._ids: set[tuple[str, str]] = set()
 
-class EventTransitionJournal:
+    def append(self, event: CanonicalEvent) -> None:
+        key = (event.run_id, event.event_id)
+        if key in self._ids:
+            raise ValueError(f"Event already journaled: {key}")
+        self._events.append(event)
+        self._ids.add(key)
 
-    def __init__(self):
-        self._journal: list[EventTransition] = []
+    def __iter__(self) -> Iterator[CanonicalEvent]:
+        return iter(tuple(self._events))
 
-    def append(self, transition: EventTransition) -> None:
-        self._journal.append(transition)
+    def __len__(self) -> int:
+        return len(self._events)

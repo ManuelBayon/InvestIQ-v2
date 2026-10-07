@@ -1,243 +1,157 @@
-from ib_insync import Trade, Fill, CommissionReport, MarketOrder, Contract, LimitOrder, StopOrder, Order
+from collections.abc import Mapping
 
-from investiq.domain.instrument_spec import StockSpec, FutureSpec, InstrumentSpec
-from investiq.domain.orders import MarketOrderSpec, LimitOrderSpec, BracketOrderSpec
+from ib_insync import CommissionReport, Contract, Fill, LimitOrder, MarketOrder, Order, StopOrder, Trade
+
 from investiq.adapters.ibkr.ib_client import IBClient
-from investiq.adapters.ibkr.ib_contract_mappers import map_stock_specs_to_ib_contract, map_future_specs_to_ib_contract
-from investiq.core.event_factory import EventFactory
+from investiq.adapters.ibkr.ib_contract_mappers import map_future_specs_to_ib_contract, map_stock_specs_to_ib_contract
+from investiq.core.broker_messages import (
+    BracketPrepared, BrokerCommission, BrokerFill, BrokerOperationFailed, BrokerOrderStatus,
+)
+from investiq.core.commands import IBSubmitOrder, OrderToPrepare, PrepareBracket, PreparedOrder
 from investiq.core.event_queue import EventQueue
+from investiq.domain.instrument_spec import FutureSpec, InstrumentSpec, StockSpec
+from investiq.domain.orders import LimitOrderSpec, MarketOrderSpec, Side, SingleOrderSpec, StopOrderSpec
 
 
 class IBAdapter:
-
     def __init__(
-            self,
-            ib_client: IBClient,
-            event_factory: EventFactory,
-            external_event_queue: EventQueue,
-    ):
-
+        self,
+        ib_client: IBClient,
+        inbound_queue: EventQueue,
+        run_id: str,
+        instruments: Mapping[str, InstrumentSpec],
+    ) -> None:
         self._ib_client = ib_client
-        self._event_factory = event_factory
-        self._external_event_queue = external_event_queue
-
+        self._inbound_queue = inbound_queue
+        self._run_id = run_id
+        self._instruments = dict(instruments)
+        self._contracts: dict[str, Contract] = {}
+        self._subscribed = False
 
     def _on_status_update(self, trade: Trade) -> None:
-        status = trade.orderStatus
-        event = self._event_factory.create_order_status_updated(
-            order_id=status.orderId,
-            parent_id=status.parentId,
-            status=status.status,
-            client_id=status.clientId,
-            perm_id=status.permId,
-        )
-        self._external_event_queue.enqueue(event)
-
+        self._inbound_queue.enqueue(BrokerOrderStatus(
+            run_id=self._run_id,
+            broker_order_id=trade.order.orderId,
+            status=trade.orderStatus.status,
+        ))
 
     def _on_fill(self, trade: Trade, fill: Fill) -> None:
-        status = trade.orderStatus
         execution = fill.execution
-        event = self._event_factory.create_fill_received(
-            order_id=status.orderId,
-            parent_id=status.parentId,
-            client_id=status.clientId,
-            perm_id=status.permId,
+        sides: dict[str, Side] = {"BOT": "BUY", "SLD": "SELL", "BUY": "BUY", "SELL": "SELL"}
+        side = sides[execution.side]
+        self._inbound_queue.enqueue(BrokerFill(
+            run_id=self._run_id,
+            broker_order_id=execution.orderId,
             exec_id=execution.execId,
             timestamp_utc=execution.time,
-            account_num=execution.acctNumber,
             qty_executed=execution.shares,
-            side=execution.side,
+            side=side,
             price=execution.price,
             cumul_qty=execution.cumQty,
-        )
-        self._external_event_queue.enqueue(event)
+        ))
 
-
-    def _on_commission_report(
-            self,
-            trade: Trade,
-            fill: Fill,
-            report: CommissionReport
-    ) -> None:
-        status = trade.orderStatus
-        execution = fill.execution
-        event = self._event_factory.create_commission_report_received(
-            order_id=status.orderId,
-            parent_id=status.parentId,
-            client_id=status.clientId,
-            perm_id=status.permId,
-            exec_id=execution.execId,
+    def _on_commission_report(self, trade: Trade, fill: Fill, report: CommissionReport) -> None:
+        self._inbound_queue.enqueue(BrokerCommission(
+            run_id=self._run_id,
+            broker_order_id=fill.execution.orderId,
+            exec_id=fill.execution.execId,
             commission=report.commission,
             currency=report.currency,
             realized_pnl=report.realizedPNL,
-        )
-        self._external_event_queue.enqueue(event)
-
+        ))
 
     def build_contract(self, spec: InstrumentSpec) -> Contract:
         if isinstance(spec, StockSpec):
-            contract = map_stock_specs_to_ib_contract(spec)
-        elif isinstance(spec, FutureSpec):
-            contract = map_future_specs_to_ib_contract(spec)
+            return map_stock_specs_to_ib_contract(spec)
+        if isinstance(spec, FutureSpec):
+            return map_future_specs_to_ib_contract(spec)
+        raise NotImplementedError(f"Unsupported instrument type: {type(spec).__name__}")
+
+    def resolve_contract(self, instrument_id: str) -> Contract:
+        if instrument_id not in self._contracts:
+            try:
+                spec = self._instruments[instrument_id]
+            except KeyError:
+                raise ValueError(f"Unknown instrument_id: {instrument_id}") from None
+            self._contracts[instrument_id] = self.build_contract(spec)
+        return self._contracts[instrument_id]
+
+    def prepare_on_ib_thread(self, command: PrepareBracket) -> None:
+        try:
+            self.resolve_contract(command.instrument_id)
+            orders = tuple(order for order in (
+                command.entry, command.stop_loss, command.take_profit,
+            ) if order is not None)
+            broker_ids = {order.order_id: self._ib_client.next_id for order in orders}
+
+            def prepare(order: OrderToPrepare | None) -> PreparedOrder | None:
+                if order is None:
+                    return None
+                return PreparedOrder(
+                    order_id=order.order_id,
+                    parent_id=order.parent_id,
+                    spec=order.spec,
+                    broker_order_id=broker_ids[order.order_id],
+                    broker_parent_id=0 if order.parent_id is None else broker_ids[order.parent_id],
+                    transmit=order.order_id == orders[-1].order_id,
+                )
+
+            entry = prepare(command.entry)
+            assert entry is not None
+            prepared = BracketPrepared(
+                run_id=command.run_id,
+                preparation_id=command.command_id,
+                intention_id=command.intention_id,
+                instrument_id=command.instrument_id,
+                entry=entry,
+                stop_loss=prepare(command.stop_loss),
+                take_profit=prepare(command.take_profit),
+            )
+        except Exception as exc:
+            self._report_failure(command, "prepare", exc)
+            return
+        self._inbound_queue.enqueue(prepared)
+
+    def convert_order(
+        self, spec: SingleOrderSpec, *, order_id: int, parent_id: int, transmit: bool,
+    ) -> Order:
+        if isinstance(spec, MarketOrderSpec):
+            order = MarketOrder(action=spec.side, totalQuantity=spec.quantity)
+        elif isinstance(spec, LimitOrderSpec):
+            order = LimitOrder(action=spec.side, totalQuantity=spec.quantity, lmtPrice=spec.limit_price)
+        elif isinstance(spec, StopOrderSpec):
+            order = StopOrder(action=spec.side, totalQuantity=spec.quantity, stopPrice=spec.stop_price)
         else:
-            raise NotImplementedError(
-                f"Unsupported instrument type: "
-                f"{type(spec).__name__}, "
-                f"available are Stock and Future."
+            raise TypeError(f"Unsupported order specification: {type(spec).__name__}")
+        order.tif = spec.tif
+        order.orderId = order_id
+        order.parentId = parent_id
+        order.transmit = transmit
+        return order
+
+    def submit_on_ib_thread(self, command: IBSubmitOrder) -> None:
+        try:
+            contract = self.resolve_contract(command.instrument_id)
+            order = self.convert_order(
+                command.order_spec,
+                order_id=command.broker_order_id,
+                parent_id=command.broker_parent_id,
+                transmit=command.transmit,
             )
-        return contract
+            if not self._subscribed:
+                # Subscribe before placement, including callbacks emitted synchronously.
+                self._ib_client.subscribe_order_events(
+                    self._on_status_update, self._on_fill, self._on_commission_report,
+                )
+                self._subscribed = True
+            self._ib_client.place_order(contract, order)
+        except Exception as exc:
+            self._report_failure(command, "submit", exc)
 
-
-    def _place_order_on_ib_thread(
-            self,
-            contract: Contract,
-            order: Order
-    ) -> None:
-        trade = self._ib_client.place_order(contract=contract, order=order)
-
-        trade.statusEvent += self._on_status_update
-        trade.fillEvent += self._on_fill
-        trade.commissionReportEvent += self._on_commission_report
-
-
-    def _place_bracket_on_ib_thread(
-            self,
-            contract: Contract,
-            bracket: list[Order]
-    ) -> None:
-        for order in bracket:
-            trade =self._ib_client.place_order(contract=contract, order=order)
-
-            trade.statusEvent += self._on_status_update
-            trade.fillEvent += self._on_fill
-            trade.commissionReportEvent += self._on_commission_report
-
-
-    def place_market_order(
-            self,
-            contract_spec: InstrumentSpec,
-            order_spec: MarketOrderSpec
-    ) -> None:
-        # Build contract
-        contract = self.build_contract(contract_spec)
-
-        # Build Market Order
-        action = "BUY" if order_spec.quantity > 0 else "SELL"
-        order = MarketOrder(
-            action=action,
-            totalQuantity=abs(order_spec.quantity)
-        )
-        order.tif = "DAY"
-
-        # Place order and subscribe to trade events
-        self._ib_client.ib_loop.call_soon_threadsafe(
-            self._place_order_on_ib_thread,
-            contract,
-            order
-        )
-
-
-    def place_limit_order(
-            self,
-            contract_spec: InstrumentSpec,
-            order_spec: LimitOrderSpec
-    ) -> None:
-        # Build contract
-        contract = self.build_contract(contract_spec)
-
-        # Build order
-        action = "BUY" if order_spec.quantity > 0 else "SELL"
-        order = LimitOrder(
-            action=action,
-            totalQuantity=abs(order_spec.quantity),
-            lmtPrice=order_spec.price
-        )
-        order.tif = "DAY"
-
-        # Place order and subscribe to trade events
-        self._ib_client.ib_loop.call_soon_threadsafe(
-            self._place_order_on_ib_thread,
-            contract,
-            order
-        )
-
-    def place_bracket_order(
-            self,
-            contract_spec: InstrumentSpec,
-            order_spec: BracketOrderSpec,
-    ) -> None:
-
-        bracket = []
-
-        # Build contract
-        contract = self.build_contract(contract_spec)
-
-        # Build parent order
-        entry = order_spec.entry
-        parent = None
-        if isinstance(entry, MarketOrderSpec):
-            parent_action = "BUY" if entry.quantity > 0 else "SELL"
-            parent = MarketOrder(
-                action=parent_action,
-                totalQuantity=abs(entry.quantity),
-            )
-            order_id: int = self._ib_client.next_id
-            parent.orderId = order_id
-            print(f"parent order_id: {order_id}")
-            parent.tif = "DAY"
-            parent.transmit = False
-            bracket.append(parent)
-
-        elif isinstance(entry, LimitOrderSpec):
-            parent_action = "BUY" if entry.quantity > 0 else "SELL"
-            parent = LimitOrder(
-                action=parent_action,
-                totalQuantity=abs(entry.quantity),
-                lmtPrice=entry.price
-            )
-            order_id: int = self._ib_client.next_id
-            parent.orderId = order_id
-            print(f"parent order_id: {order_id}")
-            parent.tif = "DAY"
-            parent.transmit = False
-
-            bracket.append(parent)
-
-        # Build stop-loss
-        if order_spec.stop_loss:
-            stop_loss = StopOrder(
-                action= "SELL" if entry.quantity > 0 else "BUY" ,
-                totalQuantity= abs(entry.quantity),
-                stopPrice=order_spec.stop_loss.price,
-            )
-            order_id: int = self._ib_client.next_id
-            stop_loss.parentId = parent.orderId
-            stop_loss.orderId = order_id
-            print(f"stop_loss order_id: {order_id}")
-            stop_loss.tif = "DAY"
-            stop_loss.transmit = False if order_spec.take_profit else True
-
-            bracket.append(stop_loss)
-
-        # Build take-profit
-        if order_spec.take_profit:
-            take_profit = LimitOrder(
-                action="SELL" if entry.quantity > 0 else "BUY",
-                totalQuantity=abs(entry.quantity),
-                lmtPrice=order_spec.take_profit.price
-            )
-            take_profit.parentId = parent.orderId
-            order_id: int = self._ib_client.next_id
-            take_profit.orderId = order_id
-            print(f"take_profit order_id: {order_id}")
-            take_profit.tif = "DAY"
-            take_profit.transmit = True
-
-            bracket.append(take_profit)
-
-        # Place orders
-        self._ib_client.ib_loop.call_soon_threadsafe(
-            self._place_bracket_on_ib_thread,
-            contract,
-            bracket
-        )
+    def _report_failure(self, command: PrepareBracket | IBSubmitOrder, operation: str, exc: Exception) -> None:
+        self._inbound_queue.enqueue(BrokerOperationFailed(
+            run_id=command.run_id,
+            command_id=command.command_id,
+            operation=operation,
+            error=f"{type(exc).__name__}: {exc}",
+        ))

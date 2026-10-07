@@ -1,7 +1,7 @@
 from datetime import datetime
 from dataclasses import dataclass
 
-from investiq.core.event_factory import EventFactory
+from investiq.core.broker_messages import MarketTrade
 from investiq.core.event_queue import EventQueue
 
 
@@ -20,16 +20,17 @@ class SyntheticIngress:
             self,
             scenario: list[TradeFixture],
             event_queue: EventQueue,
-            event_factory: EventFactory,
+            run_id: str,
     ):
         self._scenario = scenario
         self._event_queue = event_queue
-        self._event_factory = event_factory
+        self._run_id = run_id
 
 
     def start(self) -> None:
         for trade in self._scenario:
-            event = self._event_factory.create_trade_received(
+            event = MarketTrade(
+                run_id=self._run_id,
                 symbol=trade.symbol,
                 timestamp_utc=trade.timestamp_utc,
                 price=trade.price,

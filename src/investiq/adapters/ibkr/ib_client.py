@@ -1,7 +1,7 @@
 import asyncio
 from collections.abc import Callable
 
-from ib_insync import IB, Ticker, Contract, Order, Trade
+from ib_insync import IB, Ticker, Contract, Order, Trade, Fill, CommissionReport
 
 
 class IBClient:
@@ -15,6 +15,8 @@ class IBClient:
             port: int = 7497,
             client_id: int = 1,
     ) -> None:
+        # Publish the owning loop before the canonical thread can schedule work.
+        self.ib_loop = asyncio.get_event_loop_policy().get_event_loop()
         self._ib.connect(host=host, port=port, clientId=client_id)
 
     def disconnect(self):
@@ -41,6 +43,16 @@ class IBClient:
 
     def request_market_data(self, contract: Contract) -> Ticker:
         return self._ib.reqMktData(contract=contract)
+
+    def subscribe_order_events(
+        self,
+        on_status: Callable[[Trade], None],
+        on_fill: Callable[[Trade, Fill], None],
+        on_commission: Callable[[Trade, Fill, CommissionReport], None],
+    ) -> None:
+        self._ib.orderStatusEvent += on_status
+        self._ib.execDetailsEvent += on_fill
+        self._ib.commissionReportEvent += on_commission
 
 
     def place_order(self, contract: Contract, order: Order) -> Trade:

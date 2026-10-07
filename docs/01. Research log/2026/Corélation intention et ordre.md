@@ -45,80 +45,6 @@ OMS  Position  Portfolio    PnL
 Le journal canonique doit contenir les évènements externes (données marché, exécution) ainsi que les évènements internes nécessaire à la reconstruction de l'état et de la décision.
 
 ---
-# Simulation
-
-### 1. Callback donnée marché `IBKR`
-
-```
-TradeReceived:
-	run_id="TEST_RUN"
-	event_id="EVT_00001"
-	symbol="MNQZ6"
-	timestamp_utc=datetime(...)
-	price=29898.50
-	size=1.0
-```
-
-### 2. `TradeReceived`
-
-```
-IntentGenerated:
-	run_id="TEST_RUN"
-	event_id="EVT_00002"
-	causation_id="EVT_00001"
-	spec=BraketOrderSpec(
-		entry=MarketOrderSpec(BUY, 1.0)
-		stop_loss=Stoploss(29800)
-		take_profit=TakeProfit(30200)
-	)
-```
-
----
-### 3. `IntentGenerated`
-
-##  Création de l'ordre
-
-**Parent : BUY@Market**
-
-```
-OrderCreated:
-	run_id="TEST_RUN"
-	event_id="EVT_00003"
-	intention_id="EVT_00002"
-	order_id=1
-	parent_id=None
-```
-
-**Stop-Loss : Stop@29800**
-
-```
-OrderCreated:
-	run_id="TEST_RUN"
-	event_id="EVT_00004"
-	intention_id=EVT_00002
-	order_id=002
-	parent_id=001
-```
-
-**Take-Profit : Limit@ 30200**
-
-```
-OrderCreated:
-	run_id="TEST_RUN"
-	event_id="EVT_00005"
-	intention_id=EVT_00002
-	order_id=003
-	parent_id=001
-```
-
----
-### Test de la création des ordres
-
-Une intention bracket avec entrée, SL et TP produit trois événements de création correctement reliés et demande à l’adaptateur de soumettre le bracket attendu.
-
-- Mocker `IBKRAdapter`
-
----
 ## Corrélation identifiant interne et broker
 
 **Parent : BUY@Market**
@@ -131,6 +57,11 @@ BrokerOrderAssigned:
 	broker_order_id=278
 	broker_parent_id=0
 ```
+
+>[!note] Décision en cours
+>La séparation entre la création, la corrélation des identifiants ainsi que leur soumission est étudiée [[Révision du 2026-10-06 — Préparation et soumission | ici]].
+
+---
 
 **Stop-Loss : Stop@29800**
 
@@ -153,6 +84,13 @@ BrokerOrderAssigned:
 	broker_order_id=280
 	broker_parent_id=278
 ```
+
+
+### Envoi des commande de soumission d'ordre 
+
+>[!note] étudier la mise en oeuvre de cette solution 
+
+
 
 ---
 ### - 4. `statusEvent`
@@ -321,8 +259,8 @@ commissionReportEvent:
 CommissionReportReceived:
 	run_id="TEST_RUN"
 	event_id="EVT_00014"
-	order_id=001
-	parent_id=0
+	order_id=1
+	parent_id=None
 	exec_id="0000e1a7.6aa503e1.01.01"
 	commission=0.61
 	currency="USD"

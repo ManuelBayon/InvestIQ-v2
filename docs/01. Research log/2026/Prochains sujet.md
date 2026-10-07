@@ -1,0 +1,2 @@
+- Corrélation instrument_id -> éventuellement instrument spec -> instrument format broker
+- Modèle de passage des données de projection (event-sourcing).

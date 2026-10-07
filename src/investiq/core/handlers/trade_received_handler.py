@@ -1,7 +1,7 @@
 from collections.abc import Mapping
 
 from investiq.core.event_factory import EventFactory
-from investiq.core.events import TradeReceived
+from investiq.core.events import IntentGenerated, TradeReceived
 from investiq.domain.features.features import Feature
 from investiq.domain.market_store import InMemoryMarketStore
 from investiq.domain.features.feature_runtime import FeatureRuntime
@@ -21,7 +21,8 @@ class TradeReceivedHandler:
             feature_runtime: FeatureRuntime,
             strategy_features: Mapping[str, Feature],
             strategy: Strategy,
-            event_factory: EventFactory
+            event_factory: EventFactory,
+            instrument_id: str,
     ):
         self._market_store = market_store
         self._price_source = price_source
@@ -30,6 +31,7 @@ class TradeReceivedHandler:
         self._strategy_features = strategy_features
         self._strategy = strategy
         self._event_factory= event_factory
+        self._instrument_id = instrument_id
 
 
     def handle(self, event: TradeReceived) -> HandlerResult:
@@ -47,7 +49,7 @@ class TradeReceivedHandler:
             for feature in self._strategy_features.values()
         )
 
-        intents_generated = []
+        intents_generated: list[IntentGenerated] = []
 
         if all_requirements_emitted:
             order_specs = self._strategy.decide(
@@ -63,7 +65,8 @@ class TradeReceivedHandler:
             for spec in order_specs:
                 intent_generated = self._event_factory.create_intent_generated(
                     causation_id=event.event_id,
-                    order=spec
+                    instrument_id=self._instrument_id,
+                    order_spec=spec
                 )
                 intents_generated.append(intent_generated)
 

@@ -3,7 +3,7 @@ from ib_insync import Ticker, Future, Stock
 from investiq.adapters.ibkr.ib_client import IBClient
 from investiq.adapters.ibkr.ib_constants import TRADE_TICK_TYPES
 
-from investiq.core.event_factory import EventFactory
+from investiq.core.broker_messages import MarketTrade
 from investiq.core.event_queue import EventQueue
 from investiq.domain.instrument_spec import InstrumentSpec, FutureSpec, StockSpec
 
@@ -13,13 +13,13 @@ class IBLiveIngress:
     def __init__(
             self,
             ib_client: IBClient,
-            event_factory: EventFactory,
-            external_event_queue: EventQueue,
+            run_id: str,
+            inbound_queue: EventQueue,
             instrument: InstrumentSpec,
     ):
         self._ib_client = ib_client
-        self._event_factory = event_factory
-        self._external_event_queue = external_event_queue
+        self._run_id = run_id
+        self._inbound_queue = inbound_queue
         self._instrument = instrument
 
     def subscribe_to_stock(
@@ -64,13 +64,14 @@ class IBLiveIngress:
 
             for tick in ticker.ticks:
                 if tick.tickType in TRADE_TICK_TYPES:
-                    event = self._event_factory.create_trade_received(
+                    event = MarketTrade(
+                        run_id=self._run_id,
                         symbol=symbol,
                         timestamp_utc=tick.time,
                         price=tick.price,
                         size=tick.size,
                     )
-                    self._external_event_queue.enqueue(event)
+                    self._inbound_queue.enqueue(event)
                 else:
                     continue
 

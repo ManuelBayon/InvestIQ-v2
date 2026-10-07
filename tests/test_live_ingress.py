@@ -2,7 +2,6 @@ import unittest
 from unittest.mock import Mock
 
 from investiq.adapters.ibkr.ib_broker_adapter import IBAdapter
-from investiq.core.event_factory import EventFactory
 from investiq.core.event_queue import EventQueue
 from investiq.domain.instrument_spec import FutureSpec, StockSpec
 from investiq.ingress.ib_live import IBLiveIngress
@@ -18,10 +17,9 @@ class LiveIngressInstrumentTests(unittest.TestCase):
         for instrument in instruments:
             with self.subTest(instrument=instrument):
                 client = Mock()
-                factory = EventFactory(run_id="TEST")
                 queue = EventQueue()
-                ingress = IBLiveIngress(client, factory, queue, instrument)
-                adapter = IBAdapter(client, factory, queue)
+                ingress = IBLiveIngress(client, "TEST", queue, instrument)
+                adapter = IBAdapter(client, queue, "TEST", {"instrument": instrument})
 
                 ingress.start()
 

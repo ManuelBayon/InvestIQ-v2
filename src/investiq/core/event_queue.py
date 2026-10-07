@@ -1,48 +1,26 @@
 from queue import Queue
 
+from investiq.core.broker_messages import InboundMessage
+from investiq.core.commands import Command
 from investiq.core.events import CanonicalEvent
 
 
+Message = CanonicalEvent | Command | InboundMessage
+
+
 class EventQueue:
+    """Thread-safe FIFO for messages entering or circulating in the canonical loop."""
 
-    def __init__(self):
-        self._queue: Queue[CanonicalEvent] = Queue()
+    def __init__(self) -> None:
+        self._queue: Queue[Message] = Queue()
 
-    def enqueue(self, event: CanonicalEvent) -> None:
-        self._queue.put(event)
+    def enqueue(self, message: Message) -> None:
+        self._queue.put(message)
 
-    def dequeue_nowait(self) -> CanonicalEvent:
-        """
-        Remove and return an item from the queue without blocking.
-
-        Only get an item if one is immediately available.
-        Otherwise, raise the Empty exception.
-        :return: CanonicalEvent
-        """
+    def dequeue_nowait(self) -> Message:
         return self._queue.get_nowait()
 
-    def dequeue_blocking(self, block: bool = True, timeout=None) -> CanonicalEvent:
-        """
-        Remove and return an item from the queue.
-
-        - If optional args 'block' is true and 'timeout' is None (the default),
-        block if necessary until an item is available.
-
-        - If 'timeout' is a non-negative number, it blocks at most 'timeout'
-        seconds and raisesthe Empty exception if no item was available within
-        that time.
-
-        - Otherwise ('block' is false), return an item if one is immediately
-        available, else raise the Empty exception ('timeout' is ignored
-        in that case).
-
-        - Raises ShutDown if the queue has been shut down and is empty,
-        or if the queue has been shut down immediately.
-
-        :param block:
-        :param timeout:
-        :return: CanonicalEvent
-        """
+    def dequeue_blocking(self, block: bool = True, timeout: float | None = None) -> Message:
         return self._queue.get(block=block, timeout=timeout)
 
     @property

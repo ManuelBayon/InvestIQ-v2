@@ -5,10 +5,15 @@ from investiq.adapters.ibkr.ib_client import IBClient
 
 from investiq.core.dispatcher import Dispatcher
 from investiq.core.event_factory import EventFactory
-from investiq.core.event_journal import EventTransitionJournal
+from investiq.core.event_journal import EventJournal
 from investiq.core.event_loop import CanonicalEventLoop
 from investiq.core.event_queue import EventQueue
 from investiq.core.order_id_generator import OrderIdGenerator
+from investiq.core.command_id_generator import CommandIdGenerator
+from investiq.core.order_correlation import OrderCorrelation
+from investiq.core.handlers.bracket_prepared_handler import BracketPreparedHandler
+from investiq.core.handlers.broker_return_handler import BrokerReturnHandler
+from investiq.core.handlers.ib_command_handlers import IBSubmitOrderHandler, PrepareBracketHandler
 from investiq.core.handlers.intent_generated_handler import IntentGeneratedHandler
 from investiq.core.handlers.trade_received_handler import TradeReceivedHandler
 
@@ -16,6 +21,7 @@ from investiq.domain.experiment import build_features, validate_strategy_require
 from investiq.domain.features.features import Feature
 from investiq.domain.features.sources import PriceSource
 from investiq.domain.market_store import InMemoryMarketStore
+from investiq.domain.instrument_spec import FutureSpec
 
 from investiq.ingress.ib_live import IBLiveIngress
 from investiq.ingress.synthetic import SyntheticIngress
@@ -56,15 +62,22 @@ def build_runtime(config: RuntimeConfig) -> Runtime:
 
     ib_client = IBClient()
 
-    external_event_queue = EventQueue()
+    inbound_queue = EventQueue()
     internal_event_queue = EventQueue()
     event_factory = EventFactory(run_id=config.experiment.run_id)
     order_id_generator = OrderIdGenerator()
+    command_id_generator = CommandIdGenerator()
+    correlation = OrderCorrelation()
+    instrument_id = (
+        experiment.instrument.local_symbol
+        if isinstance(experiment.instrument, FutureSpec) else experiment.instrument.symbol
+    )
 
     ib_adapter = IBAdapter(
         ib_client=ib_client,
-        event_factory=event_factory,
-        external_event_queue=external_event_queue,
+        inbound_queue=inbound_queue,
+        run_id=experiment.run_id,
+        instruments={instrument_id: experiment.instrument},
     )
 
     trade_received_handler = TradeReceivedHandler(
@@ -75,30 +88,34 @@ def build_runtime(config: RuntimeConfig) -> Runtime:
         strategy_features=strategy_features,
         strategy=strategy,
         event_factory=event_factory,
+        instrument_id=instrument_id,
     )
 
-    order_generated_handler = IntentGeneratedHandler(
-        ib_adapter=ib_adapter,
-        event_factory=event_factory,
-        instrument=experiment.instrument,
+    intent_generated_handler = IntentGeneratedHandler(
         order_id_generator=order_id_generator,
+        command_id_generator=command_id_generator,
     )
 
     event_loop = CanonicalEventLoop(
-        external_event_queue=external_event_queue,
+        inbound_queue=inbound_queue,
         internal_event_queue=internal_event_queue,
-        journal=EventTransitionJournal(),
+        journal=EventJournal(),
+        correlation=correlation,
         dispatcher=Dispatcher(
             trade_received_handler=trade_received_handler,
-            order_generated_handler=order_generated_handler,
+            intent_generated_handler=intent_generated_handler,
+            prepare_bracket_handler=PrepareBracketHandler(ib_client, ib_adapter, event_factory),
+            bracket_prepared_handler=BracketPreparedHandler(event_factory, command_id_generator),
+            submit_order_handler=IBSubmitOrderHandler(ib_client, ib_adapter, event_factory),
+            broker_return_handler=BrokerReturnHandler(correlation, event_factory),
         )
     )
 
     if isinstance(config, SequentialRuntimeConfig):
         ingress = SyntheticIngress(
             scenario=config.trades[:config.num_trades],
-            event_queue=external_event_queue,
-            event_factory=event_factory,
+            event_queue=inbound_queue,
+            run_id=experiment.run_id,
         )
         return SequentialRuntime(
             ingress=ingress,
@@ -108,8 +125,8 @@ def build_runtime(config: RuntimeConfig) -> Runtime:
     elif isinstance(config, LiveRuntimeConfig):
         ingress = IBLiveIngress(
             instrument=experiment.instrument,
-            external_event_queue=external_event_queue,
-            event_factory=event_factory,
+            inbound_queue=inbound_queue,
+            run_id=experiment.run_id,
             ib_client=ib_client
         )
         return LiveRuntime(

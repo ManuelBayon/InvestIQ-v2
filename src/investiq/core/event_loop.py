@@ -1,75 +1,69 @@
-from investiq.core.event_queue import EventQueue
+from queue import Empty
 
-from investiq.core.event_journal import EventTransitionJournal, EventTransition
 from investiq.core.dispatcher import Dispatcher
-from investiq.core.events import CanonicalEvent, InternalEvent
-from investiq.core.handlers.base import HandlerResult
+from investiq.core.event_journal import EventJournal
+from investiq.core.event_queue import EventQueue, Message
+from investiq.core.events import CanonicalEvent
+from investiq.core.order_correlation import OrderCorrelation
 
 
 class CanonicalEventLoop:
-
     def __init__(
-            self,
-            journal: EventTransitionJournal,
-            external_event_queue: EventQueue,
-            internal_event_queue: EventQueue,
-            dispatcher: Dispatcher,
-    ):
+        self,
+        journal: EventJournal,
+        inbound_queue: EventQueue,
+        internal_event_queue: EventQueue,
+        dispatcher: Dispatcher,
+        correlation: OrderCorrelation,
+    ) -> None:
         self._journal = journal
-        self._external_event_queue = external_event_queue
+        self._inbound_queue = inbound_queue
         self._internal_event_queue = internal_event_queue
         self._dispatcher = dispatcher
+        self._correlation = correlation
         self.running = False
 
+    def _record(self, event: CanonicalEvent) -> None:
+        self._journal.append(event)
+        self._correlation.apply(event)
 
-    def _process(self, event: CanonicalEvent) -> None:
-        print(event)
+    def _process(self, message: Message, *, already_recorded: bool = False) -> None:
+        if isinstance(message, CanonicalEvent) and not already_recorded:
+            self._record(message)
+        result = self._dispatcher.dispatch(message)
 
-        handler_result: HandlerResult = self._dispatcher.dispatch(event)
+        # All facts are recorded and projected before any command is scheduled.
+        for event in result.events:
+            self._record(event)
+        for event in result.events:
+            if self._dispatcher.has_handler(event):
+                self._internal_event_queue.enqueue(event)
+        for command in result.commands:
+            self._internal_event_queue.enqueue(command)
 
-        for evt in handler_result.events:
-            if isinstance(evt, InternalEvent):
-                self._internal_event_queue.enqueue(evt)
-            else:
-                raise ValueError(
-                    f"Unsupported event type for event={evt}, "
-                    f"must be either InternalEvent or ExternalEvent"
-                )
-
-        self._journal.append(
-            EventTransition(
-                input_event=event,
-                emitted_events=handler_result.events,
-            )
-        )
-
+    def _drain_internal(self) -> None:
+        while True:
+            try:
+                message = self._internal_event_queue.dequeue_nowait()
+            except Empty:
+                return
+            # Internal events have already been recorded when their handler returned.
+            self._process(message, already_recorded=isinstance(message, CanonicalEvent))
 
     def run_until_empty(self) -> None:
-        """
-        Non-blocking, used for backtest or replay,
-        While there are elements returns the elements then ends.
-        :return:
-        """
-        while not self._external_event_queue.is_empty:
-            external_event = self._external_event_queue.dequeue_blocking()
-            self._process(external_event)
-
-            while not self._internal_event_queue.is_empty:
-                internal_event = self._internal_event_queue.dequeue_nowait()
-                self._process(internal_event)
-
+        """Process available messages; this does not wait for pending IB callbacks."""
+        self._drain_internal()
+        while True:
+            try:
+                message = self._inbound_queue.dequeue_nowait()
+            except Empty:
+                return
+            self._process(message)
+            self._drain_internal()
 
     def run_forever(self) -> None:
-        """
-        Blocking method, awaits elements
-        To stop the loop, set self._running = False.
-        """
         self.running = True
         while self.running:
-
-            external_event = self._external_event_queue.dequeue_blocking()
-            self._process(external_event)
-
-            while not self._internal_event_queue.is_empty:
-                internal_event = self._internal_event_queue.dequeue_nowait()
-                self._process(internal_event)
+            self._drain_internal()
+            message = self._inbound_queue.dequeue_blocking()
+            self._process(message)
