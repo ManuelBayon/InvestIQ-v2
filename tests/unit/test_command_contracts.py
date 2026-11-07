@@ -5,23 +5,23 @@ from dataclasses import FrozenInstanceError, replace
 from datetime import datetime, timezone
 from decimal import Decimal
 
-from investiq.contracts.bracket_spec import BracketSpec
-from investiq.contracts.command_envelope import CommandEnvelope
-from investiq.contracts.command_id import CommandId
-from investiq.contracts.commands.cancel_order import CancelOrder
-from investiq.contracts.commands.modify_order import ModifyOrder
-from investiq.contracts.commands.submit_bracket import SubmitBracket
-from investiq.contracts.commands.submit_order import SubmitOrder
-from investiq.contracts.event import Event
-from investiq.contracts.event_envelope import EventEnvelope
-from investiq.contracts.event_ref import EventRef
-from investiq.contracts.execution_spec import Limit, Market, StopMarket
-from investiq.contracts.inputs.market_trade_received import MarketTradeReceived
-from investiq.contracts.order_id import OrderId
-from investiq.contracts.order_spec import OrderSpec
-from investiq.contracts.recorded_command import RecordedCommand
-from investiq.contracts.side import Side
-from investiq.contracts.time_in_force import TimeInForce
+from investiq.contracts.orders.specifications import BracketSpec
+from investiq.contracts.envelopes import CommandEnvelope
+from investiq.contracts.identities import CommandId
+from investiq.contracts.commands.orders import CancelOrder
+from investiq.contracts.commands.orders import ModifyOrder
+from investiq.contracts.commands.orders import SubmitBracket
+from investiq.contracts.commands.orders import SubmitOrder
+from investiq.contracts.messages import Event
+from investiq.contracts.envelopes import EventEnvelope
+from investiq.contracts.identities import EventRef
+from investiq.contracts.orders.execution import Limit, Market, StopMarket
+from investiq.contracts.inputs.market import MarketTradeReceived
+from investiq.contracts.identities import OrderId
+from investiq.contracts.orders.specifications import OrderSpec
+from investiq.contracts.messages import RecordedCommand
+from investiq.contracts.orders.types import Side
+from investiq.contracts.orders.types import TimeInForce
 
 
 class CommandContractTests(unittest.TestCase):

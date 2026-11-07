@@ -1,6 +1,23 @@
-"""Canonical order states, independent of broker status labels."""
+"""Shared order direction, validity and lifecycle vocabulary."""
 
 from enum import StrEnum
+
+
+class Side(StrEnum):
+    """Buy or sell direction, independent of position and order role."""
+
+    BUY = "BUY"
+    SELL = "SELL"
+
+
+class TimeInForce(StrEnum):
+    """Validity policy; permitted trading sessions are configured separately."""
+
+    # Valid for the applicable trading day, as defined by the destination.
+    DAY = "DAY"
+
+    # Remains valid until cancelled, subject to destination validity limits.
+    GTC = "GTC"
 
 
 class OrderStatus(StrEnum):

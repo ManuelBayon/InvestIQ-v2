@@ -1,4 +1,4 @@
-"""Normalized contract for an individual market transaction."""
+"""Normalized market-data inputs."""
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta

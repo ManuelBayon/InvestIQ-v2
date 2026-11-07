@@ -1,9 +1,8 @@
-"""Requested execution modalities, independent of broker representations."""
+"""Broker-independent execution modalities."""
 
 from dataclasses import dataclass
 from decimal import Decimal
 from typing import TypeAlias
-
 from investiq.contracts._validation import require_decimal
 
 
