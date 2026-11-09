@@ -13,7 +13,7 @@ from investiq.contracts.commands.orders import (
 )
 from investiq.refactoring.execution_port import ExecutionPort, OrderCommand
 from investiq.refactoring.ibkr_instruments import IBKRInstruments
-from investiq.refactoring.ibkr_order_mapping import build_order
+from investiq.refactoring.ibkr_order_mapping import build_order, build_bracket_orders
 from investiq.refactoring.ibkr_order_registry import IBKROrderRegistry
 
 
@@ -87,9 +87,18 @@ class IBKRExecutionAdapter(ExecutionPort):
             self._submit_order(command)
             return
 
+        if isinstance(command, SubmitBracket):
+            self._submit_bracket(command)
+            return
+
         raise NotImplementedError(
             f"IBKR command execution is not implemented yet: {type(command).__name__}"
         )
+
+    def _subscribe_to_trade(self, trade: Trade) -> None:
+        trade.statusEvent += self._on_order_status
+        trade.fillEvent += self._on_fill
+        trade.commissionReportEvent += self._on_commission_report
 
     def _submit_order(self, command: SubmitOrder) -> None:
         """Submit an order and subscribe to its Trade on the IBKR loop."""
@@ -110,10 +119,36 @@ class IBKRExecutionAdapter(ExecutionPort):
 
         trade = self._ib.placeOrder(contract, order)
         self._registry.attach_trade(command.order_id, trade)
+        self._subscribe_to_trade(trade)
 
-        trade.statusEvent += self._on_order_status
-        trade.fillEvent += self._on_fill
-        trade.commissionReportEvent += self._on_commission_report
+
+    def _submit_bracket(self, command: SubmitBracket) -> None:
+        """Submit a native IBKR bracket on the owning event loop."""
+        contract = self._instruments.resolve(command.spec.entry.symbol)
+        members = tuple(command.iter_members())
+
+        broker_ids = {
+            order_id: self._allocate_broker_order_id()
+            for order_id, _ in members
+        }
+
+        prepared = build_bracket_orders(
+            members,
+            broker_ids=broker_ids,
+            client_id=self._client_id,
+            account=self._account,
+        )
+
+        self._registry.reserve_many(
+            client_id=self._client_id,
+            orders=[(order_id, order.orderId) for order_id, order in prepared],
+        )
+
+        for order_id, order in prepared:
+            trade = self._ib.placeOrder(contract, order)
+            self._registry.attach_trade(order_id, trade)
+            self._subscribe_to_trade(trade)
+
 
     def _allocate_broker_order_id(self) -> int:
         """Allocate an explicit order ID on the owning IBKR loop."""

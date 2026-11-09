@@ -22,7 +22,11 @@ class IBKROrderRegistry:
         self._broker_keys: set[tuple[int, int]] = set()
 
     def reserve(
-        self, *, order_id: OrderId, client_id: int, broker_order_id: int,
+            self,
+            *,
+            order_id: OrderId,
+            client_id: int,
+            broker_order_id: int,
     ) -> None:
         """Record both identities before attempting submission."""
         if broker_order_id <= 0:
@@ -35,7 +39,38 @@ class IBKROrderRegistry:
         self._by_order_id[order_id] = _OrderBinding(client_id, broker_order_id)
         self._broker_keys.add(broker_key)
 
-    def attach_trade(self, order_id: OrderId, trade: Trade) -> None:
+    def reserve_many(
+            self,
+            *,
+            client_id: int,
+            orders: list[tuple[OrderId, int]],
+    ) -> None:
+        """Validate all order identities before registering any of them."""
+        bindings: dict[OrderId, _OrderBinding] = {}
+        broker_keys: set[tuple[int, int]] = set()
+
+        for order_id, broker_id in orders:
+            if broker_id <= 0:
+                raise ValueError("An explicit positive IBKR order ID is required")
+            if order_id in self._by_order_id or order_id in bindings:
+                raise ValueError(f"Canonical order ID already reserved: {order_id}")
+
+            key = (client_id, broker_id)
+            if key in self._broker_keys or key in broker_keys:
+                raise ValueError(f"IBKR order identity already reserved: {key}")
+
+            bindings[order_id] = _OrderBinding(client_id, broker_id)
+            broker_keys.add(key)
+
+        self._by_order_id.update(bindings)
+        self._broker_keys.update(broker_keys)
+
+
+    def attach_trade(
+            self,
+            order_id: OrderId,
+            trade: Trade
+    ) -> None:
         """Attach the live local handle returned by placeOrder."""
         binding = self._by_order_id[order_id]
         if (trade.order.clientId, trade.order.orderId) != (

@@ -1,5 +1,5 @@
 """Canonical order execution requests."""
-
+from collections.abc import Iterator
 from dataclasses import dataclass
 from investiq.contracts.identities import CommandId
 from investiq.contracts.identities import OrderId
@@ -63,6 +63,18 @@ class SubmitBracket:
                 ids.append(identity)
         if len(set(ids)) != len(ids):
             raise ValueError("bracket member IDs must be distinct")
+
+    def iter_members(self) -> Iterator[tuple[OrderId, OrderSpec]]:
+        """Yield the entry and each configured exit with its canonical ID."""
+        yield self.entry_id, self.spec.entry
+
+        for order_id, spec in (
+                (self.take_profit_id, self.spec.take_profit),
+                (self.stop_loss_id, self.spec.stop_loss),
+        ):
+            if order_id is not None:
+                assert spec is not None  # Guaranteed by __post_init__.
+                yield order_id, spec
 
 
 @dataclass(frozen=True, slots=True)

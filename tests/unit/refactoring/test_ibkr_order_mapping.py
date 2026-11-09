@@ -56,11 +56,13 @@ def test_build_order_requires_explicit_account(account: str) -> None:
         build_order(MARKET_SPEC, broker_id=BROKER_ID, client_id=CLIENT_ID, account=account)
 
 
-def test_build_order_rejects_stop_market() -> None:
+def test_build_stop_market_order() -> None:
     spec = replace(MARKET_SPEC, execution=StopMarket(Decimal("123.45")))
 
-    with pytest.raises(NotImplementedError, match="StopMarket"):
-        build_order(spec, broker_id=BROKER_ID, client_id=CLIENT_ID, account=ACCOUNT)
+    order = build_order(spec, broker_id=BROKER_ID, client_id=CLIENT_ID, account=ACCOUNT)
+
+    assert order.orderType == "STP"
+    assert order.auxPrice == 123.45
 
 
 @pytest.mark.parametrize("value", [
