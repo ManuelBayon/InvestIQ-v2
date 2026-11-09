@@ -72,6 +72,18 @@ class IBKRExecutionAdapter(ExecutionPort):
 
         self._loop.call_soon_threadsafe(self._process_command, command)
 
+
+    def _allocate_broker_order_id(self) -> int:
+        """Allocate an explicit order ID on the owning IBKR loop."""
+        broker_order_id = self._ib.client.getReqId()
+        if broker_order_id == 0:
+            # placeOrder would replace zero with a newly allocated ID.
+            broker_order_id = self._ib.client.getReqId()
+        if broker_order_id <= 0:
+            raise RuntimeError(f"Invalid IBKR order ID: {broker_order_id}")
+        return broker_order_id
+
+
     def _process_command(self, command: OrderCommand) -> None:
         """Check technical readiness on the owning loop before execution."""
         if asyncio.get_running_loop() is not self._loop:
@@ -89,6 +101,10 @@ class IBKRExecutionAdapter(ExecutionPort):
 
         if isinstance(command, SubmitBracket):
             self._submit_bracket(command)
+            return
+
+        if isinstance(command, CancelOrder):
+            self._cancel_order(command)
             return
 
         raise NotImplementedError(
@@ -149,13 +165,7 @@ class IBKRExecutionAdapter(ExecutionPort):
             self._registry.attach_trade(order_id, trade)
             self._subscribe_to_trade(trade)
 
-
-    def _allocate_broker_order_id(self) -> int:
-        """Allocate an explicit order ID on the owning IBKR loop."""
-        broker_order_id = self._ib.client.getReqId()
-        if broker_order_id == 0:
-            # placeOrder would replace zero with a newly allocated ID.
-            broker_order_id = self._ib.client.getReqId()
-        if broker_order_id <= 0:
-            raise RuntimeError(f"Invalid IBKR order ID: {broker_order_id}")
-        return broker_order_id
+    def _cancel_order(self, command: CancelOrder) -> None:
+        """Request cancellation on the owning IBKR event loop."""
+        trade = self._registry.get_trade(command.order_id)
+        self._ib.client.cancelOrder(trade.order.orderId)

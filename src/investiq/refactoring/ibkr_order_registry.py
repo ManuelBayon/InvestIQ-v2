@@ -80,3 +80,10 @@ class IBKROrderRegistry:
         if binding.trade is not None and binding.trade is not trade:
             raise ValueError(f"A different Trade is already attached to {order_id}")
         binding.trade = trade
+
+    def get_trade(self, order_id: OrderId) -> Trade:
+        """Return the Trade attached to a reserved order."""
+        trade = self._by_order_id[order_id].trade
+        if trade is None:
+            raise RuntimeError(f"No IBKR Trade attached to {order_id.value}")
+        return trade
